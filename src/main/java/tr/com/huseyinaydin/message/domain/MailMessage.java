@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tr.com.huseyinaydin.auth.domain.AppUser;
+import tr.com.huseyinaydin.category.domain.MailCategory;
 
 import java.time.Instant;
 
@@ -54,6 +55,10 @@ public class MailMessage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id")
     private AppUser receiver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private MailCategory category;
 
     public static MailMessage send(AppUser sender, AppUser receiver, String subject, String body) {
         var message = new MailMessage();
@@ -97,5 +102,9 @@ public class MailMessage {
         updateDraft(receiver, subject, body);
         draft = false;
         sentAt = Instant.now();
+    }
+
+    public void assignCategory(MailCategory category) {
+        this.category = category;
     }
 }

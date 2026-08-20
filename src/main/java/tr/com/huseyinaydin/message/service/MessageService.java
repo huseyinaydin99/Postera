@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tr.com.huseyinaydin.auth.domain.AppUser;
 import tr.com.huseyinaydin.auth.repository.AppUserRepository;
+import tr.com.huseyinaydin.category.repository.MailCategoryRepository;
 import tr.com.huseyinaydin.message.domain.MailMessage;
 import tr.com.huseyinaydin.message.repository.MailMessageRepository;
 import tr.com.huseyinaydin.message.web.SendMessageRequest;
@@ -22,6 +23,7 @@ public class MessageService {
 
     private final MailMessageRepository messageRepository;
     private final AppUserRepository userRepository;
+    private final MailCategoryRepository categoryRepository;
 
     @Transactional
     public void send(String senderEmail, SendMessageRequest request) {
@@ -99,8 +101,23 @@ public class MessageService {
                 fullName(message.getSender()), message.getSender().getEmail(),
                 message.getReceiver() == null ? "Alıcı belirtilmedi" : fullName(message.getReceiver()),
                 message.getReceiver() == null ? "" : message.getReceiver().getEmail(),
-                message.getSentAt(), receivedByCurrentUser, message.isImportant(), message.isTrash(), message.isDraft()
+                message.getSentAt(), receivedByCurrentUser, message.isImportant(), message.isTrash(), message.isDraft(),
+                message.getCategory() == null ? null : message.getCategory().getId(),
+                message.getCategory() == null ? null : message.getCategory().getName()
         );
+    }
+
+    @Transactional
+    public void assignCategory(String currentUserEmail, Long messageId, Long categoryId) {
+        var message = findReceivedMessage(currentUserEmail, messageId);
+        if (categoryId == null) {
+            message.assignCategory(null);
+            return;
+        }
+        var user = findUser(currentUserEmail);
+        var category = categoryRepository.findByIdAndOwnerId(categoryId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Kategori bulunamadı."));
+        message.assignCategory(category);
     }
 
     @Transactional

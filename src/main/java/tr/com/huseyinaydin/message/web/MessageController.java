@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import tr.com.huseyinaydin.message.service.MessageService;
+import tr.com.huseyinaydin.category.service.CategoryService;
 
 @Controller
 @RequestMapping("/messages")
@@ -20,6 +21,7 @@ import tr.com.huseyinaydin.message.service.MessageService;
 public class MessageController {
 
     private final MessageService messageService;
+    private final CategoryService categoryService;
 
     @GetMapping("/inbox")
     String inbox(@RequestParam(defaultValue = "0") int page, Authentication authentication, Model model) {
@@ -137,7 +139,19 @@ public class MessageController {
     String detail(@PathVariable Long messageId, Authentication authentication, Model model) {
         try {
             model.addAttribute("message", messageService.getDetail(authentication.getName(), messageId));
+            model.addAttribute("categories", categoryService.list(authentication.getName()));
             return "messages/detail";
+        } catch (IllegalArgumentException exception) {
+            return "redirect:/messages/inbox?notFound";
+        }
+    }
+
+    @PostMapping("/{messageId}/category")
+    String assignCategory(@PathVariable Long messageId, @RequestParam(required = false) Long categoryId,
+                          Authentication authentication) {
+        try {
+            messageService.assignCategory(authentication.getName(), messageId, categoryId);
+            return "redirect:/messages/" + messageId;
         } catch (IllegalArgumentException exception) {
             return "redirect:/messages/inbox?notFound";
         }

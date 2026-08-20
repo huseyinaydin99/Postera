@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kategoriler | Postera</title></head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <h1>Kategoriler</h1>
+    <p th:if="${param.created}" role="status">Kategori oluşturuldu.</p>
+    <p th:if="${param.updated}" role="status">Kategori güncellendi.</p>
+    <p th:if="${param.error}" role="alert">Kategori işlemi tamamlanamadı.</p>
+    <form th:action="@{/categories}" method="post">
+        <label for="newCategoryName">Yeni kategori</label>
+        <input id="newCategoryName" name="name" maxlength="100" required>
+        <button type="submit">Ekle</button>
+    </form>
+    <ul>
+        <li th:each="category : ${categories}">
+            <form th:action="@{/categories/{id}(id=${category.id})}" method="post">
+                <input name="name" th:value="${category.name}" maxlength="100" required>
+                <button type="submit">Kaydet</button>
+            </form>
+            <form th:action="@{/categories/{id}/delete(id=${category.id})}" method="post">
+                <button type="submit">Sil</button>
+            </form>
+        </li>
+    </ul>
+</main>
+</body>
+</html>

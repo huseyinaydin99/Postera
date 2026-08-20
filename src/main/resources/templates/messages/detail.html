@@ -20,6 +20,15 @@
         </dl>
         <div th:text="${message.body}"></div>
         <div th:if="${message.receivedByCurrentUser}">
+            <form th:action="@{/messages/{id}/category(id=${message.id})}" method="post">
+                <label for="categoryId">Kategori</label>
+                <select id="categoryId" name="categoryId">
+                    <option value="">Kategorisiz</option>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
+                            th:selected="${category.id == message.categoryId}"></option>
+                </select>
+                <button type="submit">Kategoriyi güncelle</button>
+            </form>
             <form th:if="${!message.trash}" th:action="@{/messages/{id}/important(id=${message.id})}" method="post">
                 <button type="submit" th:text="${message.important ? 'Önem işaretini kaldır' : 'Önemli olarak işaretle'}"></button>
             </form>
