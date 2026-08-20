@@ -16,20 +16,21 @@
             </div>
             <div>
                 <label for="receiverEmail">Alıcı</label>
-                <input id="receiverEmail" th:field="*{receiverEmail}" type="email" autocomplete="email" required>
+                <input id="receiverEmail" th:field="*{receiverEmail}" type="email" autocomplete="email">
                 <p th:if="${#fields.hasErrors('receiverEmail')}" th:errors="*{receiverEmail}"></p>
             </div>
             <div>
                 <label for="subject">Konu</label>
-                <input id="subject" th:field="*{subject}" required>
+                <input id="subject" th:field="*{subject}">
                 <p th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}"></p>
             </div>
             <div>
                 <label for="body">Mesaj</label>
-                <textarea id="body" th:field="*{body}" rows="10" required></textarea>
+                <textarea id="body" th:field="*{body}" rows="10"></textarea>
                 <p th:if="${#fields.hasErrors('body')}" th:errors="*{body}"></p>
             </div>
             <button type="submit">Gönder</button>
+            <button type="submit" th:formaction="@{/messages/drafts}" formnovalidate>Taslak olarak kaydet</button>
         </form>
     </section>
 </main>

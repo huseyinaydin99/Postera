@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Taslağı düzenle | Postera</title></head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <h1>Taslağı düzenle</h1>
+    <form th:action="@{/messages/drafts/{id}(id=${messageId})}" th:object="${draftMessageRequest}" method="post">
+        <div th:if="${#fields.hasGlobalErrors()}" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
+        <div><label for="receiverEmail">Alıcı</label><input id="receiverEmail" th:field="*{receiverEmail}" type="email"><p th:errors="*{receiverEmail}"></p></div>
+        <div><label for="subject">Konu</label><input id="subject" th:field="*{subject}"><p th:errors="*{subject}"></p></div>
+        <div><label for="body">Mesaj</label><textarea id="body" th:field="*{body}" rows="10"></textarea><p th:errors="*{body}"></p></div>
+        <button name="action" value="save" type="submit">Taslağı kaydet</button>
+        <button name="action" value="send" type="submit">Mesajı gönder</button>
+    </form>
+</main>
+</body>
+</html>

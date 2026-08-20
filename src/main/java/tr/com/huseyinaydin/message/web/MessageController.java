@@ -53,10 +53,68 @@ public class MessageController {
         return "messages/list";
     }
 
+    @GetMapping("/drafts")
+    String drafts(@RequestParam(defaultValue = "0") int page, Authentication authentication, Model model) {
+        model.addAttribute("messages", messageService.drafts(authentication.getName(), page));
+        return "messages/drafts";
+    }
+
     @GetMapping("/compose")
     String compose(Model model) {
         model.addAttribute("sendMessageRequest", new SendMessageRequest(null, null, null));
         return "messages/compose";
+    }
+
+    @PostMapping("/drafts")
+    String createDraft(@Valid @ModelAttribute DraftMessageRequest draftMessageRequest, BindingResult bindingResult,
+                       Authentication authentication, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("sendMessageRequest", new SendMessageRequest(
+                    draftMessageRequest.receiverEmail(), draftMessageRequest.subject(), draftMessageRequest.body()));
+            return "messages/compose";
+        }
+        try {
+            messageService.createDraft(authentication.getName(), draftMessageRequest);
+            return "redirect:/messages/drafts?saved";
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("draft.save.failed", exception.getMessage());
+            model.addAttribute("sendMessageRequest", new SendMessageRequest(
+                    draftMessageRequest.receiverEmail(), draftMessageRequest.subject(), draftMessageRequest.body()));
+            return "messages/compose";
+        }
+    }
+
+    @GetMapping("/drafts/{messageId}/edit")
+    String editDraft(@PathVariable Long messageId, Authentication authentication, Model model) {
+        try {
+            model.addAttribute("draftMessageRequest", messageService.getDraft(authentication.getName(), messageId));
+            model.addAttribute("messageId", messageId);
+            return "messages/draft-form";
+        } catch (IllegalArgumentException exception) {
+            return "redirect:/messages/drafts";
+        }
+    }
+
+    @PostMapping("/drafts/{messageId}")
+    String updateDraft(@PathVariable Long messageId, @Valid @ModelAttribute DraftMessageRequest draftMessageRequest,
+                       BindingResult bindingResult, Authentication authentication, Model model,
+                       @RequestParam String action) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("messageId", messageId);
+            return "messages/draft-form";
+        }
+        try {
+            if ("send".equals(action)) {
+                messageService.publishDraft(authentication.getName(), messageId, draftMessageRequest);
+                return "redirect:/messages/sent?sent";
+            }
+            messageService.updateDraft(authentication.getName(), messageId, draftMessageRequest);
+            return "redirect:/messages/drafts?saved";
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("draft.update.failed", exception.getMessage());
+            model.addAttribute("messageId", messageId);
+            return "messages/draft-form";
+        }
     }
 
     @PostMapping

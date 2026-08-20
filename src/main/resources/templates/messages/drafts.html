@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Taslaklar | Postera</title></head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <h1>Taslaklar</h1>
+    <p th:if="${param.saved}" role="status">Taslağınız kaydedildi.</p>
+    <p th:if="${messages.empty}">Henüz taslak yok.</p>
+    <ul th:if="${!messages.empty}">
+        <li th:each="message : ${messages.content}">
+            <a th:href="@{/messages/drafts/{id}/edit(id=${message.id})}">
+                <span th:text="${message.counterpartName}"></span> — <span th:text="${message.subject.isBlank() ? '(Konu yok)' : message.subject}"></span>
+            </a>
+        </li>
+    </ul>
+</main>
+</body>
+</html>

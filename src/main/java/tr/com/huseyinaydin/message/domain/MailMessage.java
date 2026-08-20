@@ -51,8 +51,8 @@ public class MailMessage {
     @JoinColumn(name = "sender_id", nullable = false)
     private AppUser sender;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "receiver_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id")
     private AppUser receiver;
 
     public static MailMessage send(AppUser sender, AppUser receiver, String subject, String body) {
@@ -62,6 +62,12 @@ public class MailMessage {
         message.subject = subject;
         message.body = body;
         message.sentAt = Instant.now();
+        return message;
+    }
+
+    public static MailMessage draft(AppUser sender, AppUser receiver, String subject, String body) {
+        var message = send(sender, receiver, subject, body);
+        message.draft = true;
         return message;
     }
 
@@ -79,5 +85,17 @@ public class MailMessage {
 
     public void restoreFromTrash() {
         trash = false;
+    }
+
+    public void updateDraft(AppUser receiver, String subject, String body) {
+        this.receiver = receiver;
+        this.subject = subject;
+        this.body = body;
+    }
+
+    public void publish(AppUser receiver, String subject, String body) {
+        updateDraft(receiver, subject, body);
+        draft = false;
+        sentAt = Instant.now();
     }
 }
