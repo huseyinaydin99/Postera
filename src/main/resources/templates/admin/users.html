@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kullanıcı yönetimi | Postera</title></head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <h1>Kullanıcı yönetimi</h1>
+    <table>
+        <thead><tr><th>Kullanıcı</th><th>E-posta</th><th>Durum</th><th>Roller</th><th>İşlemler</th></tr></thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.firstName + ' ' + user.lastName}"></td>
+            <td th:text="${user.email}"></td>
+            <td th:text="${user.active ? 'Aktif' : 'Pasif'}"></td>
+            <td th:text="${#strings.listJoin(user.roles, ', ')}"></td>
+            <td>
+                <form th:action="@{/admin/users/{id}/active(id=${user.id})}" method="post">
+                    <button type="submit" th:text="${user.active ? 'Pasifleştir' : 'Etkinleştir'}"></button>
+                </form>
+                <form th:action="@{/admin/users/{id}/roles(id=${user.id})}" method="post">
+                    <label th:each="role : ${availableRoles}">
+                        <input type="checkbox" name="roles" th:value="${role}" th:checked="${user.roles.contains(role.name())}">
+                        <span th:text="${role}"></span>
+                    </label>
+                    <button type="submit">Rolleri kaydet</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

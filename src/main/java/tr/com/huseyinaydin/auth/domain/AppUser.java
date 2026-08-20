@@ -78,4 +78,13 @@ public class AppUser {
         this.firstName = firstName;
         this.lastName = lastName;
     }
+
+    public void toggleActive() {
+        active = !active;
+    }
+
+    public void replaceRoles(Set<AppRole> roles) {
+        this.roles.clear();
+        this.roles.addAll(roles);
+    }
 }
