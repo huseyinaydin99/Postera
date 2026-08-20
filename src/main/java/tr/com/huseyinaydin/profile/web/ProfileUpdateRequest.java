@@ -2,6 +2,7 @@ package tr.com.huseyinaydin.profile.web;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 public record ProfileUpdateRequest(
         @NotBlank(message = "Ad alanı zorunludur.")
@@ -10,6 +11,7 @@ public record ProfileUpdateRequest(
 
         @NotBlank(message = "Soyad alanı zorunludur.")
         @Size(max = 100, message = "Soyad en fazla 100 karakter olabilir.")
-        String lastName
+        String lastName,
+        MultipartFile profileImage
 ) {
 }

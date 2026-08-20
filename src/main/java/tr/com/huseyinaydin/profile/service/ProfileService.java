@@ -17,16 +17,20 @@ public class ProfileService {
 
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProfileImageStorage profileImageStorage;
 
     @Transactional(readOnly = true)
     public ProfileData getProfile(String email) {
         var user = findUser(email);
-        return new ProfileData(user.getFirstName(), user.getLastName(), user.getEmail());
+        return new ProfileData(user.getFirstName(), user.getLastName(), user.getEmail(), user.getProfileImageUrl());
     }
 
     @Transactional
     public void updateProfile(String email, ProfileUpdateRequest request) {
-        findUser(email).updateProfile(request.firstName().trim(), request.lastName().trim());
+        var user = findUser(email);
+        user.updateProfile(request.firstName().trim(), request.lastName().trim());
+        var imageUrl = profileImageStorage.store(request.profileImage());
+        if (imageUrl != null) user.updateProfileImage(imageUrl);
     }
 
     @Transactional

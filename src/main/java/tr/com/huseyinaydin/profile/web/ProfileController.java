@@ -26,8 +26,9 @@ public class ProfileController {
     @GetMapping
     String profile(Authentication authentication, Model model) {
         var profile = profileService.getProfile(authentication.getName());
-        model.addAttribute("profileUpdateRequest", new ProfileUpdateRequest(profile.firstName(), profile.lastName()));
+        model.addAttribute("profileUpdateRequest", new ProfileUpdateRequest(profile.firstName(), profile.lastName(), null));
         model.addAttribute("email", profile.email());
+        model.addAttribute("profileImageUrl", profile.profileImageUrl());
         return "profile/index";
     }
 
@@ -37,12 +38,21 @@ public class ProfileController {
                          Authentication authentication,
                          Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("email", profileService.getProfile(authentication.getName()).email());
+            var profile = profileService.getProfile(authentication.getName());
+            model.addAttribute("email", profile.email());
+            model.addAttribute("profileImageUrl", profile.profileImageUrl());
             return "profile/index";
         }
-
-        profileService.updateProfile(authentication.getName(), profileUpdateRequest);
-        return "redirect:/profile?updated";
+        try {
+            profileService.updateProfile(authentication.getName(), profileUpdateRequest);
+            return "redirect:/profile?updated";
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("profile.update.failed", exception.getMessage());
+            var profile = profileService.getProfile(authentication.getName());
+            model.addAttribute("email", profile.email());
+            model.addAttribute("profileImageUrl", profile.profileImageUrl());
+            return "profile/index";
+        }
     }
 
     @GetMapping("/password")

@@ -42,6 +42,9 @@ public class AppUser {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(name = "profile_image_url", length = 500)
+    private String profileImageUrl;
+
     /*
         // tam olarak mesele bu: app_user_roles bir ara tablo olduğu için hem user_id hem de role_id
         değerini tutuyor; inverseJoinColumns da bu tablodaki karşı entity'nin ID'sini gösteriyor.
@@ -94,5 +97,9 @@ public class AppUser {
 
     public void changePassword(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }
