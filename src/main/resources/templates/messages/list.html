@@ -13,6 +13,7 @@
         <p th:if="${param.sent}" role="status">Mesajınız gönderildi.</p>
         <p th:if="${param.notFound}" role="alert">Mesaj bulunamadı veya erişim yetkiniz yok.</p>
         <div th:replace="~{fragments/message-list :: messageList(${messages}, ${boxType})}"></div>
+        <div th:replace="~{fragments/pagination :: pagination(${messages}, ${paginationPath})}"></div>
     </section>
 </main>
 </body>

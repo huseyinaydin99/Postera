@@ -28,6 +28,7 @@ public class MessageController {
         model.addAttribute("messages", messageService.inbox(authentication.getName(), page));
         model.addAttribute("boxTitle", "Gelen kutusu");
         model.addAttribute("boxType", "inbox");
+        model.addAttribute("paginationPath", "/messages/inbox");
         return "messages/list";
     }
 
@@ -36,6 +37,7 @@ public class MessageController {
         model.addAttribute("messages", messageService.sent(authentication.getName(), page));
         model.addAttribute("boxTitle", "Gönderilenler");
         model.addAttribute("boxType", "sent");
+        model.addAttribute("paginationPath", "/messages/sent");
         return "messages/list";
     }
 
@@ -44,6 +46,7 @@ public class MessageController {
         model.addAttribute("messages", messageService.important(authentication.getName(), page));
         model.addAttribute("boxTitle", "Önemli mesajlar");
         model.addAttribute("boxType", "important");
+        model.addAttribute("paginationPath", "/messages/important");
         return "messages/list";
     }
 
@@ -52,6 +55,7 @@ public class MessageController {
         model.addAttribute("messages", messageService.trash(authentication.getName(), page));
         model.addAttribute("boxTitle", "Çöp kutusu");
         model.addAttribute("boxType", "trash");
+        model.addAttribute("paginationPath", "/messages/trash");
         return "messages/list";
     }
 
