@@ -6,12 +6,10 @@
     <title>Postera</title>
 </head>
 <body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
 <main>
     <h1>Postera</h1>
     <p>Mesajlaşma çalışma alanınız hazırlanıyor.</p>
-    <form th:action="@{/auth/logout}" method="post">
-        <button type="submit">Çıkış yap</button>
-    </form>
 </main>
 </body>
 </html>

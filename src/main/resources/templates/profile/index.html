@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profilim | Postera</title>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <section aria-labelledby="profile-title">
+        <h1 id="profile-title">Profilim</h1>
+        <p>E-posta adresiniz: <strong th:text="${email}"></strong></p>
+        <p th:if="${param.updated}" role="status">Profil bilgileriniz güncellendi.</p>
+
+        <form th:action="@{/profile}" th:object="${profileUpdateRequest}" method="post">
+            <div>
+                <label for="firstName">Ad</label>
+                <input id="firstName" th:field="*{firstName}" autocomplete="given-name" required>
+                <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></p>
+            </div>
+            <div>
+                <label for="lastName">Soyad</label>
+                <input id="lastName" th:field="*{lastName}" autocomplete="family-name" required>
+                <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
+            </div>
+            <button type="submit">Bilgileri güncelle</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

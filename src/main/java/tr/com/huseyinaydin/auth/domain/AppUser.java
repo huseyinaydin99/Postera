@@ -73,4 +73,9 @@ public class AppUser {
     public void assignRole(AppRole role) {
         roles.add(role);
     }
+
+    public void updateProfile(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 }

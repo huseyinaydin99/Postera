@@ -1,0 +1,7 @@
+<nav th:fragment="mainNavigation" aria-label="Ana navigasyon">
+    <a th:href="@{/}">Postera</a>
+    <a th:href="@{/profile}">Profilim</a>
+    <form th:action="@{/auth/logout}" method="post">
+        <button type="submit">Çıkış yap</button>
+    </form>
+</nav>
