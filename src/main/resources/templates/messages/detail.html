@@ -19,6 +19,17 @@
             <dd><time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time></dd>
         </dl>
         <div th:text="${message.body}"></div>
+        <div th:if="${message.receivedByCurrentUser}">
+            <form th:if="${!message.trash}" th:action="@{/messages/{id}/important(id=${message.id})}" method="post">
+                <button type="submit" th:text="${message.important ? 'Önem işaretini kaldır' : 'Önemli olarak işaretle'}"></button>
+            </form>
+            <form th:if="${!message.trash}" th:action="@{/messages/{id}/trash(id=${message.id})}" method="post">
+                <button type="submit">Çöp kutusuna taşı</button>
+            </form>
+            <form th:if="${message.trash}" th:action="@{/messages/{id}/restore(id=${message.id})}" method="post">
+                <button type="submit">Çöp kutusundan geri al</button>
+            </form>
+        </div>
     </article>
 </main>
 </body>

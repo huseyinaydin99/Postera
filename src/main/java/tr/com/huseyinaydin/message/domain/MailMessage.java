@@ -68,4 +68,16 @@ public class MailMessage {
     public void markAsRead() {
         read = true;
     }
+
+    public void toggleImportant() {
+        important = !important;
+    }
+
+    public void moveToTrash() {
+        trash = true;
+    }
+
+    public void restoreFromTrash() {
+        trash = false;
+    }
 }

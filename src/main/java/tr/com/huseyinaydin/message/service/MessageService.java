@@ -38,7 +38,7 @@ public class MessageService {
         return messageRepository.findByReceiverIdAndDraftFalseAndTrashFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
                 .map(message -> new MessageListItem(
                         message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSubject(),
-                        message.getSentAt(), message.isRead()
+                        message.getSentAt(), message.isRead(), message.isImportant()
                 ));
     }
 
@@ -48,8 +48,23 @@ public class MessageService {
         return messageRepository.findBySenderIdAndDraftFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
                 .map(message -> new MessageListItem(
                         message.getId(), fullName(message.getReceiver()), message.getReceiver().getEmail(), message.getSubject(),
-                        message.getSentAt(), message.isRead()
+                        message.getSentAt(), message.isRead(), message.isImportant()
                 ));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MessageListItem> important(String currentUserEmail, int page) {
+        var user = findUser(currentUserEmail);
+        return messageRepository
+                .findByReceiverIdAndImportantTrueAndTrashFalseAndDraftFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
+                .map(this::toInboxListItem);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MessageListItem> trash(String currentUserEmail, int page) {
+        var user = findUser(currentUserEmail);
+        return messageRepository.findByReceiverIdAndTrashTrueOrderBySentAtDesc(user.getId(), pageRequest(page))
+                .map(this::toInboxListItem);
     }
 
     @Transactional
@@ -71,8 +86,24 @@ public class MessageService {
                 message.getId(), message.getSubject(), message.getBody(),
                 fullName(message.getSender()), message.getSender().getEmail(),
                 fullName(message.getReceiver()), message.getReceiver().getEmail(),
-                message.getSentAt(), receivedByCurrentUser
+                message.getSentAt(), receivedByCurrentUser, message.isImportant(), message.isTrash()
         );
+    }
+
+    @Transactional
+    public void toggleImportant(String currentUserEmail, Long messageId) {
+        var message = findReceivedMessage(currentUserEmail, messageId);
+        message.toggleImportant();
+    }
+
+    @Transactional
+    public void moveToTrash(String currentUserEmail, Long messageId) {
+        findReceivedMessage(currentUserEmail, messageId).moveToTrash();
+    }
+
+    @Transactional
+    public void restoreFromTrash(String currentUserEmail, Long messageId) {
+        findReceivedMessage(currentUserEmail, messageId).restoreFromTrash();
     }
 
     private PageRequest pageRequest(int page) {
@@ -86,5 +117,22 @@ public class MessageService {
 
     private String fullName(AppUser user) {
         return user.getFirstName() + " " + user.getLastName();
+    }
+
+    private MessageListItem toInboxListItem(MailMessage message) {
+        return new MessageListItem(
+                message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSubject(),
+                message.getSentAt(), message.isRead(), message.isImportant()
+        );
+    }
+
+    private MailMessage findReceivedMessage(String currentUserEmail, Long messageId) {
+        var user = findUser(currentUserEmail);
+        var message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new IllegalArgumentException("Mesaj bulunamadı."));
+        if (!message.getReceiver().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("Bu mesaj üzerinde işlem yapma izniniz yok.");
+        }
+        return message;
     }
 }

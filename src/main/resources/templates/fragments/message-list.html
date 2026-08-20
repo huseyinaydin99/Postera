@@ -5,6 +5,7 @@
             <a th:href="@{/messages/{id}(id=${message.id})}">
                 <strong th:if="${boxType == 'inbox' and !message.read}" th:text="${message.counterpartName}"></strong>
                 <span th:if="${boxType != 'inbox' or message.read}" th:text="${message.counterpartName}"></span>
+                <span th:if="${message.important}" aria-label="Önemli mesaj">★</span>
                 <span th:text="${message.subject}"></span>
                 <time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time>
             </a>

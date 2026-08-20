@@ -37,6 +37,22 @@ public class MessageController {
         return "messages/list";
     }
 
+    @GetMapping("/important")
+    String important(@RequestParam(defaultValue = "0") int page, Authentication authentication, Model model) {
+        model.addAttribute("messages", messageService.important(authentication.getName(), page));
+        model.addAttribute("boxTitle", "Önemli mesajlar");
+        model.addAttribute("boxType", "important");
+        return "messages/list";
+    }
+
+    @GetMapping("/trash")
+    String trash(@RequestParam(defaultValue = "0") int page, Authentication authentication, Model model) {
+        model.addAttribute("messages", messageService.trash(authentication.getName(), page));
+        model.addAttribute("boxTitle", "Çöp kutusu");
+        model.addAttribute("boxType", "trash");
+        return "messages/list";
+    }
+
     @GetMapping("/compose")
     String compose(Model model) {
         model.addAttribute("sendMessageRequest", new SendMessageRequest(null, null, null));
@@ -67,5 +83,35 @@ public class MessageController {
         } catch (IllegalArgumentException exception) {
             return "redirect:/messages/inbox?notFound";
         }
+    }
+
+    @PostMapping("/{messageId}/important")
+    String toggleImportant(@PathVariable Long messageId, Authentication authentication) {
+        try {
+            messageService.toggleImportant(authentication.getName(), messageId);
+            return "redirect:/messages/" + messageId;
+        } catch (IllegalArgumentException exception) {
+            return "redirect:/messages/inbox?notFound";
+        }
+    }
+
+    @PostMapping("/{messageId}/trash")
+    String moveToTrash(@PathVariable Long messageId, Authentication authentication) {
+        try {
+            messageService.moveToTrash(authentication.getName(), messageId);
+        } catch (IllegalArgumentException ignored) {
+            // Geçersiz veya yetkisiz işlemlerde listeye dönülür.
+        }
+        return "redirect:/messages/inbox";
+    }
+
+    @PostMapping("/{messageId}/restore")
+    String restoreFromTrash(@PathVariable Long messageId, Authentication authentication) {
+        try {
+            messageService.restoreFromTrash(authentication.getName(), messageId);
+        } catch (IllegalArgumentException ignored) {
+            // Geçersiz veya yetkisiz işlemlerde listeye dönülür.
+        }
+        return "redirect:/messages/trash";
     }
 }
