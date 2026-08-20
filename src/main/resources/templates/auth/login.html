@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="https://www.thymeleaf.org">
 <head>
+    <link rel="stylesheet" th:href="@{/css/postera.css}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Giriş Yap | Postera</title>
@@ -23,6 +24,7 @@
             <button type="submit">Giriş yap</button>
         </form>
         <p>Henüz hesabınız yok mu? <a th:href="@{/auth/register}">Kayıt olun</a>.</p>
+        <p><a th:href="@{/auth/forgot-password}">Şifremi unuttum</a></p>
     </section>
 </main>
 </body>

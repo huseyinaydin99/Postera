@@ -3,4 +3,7 @@
     <div th:if="${param.logout}" class="alert alert-success" role="status">Oturumunuz güvenle sonlandırıldı.</div>
     <div th:if="${param.registered}" class="alert alert-success" role="status">Hesabınız oluşturuldu. Giriş yapabilirsiniz.</div>
     <div th:if="${param.emailChanged}" class="alert alert-success" role="status">E-posta adresiniz güncellendi. Yeni adresinizle giriş yapın.</div>
+    <div th:if="${param.resetRequested}" class="alert alert-success" role="status">Hesabınız varsa parola sıfırlama bağlantısı e-posta adresinize gönderildi.</div>
+    <div th:if="${param.passwordReset}" class="alert alert-success" role="status">Şifreniz güncellendi. Giriş yapabilirsiniz.</div>
+    <div th:if="${param.resetInvalid}" class="alert alert-danger" role="alert">Parola sıfırlama bağlantısı geçersiz.</div>
 </div>
