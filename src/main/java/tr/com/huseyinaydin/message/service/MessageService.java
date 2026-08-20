@@ -3,6 +3,8 @@ package tr.com.huseyinaydin.message.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tr.com.huseyinaydin.auth.domain.AppUser;
@@ -14,6 +16,8 @@ import tr.com.huseyinaydin.message.web.SendMessageRequest;
 import tr.com.huseyinaydin.message.web.DraftMessageRequest;
 
 import java.util.Locale;
+import java.time.ZoneOffset;
+import tr.com.huseyinaydin.message.web.InboxFilter;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +47,27 @@ public class MessageService {
                         message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSubject(),
                         message.getSentAt(), message.isRead(), message.isImportant()
                 ));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MessageListItem> inbox(String currentUserEmail, InboxFilter filter) {
+        var user = findUser(currentUserEmail);
+        Specification<MailMessage> spec = (root, query, cb) -> cb.and(
+                cb.equal(root.get("receiver").get("id"), user.getId()),
+                cb.isFalse(root.get("draft")), cb.isFalse(root.get("trash")));
+        if (filter.sender() != null && !filter.sender().isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(cb.concat(cb.concat(root.get("sender").get("firstName"), " "), root.get("sender").get("lastName"))), "%" + filter.sender().trim().toLowerCase(Locale.ROOT) + "%"));
+        }
+        if (filter.subject() != null && !filter.subject().isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("subject")), "%" + filter.subject().trim().toLowerCase(Locale.ROOT) + "%"));
+        }
+        if (filter.categoryId() != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("category").get("id"), filter.categoryId()));
+        if (filter.read() != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("read"), filter.read()));
+        if (filter.important() != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("important"), filter.important()));
+        if (filter.from() != null) spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("sentAt"), filter.from().atStartOfDay().toInstant(ZoneOffset.UTC)));
+        if (filter.to() != null) spec = spec.and((root, query, cb) -> cb.lessThan(root.get("sentAt"), filter.to().plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC)));
+        var sort = Sort.by(filter.ascending() ? Sort.Direction.ASC : Sort.Direction.DESC, "sentAt");
+        return messageRepository.findAll(spec, PageRequest.of(Math.max(filter.page(), 0), PAGE_SIZE, sort)).map(this::toInboxListItem);
     }
 
     @Transactional(readOnly = true)

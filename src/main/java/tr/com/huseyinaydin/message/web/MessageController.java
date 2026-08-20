@@ -24,8 +24,10 @@ public class MessageController {
     private final CategoryService categoryService;
 
     @GetMapping("/inbox")
-    String inbox(@RequestParam(defaultValue = "0") int page, Authentication authentication, Model model) {
-        model.addAttribute("messages", messageService.inbox(authentication.getName(), page));
+    String inbox(@ModelAttribute InboxFilter filter, Authentication authentication, Model model) {
+        model.addAttribute("messages", messageService.inbox(authentication.getName(), filter));
+        model.addAttribute("filter", filter);
+        model.addAttribute("categories", categoryService.list(authentication.getName()));
         model.addAttribute("boxTitle", "Gelen kutusu");
         model.addAttribute("boxType", "inbox");
         model.addAttribute("paginationPath", "/messages/inbox");

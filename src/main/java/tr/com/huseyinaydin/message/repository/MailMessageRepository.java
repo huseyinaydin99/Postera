@@ -4,11 +4,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import tr.com.huseyinaydin.message.domain.MailMessage;
 
 import java.util.Optional;
 
-public interface MailMessageRepository extends JpaRepository<MailMessage, Long> {
+public interface MailMessageRepository extends JpaRepository<MailMessage, Long>, JpaSpecificationExecutor<MailMessage> {
 
     // amaç sender için sonradan ayrı bir sorgu çalıştırmak yerine, ana sorguda birlikte getirmektir; ayrı sorgu çalışırsa gereksiz ek veritabanı sorguları oluşabilir.
     @EntityGraph(attributePaths = "sender")

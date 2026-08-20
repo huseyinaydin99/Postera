@@ -10,10 +10,26 @@
 <main>
     <section aria-labelledby="box-title">
         <h1 id="box-title" th:text="${boxTitle}"></h1>
+        <form th:if="${boxType == 'inbox'}" method="get" th:action="@{/messages/inbox}">
+            <input name="sender" placeholder="Gönderen" th:value="${filter.sender}">
+            <input name="subject" placeholder="Konu" th:value="${filter.subject}">
+            <input name="from" type="date" th:value="${filter.from}">
+            <input name="to" type="date" th:value="${filter.to}">
+            <select name="categoryId"><option value="">Tüm kategoriler</option><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id == filter.categoryId}"></option></select>
+            <select name="read"><option value="">Tüm okuma durumları</option><option value="true" th:selected="${filter.read == true}">Okundu</option><option value="false" th:selected="${filter.read == false}">Okunmadı</option></select>
+            <select name="important"><option value="">Tüm önem durumları</option><option value="true" th:selected="${filter.important == true}">Önemli</option><option value="false" th:selected="${filter.important == false}">Normal</option></select>
+            <select name="sort"><option value="desc" th:selected="${filter.sort != 'asc'}">En yeni</option><option value="asc" th:selected="${filter.sort == 'asc'}">En eski</option></select>
+            <button type="submit">Filtrele</button>
+        </form>
         <p th:if="${param.sent}" role="status">Mesajınız gönderildi.</p>
         <p th:if="${param.notFound}" role="alert">Mesaj bulunamadı veya erişim yetkiniz yok.</p>
         <div th:replace="~{fragments/message-list :: messageList(${messages}, ${boxType})}"></div>
-        <div th:replace="~{fragments/pagination :: pagination(${messages}, ${paginationPath})}"></div>
+        <nav th:if="${boxType == 'inbox' and messages.totalPages > 1}" aria-label="Sayfa gezintisi">
+            <a th:if="${messages.hasPrevious()}" th:href="@{/messages/inbox(page=${messages.number - 1},sender=${filter.sender},subject=${filter.subject},from=${filter.from},to=${filter.to},categoryId=${filter.categoryId},read=${filter.read},important=${filter.important},sort=${filter.sort})}">Önceki</a>
+            <span th:text="|${messages.number + 1} + ' / ' + ${messages.totalPages}"></span>
+            <a th:if="${messages.hasNext()}" th:href="@{/messages/inbox(page=${messages.number + 1},sender=${filter.sender},subject=${filter.subject},from=${filter.from},to=${filter.to},categoryId=${filter.categoryId},read=${filter.read},important=${filter.important},sort=${filter.sort})}">Sonraki</a>
+        </nav>
+        <div th:if="${boxType != 'inbox'}" th:replace="~{fragments/pagination :: pagination(${messages}, ${paginationPath})}"></div>
     </section>
 </main>
 </body>
