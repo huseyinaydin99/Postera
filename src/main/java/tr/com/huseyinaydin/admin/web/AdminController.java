@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import tr.com.huseyinaydin.admin.service.AdminUserService;
 import tr.com.huseyinaydin.admin.service.DashboardService;
+import tr.com.huseyinaydin.report.service.MessageReportService;
 import tr.com.huseyinaydin.auth.domain.RoleName;
 
 import java.util.Set;
@@ -20,11 +21,18 @@ import java.util.Set;
 public class AdminController {
     private final AdminUserService adminUserService;
     private final DashboardService dashboardService;
+    private final MessageReportService reportService;
 
     @GetMapping("/users")
     String dashboard(Model model) {
         model.addAttribute("dashboard", dashboardService.getDashboard());
         return "admin/dashboard";
+    }
+
+    @GetMapping("/reports")
+    String reports(Model model) {
+        model.addAttribute("reports", reportService.listReports());
+        return "admin/reports";
     }
 
     @GetMapping

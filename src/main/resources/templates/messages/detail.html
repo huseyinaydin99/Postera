@@ -19,6 +19,12 @@
             <dd><time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time></dd>
         </dl>
         <div th:text="${message.body}"></div>
+        <p th:if="${param.reported}" role="status">Mesaj incelemeye alınmak üzere şikayet edildi.</p>
+        <p th:if="${param.reportError}" role="alert">Şikayet işlemi tamamlanamadı.</p>
+        <form th:if="${!alreadyReported}" th:action="@{/messages/{id}/report(id=${message.id})}" method="post">
+            <button type="submit">Mesajı şikayet et</button>
+        </form>
+        <p th:if="${alreadyReported}">Bu mesajı şikayet ettiniz.</p>
         <div th:if="${message.receivedByCurrentUser}">
             <form th:action="@{/messages/{id}/category(id=${message.id})}" method="post">
                 <label for="categoryId">Kategori</label>

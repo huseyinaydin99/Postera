@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import tr.com.huseyinaydin.message.service.MessageService;
 import tr.com.huseyinaydin.category.service.CategoryService;
+import tr.com.huseyinaydin.report.service.MessageReportService;
 
 @Controller
 @RequestMapping("/messages")
@@ -22,6 +23,7 @@ public class MessageController {
 
     private final MessageService messageService;
     private final CategoryService categoryService;
+    private final MessageReportService reportService;
 
     @GetMapping("/inbox")
     String inbox(@ModelAttribute InboxFilter filter, Authentication authentication, Model model) {
@@ -146,6 +148,7 @@ public class MessageController {
         try {
             model.addAttribute("message", messageService.getDetail(authentication.getName(), messageId));
             model.addAttribute("categories", categoryService.list(authentication.getName()));
+            model.addAttribute("alreadyReported", reportService.isReportedBy(authentication.getName(), messageId));
             return "messages/detail";
         } catch (IllegalArgumentException exception) {
             return "redirect:/messages/inbox?notFound";

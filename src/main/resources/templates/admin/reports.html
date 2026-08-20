@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Şikayet edilen mesajlar | Postera</title></head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <h1>Şikayet edilen mesajlar</h1>
+    <p th:if="${#lists.isEmpty(reports)}">Henüz şikayet edilen mesaj yok.</p>
+    <table th:if="${!#lists.isEmpty(reports)}">
+        <thead><tr><th>Konu</th><th>Gönderen</th><th>Alıcı</th><th>Şikayet eden</th><th>Tarih</th></tr></thead>
+        <tbody><tr th:each="report : ${reports}">
+            <td><a th:href="@{/messages/{id}(id=${report.messageId})}" th:text="${report.subject}"></a></td>
+            <td th:text="${report.senderName}"></td><td th:text="${report.receiverName}"></td>
+            <td th:text="${report.reportedByName}"></td>
+            <td th:text="${#temporals.format(report.reportedAt, 'dd.MM.yyyy HH:mm')}"></td>
+        </tr></tbody>
+    </table>
+</main>
+</body>
+</html>
