@@ -60,4 +60,17 @@ public class AppUser {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<AppRole> roles = new HashSet<>();
+
+    public static AppUser create(String firstName, String lastName, String email, String passwordHash) {
+        var user = new AppUser();
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.email = email;
+        user.passwordHash = passwordHash;
+        return user;
+    }
+
+    public void assignRole(AppRole role) {
+        roles.add(role);
+    }
 }

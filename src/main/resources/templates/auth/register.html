@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kayıt Ol | Postera</title>
+</head>
+<body>
+<main>
+    <section aria-labelledby="register-title">
+        <h1 id="register-title">Postera hesabı oluşturun</h1>
+        <p>Mesajlaşma çalışma alanınıza erişmek için bilgilerinizi girin.</p>
+
+        <form th:action="@{/auth/register}" th:object="${registrationRequest}" method="post">
+            <div th:if="${#fields.hasGlobalErrors()}" role="alert">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+            </div>
+            <div>
+                <label for="firstName">Ad</label>
+                <input id="firstName" th:field="*{firstName}" autocomplete="given-name" required>
+                <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></p>
+            </div>
+            <div>
+                <label for="lastName">Soyad</label>
+                <input id="lastName" th:field="*{lastName}" autocomplete="family-name" required>
+                <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
+            </div>
+            <div>
+                <label for="email">E-posta adresi</label>
+                <input id="email" th:field="*{email}" type="email" autocomplete="email" required>
+                <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+            </div>
+            <div>
+                <label for="password">Şifre</label>
+                <input id="password" th:field="*{password}" type="password" autocomplete="new-password" required>
+                <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+            </div>
+            <div>
+                <label for="passwordConfirmation">Şifre tekrarı</label>
+                <input id="passwordConfirmation" th:field="*{passwordConfirmation}" type="password" autocomplete="new-password" required>
+                <p th:if="${#fields.hasErrors('passwordConfirmation')}" th:errors="*{passwordConfirmation}"></p>
+            </div>
+            <button type="submit">Hesap oluştur</button>
+        </form>
+        <p>Zaten hesabınız var mı? <a th:href="@{/auth/login}">Giriş yapın</a>.</p>
+    </section>
+</main>
+</body>
+</html>
