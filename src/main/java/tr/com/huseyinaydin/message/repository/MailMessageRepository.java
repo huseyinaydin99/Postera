@@ -5,9 +5,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import tr.com.huseyinaydin.message.domain.MailMessage;
 
 import java.util.Optional;
+import java.time.Instant;
+import java.util.List;
 
 public interface MailMessageRepository extends JpaRepository<MailMessage, Long>, JpaSpecificationExecutor<MailMessage> {
 
@@ -31,4 +34,28 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
     @Override
     @EntityGraph(attributePaths = {"sender", "receiver", "category"})
     Optional<MailMessage> findById(Long id);
+
+    long countByDraftFalse();
+
+    long countByDraftFalseAndSentAtGreaterThanEqualAndSentAtLessThan(Instant from, Instant to);
+
+    long countByDraftFalseAndTrashFalseAndReadFalse();
+
+    long countByTrashTrue();
+
+    @Query("""
+            select m.sender.firstName, m.sender.lastName, count(m)
+            from MailMessage m where m.draft = false
+            group by m.sender.id, m.sender.firstName, m.sender.lastName
+            order by count(m) desc
+            """)
+    List<Object[]> findTopSenders(org.springframework.data.domain.Pageable pageable);
+
+    @Query("""
+            select m.category.name, count(m)
+            from MailMessage m where m.category is not null
+            group by m.category.id, m.category.name
+            order by count(m) desc
+            """)
+    List<Object[]> findTopCategories(org.springframework.data.domain.Pageable pageable);
 }

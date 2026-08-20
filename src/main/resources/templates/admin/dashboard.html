@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Yönetim paneli | Postera</title></head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <h1>Yönetim paneli</h1>
+    <p><a th:href="@{/admin/users}">Kullanıcı yönetimine git</a></p>
+    <section aria-label="Sistem özeti">
+        <dl>
+            <dt>Toplam kullanıcı</dt><dd th:text="${dashboard.totalUsers}"></dd>
+            <dt>Aktif kullanıcı</dt><dd th:text="${dashboard.activeUsers}"></dd>
+            <dt>Toplam mesaj</dt><dd th:text="${dashboard.totalMessages}"></dd>
+            <dt>Bugün gönderilen</dt><dd th:text="${dashboard.todayMessages}"></dd>
+            <dt>Okunmamış mesaj</dt><dd th:text="${dashboard.unreadMessages}"></dd>
+            <dt>Çöp kutusundaki mesaj</dt><dd th:text="${dashboard.trashMessages}"></dd>
+        </dl>
+    </section>
+    <section><h2>En çok mesaj gönderenler</h2><ol><li th:each="item : ${dashboard.topSenders}" th:text="${item.label + ': ' + item.count}"></li></ol></section>
+    <section><h2>En çok kullanılan kategoriler</h2><ol><li th:each="item : ${dashboard.topCategories}" th:text="${item.label + ': ' + item.count}"></li></ol></section>
+</main>
+</body>
+</html>
