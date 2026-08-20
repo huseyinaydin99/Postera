@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Postera</title>
+</head>
+<body>
+<main>
+    <h1>Postera</h1>
+    <p>Mesajlaşma çalışma alanınız hazırlanıyor.</p>
+    <form th:action="@{/auth/logout}" method="post">
+        <button type="submit">Çıkış yap</button>
+    </form>
+</main>
+</body>
+</html>
