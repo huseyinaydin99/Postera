@@ -87,4 +87,12 @@ public class AppUser {
         this.roles.clear();
         this.roles.addAll(roles);
     }
+
+    public void changeEmail(String email) {
+        this.email = email;
+    }
+
+    public void changePassword(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
 }

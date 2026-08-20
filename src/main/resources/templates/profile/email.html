@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>E-posta değiştir | Postera</title></head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main><h1>E-posta adresini değiştir</h1>
+    <form th:action="@{/profile/email}" th:object="${emailChangeRequest}" method="post">
+        <div th:if="${#fields.hasGlobalErrors()}" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
+        <label for="currentPassword">Mevcut şifre</label><input id="currentPassword" th:field="*{currentPassword}" type="password" autocomplete="current-password"><p th:errors="*{currentPassword}"></p>
+        <label for="newEmail">Yeni e-posta adresi</label><input id="newEmail" th:field="*{newEmail}" type="email" autocomplete="email"><p th:errors="*{newEmail}"></p>
+        <button type="submit">E-posta adresini güncelle</button>
+    </form>
+</main></body></html>

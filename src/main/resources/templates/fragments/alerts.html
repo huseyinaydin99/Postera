@@ -2,4 +2,5 @@
     <div th:if="${param.error}" class="alert alert-danger" role="alert">E-posta adresi veya şifre geçersiz.</div>
     <div th:if="${param.logout}" class="alert alert-success" role="status">Oturumunuz güvenle sonlandırıldı.</div>
     <div th:if="${param.registered}" class="alert alert-success" role="status">Hesabınız oluşturuldu. Giriş yapabilirsiniz.</div>
+    <div th:if="${param.emailChanged}" class="alert alert-success" role="status">E-posta adresiniz güncellendi. Yeni adresinizle giriş yapın.</div>
 </div>
