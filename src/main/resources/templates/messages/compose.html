@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Yeni mesaj | Postera</title>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <section aria-labelledby="compose-title">
+        <h1 id="compose-title">Yeni mesaj</h1>
+        <form th:action="@{/messages}" th:object="${sendMessageRequest}" method="post">
+            <div th:if="${#fields.hasGlobalErrors()}" role="alert">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+            </div>
+            <div>
+                <label for="receiverEmail">Alıcı</label>
+                <input id="receiverEmail" th:field="*{receiverEmail}" type="email" autocomplete="email" required>
+                <p th:if="${#fields.hasErrors('receiverEmail')}" th:errors="*{receiverEmail}"></p>
+            </div>
+            <div>
+                <label for="subject">Konu</label>
+                <input id="subject" th:field="*{subject}" required>
+                <p th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}"></p>
+            </div>
+            <div>
+                <label for="body">Mesaj</label>
+                <textarea id="body" th:field="*{body}" rows="10" required></textarea>
+                <p th:if="${#fields.hasErrors('body')}" th:errors="*{body}"></p>
+            </div>
+            <button type="submit">Gönder</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

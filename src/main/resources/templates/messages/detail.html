@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${message.subject} + ' | Postera'">Mesaj | Postera</title>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <article>
+        <h1 th:text="${message.subject}"></h1>
+        <dl>
+            <dt>Gönderen</dt>
+            <dd th:text="${message.senderName + ' <' + message.senderEmail + '>'}"></dd>
+            <dt>Alıcı</dt>
+            <dd th:text="${message.receiverName + ' <' + message.receiverEmail + '>'}"></dd>
+            <dt>Tarih</dt>
+            <dd><time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time></dd>
+        </dl>
+        <div th:text="${message.body}"></div>
+    </article>
+</main>
+</body>
+</html>

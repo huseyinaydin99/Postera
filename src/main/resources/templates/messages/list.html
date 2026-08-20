@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${boxTitle} + ' | Postera'">Postera</title>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <section aria-labelledby="box-title">
+        <h1 id="box-title" th:text="${boxTitle}"></h1>
+        <p th:if="${param.sent}" role="status">Mesajınız gönderildi.</p>
+        <p th:if="${param.notFound}" role="alert">Mesaj bulunamadı veya erişim yetkiniz yok.</p>
+        <div th:replace="~{fragments/message-list :: messageList(${messages}, ${boxType})}"></div>
+    </section>
+</main>
+</body>
+</html>
