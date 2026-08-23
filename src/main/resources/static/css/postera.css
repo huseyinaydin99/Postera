@@ -183,3 +183,25 @@ th { background: var(--paper); color: var(--ink-500); }
 @media (max-width: 640px) {
     .message-list-item > a { grid-template-columns: 1fr; gap: .25rem; }
 }
+
+.message-participants { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+.participant-card { display: flex; align-items: center; gap: .75rem; padding: .85rem; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+.participant-card img, .conversation-message > img { width: 44px; height: 44px; flex: 0 0 44px; border: 0; border-radius: 50%; object-fit: cover; }
+.participant-card div { display: grid; gap: .1rem; min-width: 0; }
+.participant-card span, .participant-card small { color: var(--ink-500); font-size: .78rem; overflow-wrap: anywhere; }
+.message-sent-at { color: var(--ink-500); font: .78rem var(--font-mono); }
+.conversation { display: grid; gap: 1rem; margin: 1.5rem 0; }
+.conversation-message { display: flex; align-items: flex-start; gap: .7rem; max-width: min(720px, 92%); }
+.conversation-message-own { flex-direction: row-reverse; justify-self: end; }
+.conversation-bubble { padding: .85rem 1rem; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.conversation-message-own .conversation-bubble { background: var(--accent-soft); border-color: #f5d7ad; }
+.conversation-bubble > div { display: flex; align-items: baseline; gap: .75rem; margin: 0 0 .35rem; white-space: normal; }
+.conversation-bubble time { color: var(--ink-500); font-size: .75rem; }
+.conversation-bubble p { margin: 0; white-space: pre-wrap; }
+.reply-form { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
+.reply-form button { display: inline-flex; align-items: center; gap: .4rem; }
+
+@media (max-width: 640px) {
+    .message-participants { grid-template-columns: 1fr; }
+    .conversation-message { max-width: 100%; }
+}

@@ -16,6 +16,7 @@ import tr.com.huseyinaydin.auth.domain.AppUser;
 import tr.com.huseyinaydin.category.domain.MailCategory;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -57,6 +58,9 @@ public class MailMessage {
     @Column(nullable = false)
     private boolean draft;
 
+    @Column(name = "conversation_id", length = 36)
+    private String conversationId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
     private AppUser sender;
@@ -76,6 +80,7 @@ public class MailMessage {
         message.subject = subject;
         message.body = body;
         message.sentAt = Instant.now();
+        message.conversationId = UUID.randomUUID().toString();
         return message;
     }
 
@@ -83,6 +88,18 @@ public class MailMessage {
         var message = send(sender, receiver, subject, body);
         message.draft = true;
         return message;
+    }
+
+    public static MailMessage reply(AppUser sender, AppUser receiver, String subject, String body, String conversationId) {
+        var message = send(sender, receiver, subject, body);
+        message.conversationId = conversationId;
+        return message;
+    }
+
+    public void startConversationIfMissing() {
+        if (conversationId == null) {
+            conversationId = UUID.randomUUID().toString();
+        }
     }
 
     public void markAsRead() {

@@ -125,14 +125,40 @@ public class MessageService {
 
         return new MessageDetail(
                 message.getId(), message.getSubject(), message.getBody(),
-                fullName(message.getSender()), message.getSender().getEmail(),
+                fullName(message.getSender()), message.getSender().getEmail(), message.getSender().getProfileImageUrl(),
                 message.getReceiver() == null ? "Alıcı belirtilmedi" : fullName(message.getReceiver()),
                 message.getReceiver() == null ? "" : message.getReceiver().getEmail(),
+                message.getReceiver() == null ? null : message.getReceiver().getProfileImageUrl(),
                 message.getSentAt(), receivedByCurrentUser, message.isImportant(),
                 receivedByCurrentUser ? message.isTrash() : message.isSenderTrash(), message.isDraft(),
                 message.getCategory() == null ? null : message.getCategory().getId(),
                 message.getCategory() == null ? null : message.getCategory().getName()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<ConversationMessage> conversation(String currentUserEmail, Long messageId) {
+        var user = findUser(currentUserEmail);
+        var message = findOwnedMessage(user, messageId);
+        if (message.getConversationId() == null) {
+            return java.util.List.of(toConversationMessage(message, user.getId()));
+        }
+        return messageRepository.findByConversationIdOrderBySentAtAsc(message.getConversationId()).stream()
+                .filter(item -> isReceiver(user, item) || item.getSender().getId().equals(user.getId()))
+                .map(item -> toConversationMessage(item, user.getId()))
+                .toList();
+    }
+
+    @Transactional
+    public void reply(String currentUserEmail, Long messageId, String body) {
+        var sender = findUser(currentUserEmail);
+        var message = findOwnedMessage(sender, messageId);
+        if (message.isDraft() || message.getReceiver() == null) {
+            throw new IllegalArgumentException("Bu mesaja yanıt verilemez.");
+        }
+        message.startConversationIfMissing();
+        var receiver = isReceiver(sender, message) ? message.getSender() : message.getReceiver();
+        messageRepository.save(MailMessage.reply(sender, receiver, replySubject(message.getSubject()), body.trim(), message.getConversationId()));
     }
 
     @Transactional
@@ -276,6 +302,17 @@ public class MessageService {
                 counterpart == null ? "" : counterpart.getEmail(), message.getSubject(), message.getSentAt(),
                 message.isRead(), message.isImportant()
         );
+    }
+
+    private ConversationMessage toConversationMessage(MailMessage message, Long currentUserId) {
+        return new ConversationMessage(
+                message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSender().getProfileImageUrl(),
+                message.getBody(), message.getSentAt(), message.getSender().getId().equals(currentUserId)
+        );
+    }
+
+    private String replySubject(String subject) {
+        return subject.regionMatches(true, 0, "Re:", 0, 3) ? subject : "Re: " + subject;
     }
 
     private int permanentlyDeleteTrashMessages(AppUser user, Collection<MailMessage> messages) {

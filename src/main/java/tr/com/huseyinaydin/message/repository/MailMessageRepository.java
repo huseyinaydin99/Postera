@@ -50,6 +50,9 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
     @EntityGraph(attributePaths = {"sender", "receiver", "category"})
     Optional<MailMessage> findById(Long id);
 
+    @EntityGraph(attributePaths = {"sender", "receiver"})
+    List<MailMessage> findByConversationIdOrderBySentAtAsc(String conversationId);
+
     long countByDraftFalse();
 
     long countByDraftFalseAndSentAtGreaterThanEqualAndSentAtLessThan(Instant from, Instant to);

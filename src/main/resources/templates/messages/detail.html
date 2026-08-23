@@ -10,15 +10,37 @@
 <main>
     <article>
         <h1 th:text="${message.subject}"></h1>
-        <dl>
-            <dt>Gönderen</dt>
-            <dd th:text="${message.senderName + ' <' + message.senderEmail + '>'}"></dd>
-            <dt>Alıcı</dt>
-            <dd th:text="${message.receiverName + ' <' + message.receiverEmail + '>'}"></dd>
-            <dt>Tarih</dt>
-            <dd><time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time></dd>
-        </dl>
-        <div th:text="${message.body}"></div>
+        <div class="message-participants">
+            <div class="participant-card">
+                <img th:src="${message.senderProfileImageUrl != null ? message.senderProfileImageUrl : '/images/default-avatar.svg'}"
+                     th:alt="${message.senderName + ' profil fotoğrafı'}">
+                <div><span>Gönderen</span><strong th:text="${message.senderName}"></strong><small th:text="${message.senderEmail}"></small></div>
+            </div>
+            <div class="participant-card">
+                <img th:src="${message.receiverProfileImageUrl != null ? message.receiverProfileImageUrl : '/images/default-avatar.svg'}"
+                     th:alt="${message.receiverName + ' profil fotoğrafı'}">
+                <div><span>Alıcı</span><strong th:text="${message.receiverName}"></strong><small th:text="${message.receiverEmail}"></small></div>
+            </div>
+        </div>
+        <p class="message-sent-at"><time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time></p>
+        <section class="conversation" aria-label="Mesaj konuşması">
+            <div th:each="item : ${conversation}" class="conversation-message" th:classappend="${item.sentByCurrentUser} ? ' conversation-message-own' : ''">
+                <img th:src="${item.senderProfileImageUrl != null ? item.senderProfileImageUrl : '/images/default-avatar.svg'}"
+                     th:alt="${item.senderName + ' profil fotoğrafı'}">
+                <div class="conversation-bubble">
+                    <div><strong th:text="${item.senderName}"></strong><time th:text="${#temporals.format(item.sentAt, 'dd.MM.yyyy HH:mm')}"></time></div>
+                    <p th:text="${item.body}"></p>
+                </div>
+            </div>
+        </section>
+        <form th:if="${!message.draft}" class="reply-form" th:action="@{/messages/{id}/reply(id=${message.id})}" th:object="${replyMessageRequest}" method="post">
+            <label for="reply-body">Yanıtınız</label>
+            <textarea id="reply-body" th:field="*{body}" rows="4" placeholder="Bu konuşmaya yanıt yazın..."></textarea>
+            <p th:if="${#fields.hasErrors('body')}" th:errors="*{body}"></p>
+            <button type="submit"><span class="material-symbols-outlined">send</span> Yanıt gönder</button>
+        </form>
+        <p th:if="${param.replied}" role="status">Yanıtınız gönderildi.</p>
+        <p th:if="${param.replyError}" role="alert">Yanıt gönderilemedi.</p>
         <p th:if="${param.reported}" role="status">Mesaj incelemeye alınmak üzere şikayet edildi.</p>
         <p th:if="${param.reportError}" role="alert">Şikayet işlemi tamamlanamadı.</p>
         <form th:if="${!alreadyReported}" th:action="@{/messages/{id}/report(id=${message.id})}" method="post">

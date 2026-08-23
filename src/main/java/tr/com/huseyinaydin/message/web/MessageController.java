@@ -153,6 +153,8 @@ public class MessageController {
     String detail(@PathVariable Long messageId, Authentication authentication, Model model) {
         try {
             model.addAttribute("message", messageService.getDetail(authentication.getName(), messageId));
+            model.addAttribute("conversation", messageService.conversation(authentication.getName(), messageId));
+            model.addAttribute("replyMessageRequest", new ReplyMessageRequest(null));
             model.addAttribute("categories", categoryService.list(authentication.getName()));
             model.addAttribute("alreadyReported", reportService.isReportedBy(authentication.getName(), messageId));
             return "messages/detail";
@@ -200,6 +202,28 @@ public class MessageController {
             // Geçersiz veya yetkisiz işlemlerde listeye dönülür.
         }
         return "redirect:/messages/trash";
+    }
+
+    @PostMapping("/{messageId}/reply")
+    String reply(@PathVariable Long messageId, @Valid @ModelAttribute ReplyMessageRequest replyMessageRequest,
+                 BindingResult bindingResult, Authentication authentication, Model model) {
+        if (bindingResult.hasErrors()) {
+            try {
+                model.addAttribute("message", messageService.getDetail(authentication.getName(), messageId));
+                model.addAttribute("conversation", messageService.conversation(authentication.getName(), messageId));
+                model.addAttribute("categories", categoryService.list(authentication.getName()));
+                model.addAttribute("alreadyReported", reportService.isReportedBy(authentication.getName(), messageId));
+                return "messages/detail";
+            } catch (IllegalArgumentException exception) {
+                return "redirect:/messages/inbox?notFound";
+            }
+        }
+        try {
+            messageService.reply(authentication.getName(), messageId, replyMessageRequest.body());
+            return "redirect:/messages/" + messageId + "?replied";
+        } catch (IllegalArgumentException exception) {
+            return "redirect:/messages/" + messageId + "?replyError";
+        }
     }
 
     @PostMapping("/trash/selected/delete")
