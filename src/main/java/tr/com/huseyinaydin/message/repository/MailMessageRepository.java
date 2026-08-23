@@ -5,7 +5,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import tr.com.huseyinaydin.message.domain.MailMessage;
 
 import java.util.Optional;
@@ -27,6 +29,24 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
 
     @EntityGraph(attributePaths = "sender")
     Page<MailMessage> findByReceiverIdAndTrashTrueOrderBySentAtDesc(Long receiverId, Pageable pageable);
+
+    @Modifying
+    @Query("""
+            delete from MailMessage message
+            where message.receiver.id = :receiverId
+              and message.trash = true
+              and message.id in :messageIds
+            """)
+    int deleteSelectedTrashByReceiverId(@Param("receiverId") Long receiverId,
+                                        @Param("messageIds") List<Long> messageIds);
+
+    @Modifying
+    @Query("""
+            delete from MailMessage message
+            where message.receiver.id = :receiverId
+              and message.trash = true
+            """)
+    int deleteAllTrashByReceiverId(@Param("receiverId") Long receiverId);
 
     @EntityGraph(attributePaths = "receiver")
     Page<MailMessage> findBySenderIdAndDraftTrueAndTrashFalseOrderBySentAtDesc(Long senderId, Pageable pageable);

@@ -17,6 +17,8 @@ import tr.com.huseyinaydin.message.web.DraftMessageRequest;
 
 import java.util.Locale;
 import java.time.ZoneOffset;
+import java.util.Collection;
+import java.util.Objects;
 import tr.com.huseyinaydin.message.web.InboxFilter;
 
 @Service
@@ -187,6 +189,26 @@ public class MessageService {
     @Transactional
     public void restoreFromTrash(String currentUserEmail, Long messageId) {
         findReceivedMessage(currentUserEmail, messageId).restoreFromTrash();
+    }
+
+    @Transactional
+    public int permanentlyDeleteSelectedTrash(String currentUserEmail, Collection<Long> messageIds) {
+        if (messageIds == null || messageIds.isEmpty()) {
+            return 0;
+        }
+        var uniqueMessageIds = messageIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (uniqueMessageIds.isEmpty()) {
+            return 0;
+        }
+        return messageRepository.deleteSelectedTrashByReceiverId(findUser(currentUserEmail).getId(), uniqueMessageIds);
+    }
+
+    @Transactional
+    public int permanentlyDeleteAllTrash(String currentUserEmail) {
+        return messageRepository.deleteAllTrashByReceiverId(findUser(currentUserEmail).getId());
     }
 
     private PageRequest pageRequest(int page) {

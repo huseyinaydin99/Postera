@@ -1,7 +1,48 @@
 <div th:fragment="messageList(messages, boxType)">
     <p th:if="${messages.empty}">Bu klasörde henüz mesaj yok.</p>
-    <ul th:if="${!messages.empty}">
-        <li th:each="message : ${messages.content}">
+    <div th:if="${boxType == 'trash' and !messages.empty}" class="trash-toolbar" data-trash-toolbar>
+        <button type="button" class="trash-toolbar-button" data-selection-toggle>
+            <span class="material-symbols-outlined">checklist</span> Seçimi aktifleştir
+        </button>
+        <form class="trash-empty-form" th:action="@{/messages/trash/empty}" method="post"
+              onsubmit="return confirm('Çöp kutusundaki tüm mesajlar kalıcı olarak silinecek. Devam etmek istiyor musunuz?');">
+            <button type="submit" class="trash-toolbar-button trash-danger-button">
+                <span class="material-symbols-outlined">delete_forever</span> Çöp kutusunu boşalt
+            </button>
+        </form>
+    </div>
+    <form th:if="${boxType == 'trash' and !messages.empty}" id="trash-selection-form"
+          th:action="@{/messages/trash/selected/delete}" method="post" data-selection-form>
+        <div class="trash-selection-bar" hidden data-selection-bar>
+            <label class="select-all-control" for="select-all-trash">
+                <input id="select-all-trash" type="checkbox" data-select-all disabled>
+                <span>Tümünü seç</span>
+            </label>
+            <span data-selected-count>0 mesaj seçildi</span>
+            <button type="submit" class="trash-danger-button" disabled data-delete-selected
+                    onclick="return confirm('Seçilen mesajlar kalıcı olarak silinecek. Devam etmek istiyor musunuz?');">
+                Seçilenleri sil
+            </button>
+            <button type="button" class="trash-toolbar-button" data-selection-cancel>İptal</button>
+        </div>
+        <ul class="message-list">
+            <li th:each="message : ${messages.content}" class="message-list-item">
+                <label class="message-selector" hidden data-message-selector>
+                    <input type="checkbox" name="messageIds" th:value="${message.id}" disabled data-message-checkbox>
+                    <span class="visually-hidden">Mesajı seç</span>
+                </label>
+                <a th:href="@{/messages/{id}(id=${message.id})}">
+                    <strong th:if="${!message.read}" th:text="${message.counterpartName}"></strong>
+                    <span th:if="${message.read}" th:text="${message.counterpartName}"></span>
+                    <span th:if="${message.important}" aria-label="Önemli mesaj">★</span>
+                    <span th:text="${message.subject}"></span>
+                    <time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time>
+                </a>
+            </li>
+        </ul>
+    </form>
+    <ul th:if="${boxType != 'trash' and !messages.empty}" class="message-list">
+        <li th:each="message : ${messages.content}" class="message-list-item">
             <a th:href="@{/messages/{id}(id=${message.id})}">
                 <strong th:if="${boxType == 'inbox' and !message.read}" th:text="${message.counterpartName}"></strong>
                 <span th:if="${boxType != 'inbox' or message.read}" th:text="${message.counterpartName}"></span>

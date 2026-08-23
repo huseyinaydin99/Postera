@@ -11,6 +11,8 @@
     <section aria-labelledby="box-title">
         <h1 id="box-title" th:text="${boxTitle}"></h1>
         <p th:if="${filterError}" role="alert" th:text="${filterError}"></p>
+        <p th:if="${trashActionError}" role="alert" th:text="${trashActionError}"></p>
+        <p th:if="${trashActionSuccess}" role="status" th:text="${trashActionSuccess}"></p>
         <form th:if="${boxType == 'inbox'}" method="get" th:action="@{/messages/inbox}">
             <input name="sender" placeholder="Gönderen" th:value="${filter.sender}">
             <input name="subject" placeholder="Konu" th:value="${filter.subject}">
@@ -33,5 +35,6 @@
         <div th:if="${boxType != 'inbox'}" th:replace="~{fragments/pagination :: pagination(${messages}, ${paginationPath})}"></div>
     </section>
 </main>
+<script th:if="${boxType == 'trash'}" th:src="@{/js/trash-selection.js}" defer></script>
 </body>
 </html>

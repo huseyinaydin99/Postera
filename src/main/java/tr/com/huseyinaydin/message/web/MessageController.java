@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tr.com.huseyinaydin.message.service.MessageService;
 import tr.com.huseyinaydin.category.service.CategoryService;
 import tr.com.huseyinaydin.report.service.MessageReportService;
@@ -197,6 +198,29 @@ public class MessageController {
             messageService.restoreFromTrash(authentication.getName(), messageId);
         } catch (IllegalArgumentException ignored) {
             // Geçersiz veya yetkisiz işlemlerde listeye dönülür.
+        }
+        return "redirect:/messages/trash";
+    }
+
+    @PostMapping("/trash/selected/delete")
+    String permanentlyDeleteSelectedTrash(@RequestParam(required = false) java.util.List<Long> messageIds,
+                                          Authentication authentication, RedirectAttributes redirectAttributes) {
+        var deletedCount = messageService.permanentlyDeleteSelectedTrash(authentication.getName(), messageIds);
+        if (deletedCount == 0) {
+            redirectAttributes.addFlashAttribute("trashActionError", "Silmek için çöp kutusundan en az bir mesaj seçin.");
+        } else {
+            redirectAttributes.addFlashAttribute("trashActionSuccess", deletedCount + " mesaj kalıcı olarak silindi.");
+        }
+        return "redirect:/messages/trash";
+    }
+
+    @PostMapping("/trash/empty")
+    String permanentlyDeleteAllTrash(Authentication authentication, RedirectAttributes redirectAttributes) {
+        var deletedCount = messageService.permanentlyDeleteAllTrash(authentication.getName());
+        if (deletedCount == 0) {
+            redirectAttributes.addFlashAttribute("trashActionError", "Çöp kutusu zaten boş.");
+        } else {
+            redirectAttributes.addFlashAttribute("trashActionSuccess", "Çöp kutusundaki " + deletedCount + " mesaj kalıcı olarak silindi.");
         }
         return "redirect:/messages/trash";
     }
