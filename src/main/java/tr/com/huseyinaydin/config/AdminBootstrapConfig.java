@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 import tr.com.huseyinaydin.auth.domain.RoleName;
 import tr.com.huseyinaydin.auth.repository.AppRoleRepository;
@@ -13,6 +14,7 @@ import tr.com.huseyinaydin.auth.repository.AppUserRepository;
 import java.util.Locale;
 
 @Configuration
+@Profile("!test")
 @RequiredArgsConstructor
 public class AdminBootstrapConfig {
     private final AppUserRepository userRepository;

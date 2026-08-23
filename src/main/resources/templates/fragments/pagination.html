@@ -1,5 +1,5 @@
 <nav th:fragment="pagination(messages, path)" th:if="${messages.totalPages > 1}" aria-label="Sayfa gezintisi">
     <a th:if="${messages.hasPrevious()}" th:href="@{${path}(page=${messages.number - 1})}">Önceki</a>
-    <span th:text="|${messages.number + 1} + ' / ' + ${messages.totalPages}"></span>
+    <span th:text="|${messages.number + 1} / ${messages.totalPages}|"></span>
     <a th:if="${messages.hasNext()}" th:href="@{${path}(page=${messages.number + 1})}">Sonraki</a>
 </nav>

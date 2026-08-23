@@ -10,6 +10,7 @@
 <main>
     <section aria-labelledby="box-title">
         <h1 id="box-title" th:text="${boxTitle}"></h1>
+        <p th:if="${filterError}" role="alert" th:text="${filterError}"></p>
         <form th:if="${boxType == 'inbox'}" method="get" th:action="@{/messages/inbox}">
             <input name="sender" placeholder="Gönderen" th:value="${filter.sender}">
             <input name="subject" placeholder="Konu" th:value="${filter.subject}">
@@ -26,7 +27,7 @@
         <div th:replace="~{fragments/message-list :: messageList(${messages}, ${boxType})}"></div>
         <nav th:if="${boxType == 'inbox' and messages.totalPages > 1}" aria-label="Sayfa gezintisi">
             <a th:if="${messages.hasPrevious()}" th:href="@{/messages/inbox(page=${messages.number - 1},sender=${filter.sender},subject=${filter.subject},from=${filter.from},to=${filter.to},categoryId=${filter.categoryId},read=${filter.read},important=${filter.important},sort=${filter.sort})}">Önceki</a>
-            <span th:text="|${messages.number + 1} + ' / ' + ${messages.totalPages}"></span>
+            <span th:text="|${messages.number + 1} / ${messages.totalPages}|"></span>
             <a th:if="${messages.hasNext()}" th:href="@{/messages/inbox(page=${messages.number + 1},sender=${filter.sender},subject=${filter.subject},from=${filter.from},to=${filter.to},categoryId=${filter.categoryId},read=${filter.read},important=${filter.important},sort=${filter.sort})}">Sonraki</a>
         </nav>
         <div th:if="${boxType != 'inbox'}" th:replace="~{fragments/pagination :: pagination(${messages}, ${paginationPath})}"></div>

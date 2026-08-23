@@ -67,7 +67,7 @@ public class MessageService {
         if (filter.from() != null) spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("sentAt"), filter.from().atStartOfDay().toInstant(ZoneOffset.UTC)));
         if (filter.to() != null) spec = spec.and((root, query, cb) -> cb.lessThan(root.get("sentAt"), filter.to().plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC)));
         var sort = Sort.by(filter.ascending() ? Sort.Direction.ASC : Sort.Direction.DESC, "sentAt");
-        return messageRepository.findAll(spec, PageRequest.of(Math.max(filter.page(), 0), PAGE_SIZE, sort)).map(this::toInboxListItem);
+        return messageRepository.findAll(spec, PageRequest.of(filter.pageNumber(), PAGE_SIZE, sort)).map(this::toInboxListItem);
     }
 
     @Transactional(readOnly = true)

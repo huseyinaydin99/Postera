@@ -26,7 +26,12 @@ public class MessageController {
     private final MessageReportService reportService;
 
     @GetMapping("/inbox")
-    String inbox(@ModelAttribute InboxFilter filter, Authentication authentication, Model model) {
+    String inbox(@ModelAttribute InboxFilter filter, BindingResult bindingResult,
+                 Authentication authentication, Model model) {
+        if (bindingResult.hasErrors()) {
+            filter = InboxFilter.empty();
+            model.addAttribute("filterError", "Filtre değerleri geçersiz olduğu için varsayılan liste gösterildi.");
+        }
         model.addAttribute("messages", messageService.inbox(authentication.getName(), filter));
         model.addAttribute("filter", filter);
         model.addAttribute("categories", categoryService.list(authentication.getName()));
