@@ -45,6 +45,14 @@
                 <button type="submit">Çöp kutusundan geri al</button>
             </form>
         </div>
+        <div th:unless="${message.receivedByCurrentUser}">
+            <form th:if="${!message.trash}" th:action="@{/messages/{id}/trash(id=${message.id})}" method="post">
+                <button type="submit">Çöp kutusuna taşı</button>
+            </form>
+            <form th:if="${message.trash}" th:action="@{/messages/{id}/restore(id=${message.id})}" method="post">
+                <button type="submit">Çöp kutusundan geri al</button>
+            </form>
+        </div>
     </article>
 </main>
 </body>

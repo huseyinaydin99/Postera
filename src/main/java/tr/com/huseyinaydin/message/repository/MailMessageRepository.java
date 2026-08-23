@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import tr.com.huseyinaydin.message.domain.MailMessage;
@@ -18,38 +17,34 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
 
     // amaç sender için sonradan ayrı bir sorgu çalıştırmak yerine, ana sorguda birlikte getirmektir; ayrı sorgu çalışırsa gereksiz ek veritabanı sorguları oluşabilir.
     @EntityGraph(attributePaths = "sender")
-    Page<MailMessage> findByReceiverIdAndDraftFalseAndTrashFalseOrderBySentAtDesc(Long receiverId, Pageable pageable);
+    Page<MailMessage> findByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalseOrderBySentAtDesc(Long receiverId, Pageable pageable);
 
     @EntityGraph(attributePaths = "receiver")
-    Page<MailMessage> findBySenderIdAndDraftFalseOrderBySentAtDesc(Long senderId, Pageable pageable);
+    Page<MailMessage> findBySenderIdAndDraftFalseAndSenderTrashFalseAndSenderDeletedFalseOrderBySentAtDesc(Long senderId, Pageable pageable);
 
     @EntityGraph(attributePaths = "sender")
-    Page<MailMessage> findByReceiverIdAndImportantTrueAndTrashFalseAndDraftFalseOrderBySentAtDesc(Long receiverId,
-                                                                                                      Pageable pageable);
+    Page<MailMessage> findByReceiverIdAndImportantTrueAndTrashFalseAndReceiverDeletedFalseAndDraftFalseOrderBySentAtDesc(Long receiverId,
+                                                                                                                            Pageable pageable);
 
-    @EntityGraph(attributePaths = "sender")
-    Page<MailMessage> findByReceiverIdAndTrashTrueOrderBySentAtDesc(Long receiverId, Pageable pageable);
-
-    @Modifying
+    @EntityGraph(attributePaths = {"sender", "receiver"})
     @Query("""
-            delete from MailMessage message
-            where message.receiver.id = :receiverId
-              and message.trash = true
-              and message.id in :messageIds
+            select message from MailMessage message
+            where (message.receiver.id = :userId and message.trash = true and message.receiverDeleted = false)
+               or (message.sender.id = :userId and message.senderTrash = true and message.senderDeleted = false)
+            order by message.sentAt desc
             """)
-    int deleteSelectedTrashByReceiverId(@Param("receiverId") Long receiverId,
-                                        @Param("messageIds") List<Long> messageIds);
+    Page<MailMessage> findTrashByOwnerId(@Param("userId") Long userId, Pageable pageable);
 
-    @Modifying
+    @EntityGraph(attributePaths = {"sender", "receiver"})
     @Query("""
-            delete from MailMessage message
-            where message.receiver.id = :receiverId
-              and message.trash = true
+            select message from MailMessage message
+            where (message.receiver.id = :userId and message.trash = true and message.receiverDeleted = false)
+               or (message.sender.id = :userId and message.senderTrash = true and message.senderDeleted = false)
             """)
-    int deleteAllTrashByReceiverId(@Param("receiverId") Long receiverId);
+    List<MailMessage> findAllTrashByOwnerId(@Param("userId") Long userId);
 
     @EntityGraph(attributePaths = "receiver")
-    Page<MailMessage> findBySenderIdAndDraftTrueAndTrashFalseOrderBySentAtDesc(Long senderId, Pageable pageable);
+    Page<MailMessage> findBySenderIdAndDraftTrueAndSenderTrashFalseAndSenderDeletedFalseOrderBySentAtDesc(Long senderId, Pageable pageable);
 
     @Override
     @EntityGraph(attributePaths = {"sender", "receiver", "category"})

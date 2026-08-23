@@ -1,9 +1,8 @@
 (() => {
-    const toolbar = document.querySelector('[data-trash-toolbar]');
     const form = document.querySelector('[data-selection-form]');
-    if (!toolbar || !form) return;
+    const toggle = document.querySelector('[data-selection-toggle]');
+    if (!form || !toggle) return;
 
-    const toggle = toolbar.querySelector('[data-selection-toggle]');
     const selectionBar = form.querySelector('[data-selection-bar]');
     const selectors = [...form.querySelectorAll('[data-message-selector]')];
     const checkboxes = [...form.querySelectorAll('[data-message-checkbox]')];

@@ -224,4 +224,16 @@ public class MessageController {
         }
         return "redirect:/messages/trash";
     }
+
+    @PostMapping("/selected/trash")
+    String moveSelectedToTrash(@RequestParam String boxType, @RequestParam(required = false) java.util.List<Long> messageIds,
+                               Authentication authentication, RedirectAttributes redirectAttributes) {
+        var movedCount = messageService.moveSelectedToTrash(authentication.getName(), messageIds, boxType);
+        if (movedCount == 0) {
+            redirectAttributes.addFlashAttribute("bulkActionError", "Çöp kutusuna taşımak için en az bir geçerli mesaj seçin.");
+        } else {
+            redirectAttributes.addFlashAttribute("bulkActionSuccess", movedCount + " mesaj çöp kutusuna taşındı.");
+        }
+        return "redirect:/messages/" + boxType;
+    }
 }

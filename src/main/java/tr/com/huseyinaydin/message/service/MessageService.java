@@ -44,7 +44,7 @@ public class MessageService {
     @Transactional(readOnly = true)
     public Page<MessageListItem> inbox(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
-        return messageRepository.findByReceiverIdAndDraftFalseAndTrashFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
+        return messageRepository.findByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
                 .map(message -> new MessageListItem(
                         message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSubject(),
                         message.getSentAt(), message.isRead(), message.isImportant()
@@ -56,7 +56,7 @@ public class MessageService {
         var user = findUser(currentUserEmail);
         Specification<MailMessage> spec = (root, query, cb) -> cb.and(
                 cb.equal(root.get("receiver").get("id"), user.getId()),
-                cb.isFalse(root.get("draft")), cb.isFalse(root.get("trash")));
+                cb.isFalse(root.get("draft")), cb.isFalse(root.get("trash")), cb.isFalse(root.get("receiverDeleted")));
         if (filter.sender() != null && !filter.sender().isBlank()) {
             spec = spec.and((root, query, cb) -> cb.like(cb.lower(cb.concat(cb.concat(root.get("sender").get("firstName"), " "), root.get("sender").get("lastName"))), "%" + filter.sender().trim().toLowerCase(Locale.ROOT) + "%"));
         }
@@ -75,7 +75,7 @@ public class MessageService {
     @Transactional(readOnly = true)
     public Page<MessageListItem> sent(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
-        return messageRepository.findBySenderIdAndDraftFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
+        return messageRepository.findBySenderIdAndDraftFalseAndSenderTrashFalseAndSenderDeletedFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
                 .map(message -> new MessageListItem(
                         message.getId(), fullName(message.getReceiver()), message.getReceiver().getEmail(), message.getSubject(),
                         message.getSentAt(), message.isRead(), message.isImportant()
@@ -86,21 +86,21 @@ public class MessageService {
     public Page<MessageListItem> important(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
         return messageRepository
-                .findByReceiverIdAndImportantTrueAndTrashFalseAndDraftFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
+                .findByReceiverIdAndImportantTrueAndTrashFalseAndReceiverDeletedFalseAndDraftFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
                 .map(this::toInboxListItem);
     }
 
     @Transactional(readOnly = true)
     public Page<MessageListItem> trash(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
-        return messageRepository.findByReceiverIdAndTrashTrueOrderBySentAtDesc(user.getId(), pageRequest(page))
-                .map(this::toInboxListItem);
+        return messageRepository.findTrashByOwnerId(user.getId(), pageRequest(page))
+                .map(message -> toListItemForOwner(message, user.getId()));
     }
 
     @Transactional(readOnly = true)
     public Page<MessageListItem> drafts(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
-        return messageRepository.findBySenderIdAndDraftTrueAndTrashFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
+        return messageRepository.findBySenderIdAndDraftTrueAndSenderTrashFalseAndSenderDeletedFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
                 .map(message -> new MessageListItem(
                         message.getId(), message.getReceiver() == null ? "Alıcı belirtilmedi" : fullName(message.getReceiver()),
                         message.getReceiver() == null ? "" : message.getReceiver().getEmail(), message.getSubject(),
@@ -128,7 +128,8 @@ public class MessageService {
                 fullName(message.getSender()), message.getSender().getEmail(),
                 message.getReceiver() == null ? "Alıcı belirtilmedi" : fullName(message.getReceiver()),
                 message.getReceiver() == null ? "" : message.getReceiver().getEmail(),
-                message.getSentAt(), receivedByCurrentUser, message.isImportant(), message.isTrash(), message.isDraft(),
+                message.getSentAt(), receivedByCurrentUser, message.isImportant(),
+                receivedByCurrentUser ? message.isTrash() : message.isSenderTrash(), message.isDraft(),
                 message.getCategory() == null ? null : message.getCategory().getId(),
                 message.getCategory() == null ? null : message.getCategory().getName()
         );
@@ -183,12 +184,47 @@ public class MessageService {
 
     @Transactional
     public void moveToTrash(String currentUserEmail, Long messageId) {
-        findReceivedMessage(currentUserEmail, messageId).moveToTrash();
+        var user = findUser(currentUserEmail);
+        var message = findOwnedMessage(user, messageId);
+        if (isReceiver(user, message)) {
+            message.moveToTrash();
+        } else {
+            message.moveSenderCopyToTrash();
+        }
     }
 
     @Transactional
     public void restoreFromTrash(String currentUserEmail, Long messageId) {
-        findReceivedMessage(currentUserEmail, messageId).restoreFromTrash();
+        var user = findUser(currentUserEmail);
+        var message = findOwnedMessage(user, messageId);
+        if (isReceiver(user, message)) {
+            message.restoreFromTrash();
+        } else {
+            message.restoreSenderCopyFromTrash();
+        }
+    }
+
+    @Transactional
+    public int moveSelectedToTrash(String currentUserEmail, Collection<Long> messageIds, String boxType) {
+        if (messageIds == null || messageIds.isEmpty()) return 0;
+        var user = findUser(currentUserEmail);
+        var ids = messageIds.stream().filter(Objects::nonNull).distinct().toList();
+        var moved = 0;
+        for (var message : messageRepository.findAllById(ids)) {
+            var receiverOwnsMessage = isReceiver(user, message);
+            var senderOwnsMessage = message.getSender().getId().equals(user.getId());
+            var eligible = switch (boxType) {
+                case "inbox", "important" -> receiverOwnsMessage && !message.isDraft() && !message.isTrash() && !message.isReceiverDeleted();
+                case "sent" -> senderOwnsMessage && !message.isDraft() && !message.isSenderTrash() && !message.isSenderDeleted();
+                case "drafts" -> senderOwnsMessage && message.isDraft() && !message.isSenderTrash() && !message.isSenderDeleted();
+                default -> false;
+            };
+            if (eligible) {
+                if (receiverOwnsMessage) message.moveToTrash(); else message.moveSenderCopyToTrash();
+                moved++;
+            }
+        }
+        return moved;
     }
 
     @Transactional
@@ -203,12 +239,14 @@ public class MessageService {
         if (uniqueMessageIds.isEmpty()) {
             return 0;
         }
-        return messageRepository.deleteSelectedTrashByReceiverId(findUser(currentUserEmail).getId(), uniqueMessageIds);
+        var user = findUser(currentUserEmail);
+        return permanentlyDeleteTrashMessages(user, messageRepository.findAllById(uniqueMessageIds));
     }
 
     @Transactional
     public int permanentlyDeleteAllTrash(String currentUserEmail) {
-        return messageRepository.deleteAllTrashByReceiverId(findUser(currentUserEmail).getId());
+        var user = findUser(currentUserEmail);
+        return permanentlyDeleteTrashMessages(user, messageRepository.findAllTrashByOwnerId(user.getId()));
     }
 
     private PageRequest pageRequest(int page) {
@@ -229,6 +267,48 @@ public class MessageService {
                 message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSubject(),
                 message.getSentAt(), message.isRead(), message.isImportant()
         );
+    }
+
+    private MessageListItem toListItemForOwner(MailMessage message, Long ownerId) {
+        var counterpart = message.getSender().getId().equals(ownerId) ? message.getReceiver() : message.getSender();
+        return new MessageListItem(
+                message.getId(), counterpart == null ? "Alıcı belirtilmedi" : fullName(counterpart),
+                counterpart == null ? "" : counterpart.getEmail(), message.getSubject(), message.getSentAt(),
+                message.isRead(), message.isImportant()
+        );
+    }
+
+    private int permanentlyDeleteTrashMessages(AppUser user, Collection<MailMessage> messages) {
+        var deleted = 0;
+        var purgeableMessages = new java.util.ArrayList<MailMessage>();
+        for (var message : messages) {
+            var deletedForCurrentUser = false;
+            if (isReceiver(user, message) && message.isTrash() && !message.isReceiverDeleted()) {
+                message.permanentlyDeleteReceiverCopy();
+                deletedForCurrentUser = true;
+            }
+            if (message.getSender().getId().equals(user.getId()) && message.isSenderTrash() && !message.isSenderDeleted()) {
+                message.permanentlyDeleteSenderCopy();
+                deletedForCurrentUser = true;
+            }
+            if (deletedForCurrentUser) deleted++;
+            if (message.canBePurged()) purgeableMessages.add(message);
+        }
+        messageRepository.deleteAll(purgeableMessages);
+        return deleted;
+    }
+
+    private MailMessage findOwnedMessage(AppUser user, Long messageId) {
+        var message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new IllegalArgumentException("Mesaj bulunamadı."));
+        if (!isReceiver(user, message) && !message.getSender().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("Bu mesaj üzerinde işlem yapma izniniz yok.");
+        }
+        return message;
+    }
+
+    private boolean isReceiver(AppUser user, MailMessage message) {
+        return message.getReceiver() != null && message.getReceiver().getId().equals(user.getId());
     }
 
     private MailMessage findReceivedMessage(String currentUserEmail, Long messageId) {

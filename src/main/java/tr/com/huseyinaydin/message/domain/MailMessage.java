@@ -46,6 +46,15 @@ public class MailMessage {
     private boolean trash;
 
     @Column(nullable = false)
+    private boolean senderTrash;
+
+    @Column(nullable = false)
+    private boolean receiverDeleted;
+
+    @Column(nullable = false)
+    private boolean senderDeleted;
+
+    @Column(nullable = false)
     private boolean draft;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -90,6 +99,26 @@ public class MailMessage {
 
     public void restoreFromTrash() {
         trash = false;
+    }
+
+    public void moveSenderCopyToTrash() {
+        senderTrash = true;
+    }
+
+    public void restoreSenderCopyFromTrash() {
+        senderTrash = false;
+    }
+
+    public void permanentlyDeleteReceiverCopy() {
+        receiverDeleted = true;
+    }
+
+    public void permanentlyDeleteSenderCopy() {
+        senderDeleted = true;
+    }
+
+    public boolean canBePurged() {
+        return senderDeleted && (receiver == null || receiverDeleted);
     }
 
     public void updateDraft(AppUser receiver, String subject, String body) {
