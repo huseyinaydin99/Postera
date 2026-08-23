@@ -1,16 +1,36 @@
-<nav th:fragment="mainNavigation" aria-label="Ana navigasyon">
+<aside th:fragment="mainNavigation" class="sidebar" aria-label="Ana navigasyon">
     <link rel="stylesheet" th:href="@{/css/postera.css}">
-    <a th:href="@{/}">Postera</a>
-    <a th:href="@{/messages/inbox}">Gelen kutusu</a>
-    <a th:href="@{/messages/compose}">Yeni mesaj</a>
-    <a th:href="@{/messages/sent}">Gönderilenler</a>
-    <a th:href="@{/messages/drafts}">Taslaklar</a>
-    <a th:href="@{/messages/important}">Önemli mesajlar</a>
-    <a th:href="@{/messages/trash}">Çöp kutusu</a>
-    <a th:href="@{/categories}">Kategoriler</a>
-    <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Yönetim</a>
-    <a th:href="@{/profile}">Profilim</a>
-    <form th:action="@{/auth/logout}" method="post">
-        <button type="submit">Çıkış yap</button>
-    </form>
-</nav>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,400..700,0..1&display=swap">
+
+    <div class="sidebar-brand">
+        <h1>Postera</h1>
+        <p>Kurumsal Mesajlaşma</p>
+    </div>
+
+    <a class="btn-compose" th:href="@{/messages/compose}">
+        <span class="material-symbols-outlined">edit_square</span>
+        Yeni Mail
+    </a>
+
+    <ul class="sidebar-nav">
+        <li><a class="sidebar-link" th:href="@{/messages/inbox}"><span class="material-symbols-outlined">inbox</span>Gelen Kutusu</a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/compose}"><span class="material-symbols-outlined">edit</span>Mail Gönder</a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/drafts}"><span class="material-symbols-outlined">drafts</span>Taslaklar</a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/sent}"><span class="material-symbols-outlined">send</span>Gönderilenler</a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/important}"><span class="material-symbols-outlined">label_important</span>Önemli Mesajlar</a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/trash}"><span class="material-symbols-outlined">delete</span>Çöp Kutusu</a></li>
+        <li><a class="sidebar-link" th:href="@{/categories}"><span class="material-symbols-outlined">folder</span>Kategoriler</a></li>
+        <li><a class="sidebar-link" th:href="@{/profile}"><span class="material-symbols-outlined">account_circle</span>Profilim</a></li>
+        <li sec:authorize="hasRole('ADMIN')" class="sidebar-divider">
+            <a class="sidebar-link" th:href="@{/admin}"><span class="material-symbols-outlined">analytics</span>İstatistikler</a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')"><a class="sidebar-link" th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span>Kullanıcı Listesi</a></li>
+        <li sec:authorize="hasRole('ADMIN')"><a class="sidebar-link" th:href="@{/admin/reports}"><span class="material-symbols-outlined">report</span>Şikayetler</a></li>
+    </ul>
+
+    <div class="sidebar-divider sidebar-footer">
+        <form th:action="@{/auth/logout}" method="post">
+            <button class="sidebar-link" type="submit"><span class="material-symbols-outlined">logout</span>Çıkış Yap</button>
+        </form>
+    </div>
+</aside>
