@@ -142,7 +142,7 @@ a.sidebar-link:hover, button.sidebar-link:hover { background: var(--accent-soft)
 .sidebar-footer form { display: block; }
 
 body > main, body > header + main {
-    width: auto; max-width: none; min-height: 100vh; margin: 0 0 0 260px; padding: 6.75rem 2rem 2.5rem;
+    width: auto; max-width: none; min-height: 100vh; margin: 0 0 0 260px; padding: 6.75rem 2rem 5.75rem;
     background: var(--paper); 
 }
 .topbar {
@@ -164,6 +164,16 @@ body > main, body > header + main {
 .profile-menu-panel a, .profile-menu-panel button { display: flex; align-items: center; gap: .6rem; width: 100%; padding: .65rem .5rem; border: 0; border-radius: 5px; background: transparent; color: var(--ink-700); font: 500 .88rem var(--font-body); text-align: left; text-decoration: none; }
 .profile-menu-panel a:hover, .profile-menu-panel button:hover { background: var(--accent-soft); color: var(--accent); }
 .profile-menu-panel form { display: block; margin: 0; }
+.app-footer {
+    position: fixed; z-index: 15; right: 0; bottom: 0; left: 260px; min-height: 3.5rem; padding: .75rem 2rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    border-top: 1px solid var(--line); background: rgba(250, 249, 246, .94); backdrop-filter: blur(10px);
+    color: var(--ink-500); font-size: .78rem;
+}
+.app-footer p { margin: 0; }
+.app-footer a { color: var(--accent); }
+.app-footer-github { display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; text-decoration: none; }
+.app-footer-github .material-symbols-outlined { font-size: 1rem; }
 main > section, main > article, main > form, main > table, main > dl, main > ul, main > ol {
     max-width: 1200px; background: var(--paper-raised); border-color: var(--line); border-radius: 10px;
     box-shadow: 0 1px 3px rgba(26, 35, 50, .04);
@@ -179,7 +189,13 @@ th { background: var(--paper); color: var(--ink-500); }
     .sidebar-footer { display: none; }
     .topbar { position: static; width: 100%; height: auto; min-height: 4rem; padding: .75rem 1rem; }
     .topbar-search { width: min(100%, 440px); }
-    body > main, body > header + main { margin-left: 0; padding: 1.25rem 1rem; }
+    .app-footer { left: 0; min-height: 3.75rem; padding: .65rem 1rem; }
+    body > main, body > header + main { margin-left: 0; padding: 1.25rem 1rem 5.5rem; }
+}
+
+@media (max-width: 480px) {
+    .app-footer { align-items: flex-start; flex-direction: column; gap: .3rem; }
+    body > main, body > header + main { padding-bottom: 6.75rem; }
 }
 
 .message-list { margin: 1rem 0 0; padding: 0; list-style: none; }
