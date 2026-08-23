@@ -5,6 +5,206 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${boxTitle} + ' | Postera'">Postera</title>
 </head>
+<style>
+    /* Ana container */
+    .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: .75rem;
+        padding: .9rem;
+
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--paper-raised);
+        box-shadow: 0 2px 6px rgba(0,0,0,.04);
+    }
+
+    /* Kategoriden sonra yeni satır başlat */
+    /* Genel küçültme */
+    .filter-bar {
+        font-size: 0.85em; /* tüm metinleri küçültür */
+    }
+
+    /* Grup boşlukları */
+    .filter-bar {
+        gap: .45rem;
+        padding: .6rem;
+    }
+
+    /* Label */
+    .filter-group label {
+        font-size: .65rem;
+    }
+
+    /* Input ve select */
+    .form-control,
+    .form-select {
+        min-height: 1.7rem;
+        padding: .25rem .4rem;
+        font-size: .7rem;
+    }
+
+    /* Tarih alanı iç boşluk */
+    .filter-inline {
+        gap: .25rem;
+    }
+
+    /* Butonlar */
+    .btn {
+        min-height: 1.7rem;
+        padding: .25rem .5rem;
+        font-size: .7rem;
+    }
+
+    /* Aksiyon alanı */
+    .filter-actions {
+        gap: .35rem;
+    }
+
+    /* Grup */
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem;
+    }
+
+    /* Label */
+    .filter-group label {
+        font-size: .72rem;
+        font-weight: 600;
+        color: var(--ink-600);
+    }
+
+    /* Inline (tarih) */
+    .filter-inline {
+        display: flex;
+        gap: .4rem;
+    }
+
+    /* Inputs */
+    .form-control,
+    .form-select {
+        width: 100%;
+        min-height: 2.2rem;
+        padding: .35rem .55rem;
+
+        border: 1px solid var(--line);
+        border-radius: 6px;
+
+        font-size: .8rem;
+        background: var(--paper);
+    }
+
+    /* Focus */
+    .form-control:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 .15rem rgba(180, 83, 9, .12);
+    }
+
+    /* Aksiyonlar */
+    .filter-actions {
+        display: flex;
+        align-items: flex-end;
+        gap: .5rem;
+    }
+
+    /* Butonlar */
+    .btn {
+        min-height: 2.2rem;
+        padding: .35rem .7rem;
+        border-radius: 6px;
+        font-size: .8rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    /* Filtrele */
+    .btn-filter {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+    }
+
+    .btn-filter:hover {
+        background: var(--accent-hover);
+    }
+
+    /* Reset */
+    .btn-reset {
+        border: 1px solid var(--line);
+        background: var(--paper);
+        color: var(--ink-700);
+    }
+
+    .btn-reset:hover {
+        background: var(--accent-soft);
+        color: var(--accent);
+    }
+
+    /* Mobil */
+    @media (max-width: 600px) {
+        .filter-bar {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-actions {
+            flex-direction: column;
+        }
+    }
+
+
+
+
+    .filter-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .filter-table td {
+        padding: .4rem;
+        vertical-align: top;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+    }
+
+    .filter-inline {
+        display: flex;
+        gap: .3rem;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        min-height: 2rem;
+        padding: .3rem .5rem;
+        font-size: .75rem;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: .4rem;
+        align-items: flex-end;
+    }
+
+    .btn {
+        padding: .3rem .6rem;
+        font-size: .75rem;
+    }
+
+    .filter-table td {
+        vertical-align: bottom;
+    }
+
+    .filter-actions-cell {
+        vertical-align: bottom;
+    }
+</style>
 <body>
 <header th:replace="~{fragments/navigation :: mainNavigation}"></header>
 <main>
@@ -15,16 +215,90 @@
         <p th:if="${trashActionSuccess}" role="status" th:text="${trashActionSuccess}"></p>
         <p th:if="${bulkActionError}" role="alert" th:text="${bulkActionError}"></p>
         <p th:if="${bulkActionSuccess}" role="status" th:text="${bulkActionSuccess}"></p>
-        <form th:if="${boxType == 'inbox'}" method="get" th:action="@{/messages/inbox}">
-            <input name="sender" placeholder="Gönderen" th:value="${filter.sender}">
-            <input name="subject" placeholder="Konu" th:value="${filter.subject}">
-            <input name="from" type="date" th:value="${filter.from}">
-            <input name="to" type="date" th:value="${filter.to}">
-            <select name="categoryId"><option value="">Tüm kategoriler</option><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id == filter.categoryId}"></option></select>
-            <select name="read"><option value="">Tüm okuma durumları</option><option value="true" th:selected="${filter.read == true}">Okundu</option><option value="false" th:selected="${filter.read == false}">Okunmadı</option></select>
-            <select name="important"><option value="">Tüm önem durumları</option><option value="true" th:selected="${filter.important == true}">Önemli</option><option value="false" th:selected="${filter.important == false}">Normal</option></select>
-            <select name="sort"><option value="desc" th:selected="${filter.sort != 'asc'}">En yeni</option><option value="asc" th:selected="${filter.sort == 'asc'}">En eski</option></select>
-            <button type="submit">Filtrele</button>
+        <form th:if="${boxType == 'inbox'}" class="filter-bar" method="get" th:action="@{/messages/inbox}">
+
+            <table class="filter-table">
+                <tr>
+                    <td>
+                        <div class="filter-group">
+                            <label>Gönderen</label>
+                            <input class="form-control" name="sender" placeholder="Gönderen" th:value="${filter.sender}">
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="filter-group">
+                            <label>Konu</label>
+                            <input class="form-control" name="subject" placeholder="Konu" th:value="${filter.subject}">
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="filter-group">
+                            <label>Tarih</label>
+                            <div class="filter-inline">
+                                <input class="form-control" name="from" type="date" th:value="${filter.from}">
+                                <input class="form-control" name="to" type="date" th:value="${filter.to}">
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="filter-group">
+                            <label>Kategori</label>
+                            <select class="form-select" name="categoryId">
+                                <option value="">Tümü</option>
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}"
+                                        th:selected="${category.id == filter.categoryId}">
+                                </option>
+                            </select>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="filter-group">
+                            <label>Durum</label>
+                            <select class="form-select" name="read">
+                                <option value="">Tümü</option>
+                                <option value="true" th:selected="${filter.read == true}">Okundu</option>
+                                <option value="false" th:selected="${filter.read == false}">Okunmadı</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="filter-group">
+                            <label>Önem</label>
+                            <select class="form-select" name="important">
+                                <option value="">Tümü</option>
+                                <option value="true" th:selected="${filter.important == true}">Önemli</option>
+                                <option value="false" th:selected="${filter.important == false}">Normal</option>
+                            </select>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="filter-group">
+                            <label>Sırala</label>
+                            <select class="form-select" name="sort">
+                                <option value="desc" th:selected="${filter.sort != 'asc'}">En yeni</option>
+                                <option value="asc" th:selected="${filter.sort == 'asc'}">En eski</option>
+                            </select>
+                        </div>
+                    </td>
+
+                    <td class="filter-actions-cell">
+                        <div class="filter-group">
+                            <button class="btn btn-filter" type="submit">Filtrele</button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
         </form>
         <p th:if="${param.sent}" role="status">Mesajınız gönderildi.</p>
         <p th:if="${param.notFound}" role="alert">Mesaj bulunamadı veya erişim yetkiniz yok.</p>
