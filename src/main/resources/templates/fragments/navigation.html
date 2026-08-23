@@ -1,7 +1,8 @@
-<aside th:fragment="mainNavigation" class="sidebar" aria-label="Ana navigasyon">
+<div th:fragment="mainNavigation">
     <link rel="stylesheet" th:href="@{/css/postera.css}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,400..700,0..1&display=swap">
 
+<aside class="sidebar" aria-label="Ana navigasyon">
     <div class="sidebar-brand">
         <h1>Postera</h1>
         <p>Kurumsal Mesajlaşma</p>
@@ -20,7 +21,6 @@
         <li><a class="sidebar-link" th:href="@{/messages/important}"><span class="material-symbols-outlined">label_important</span>Önemli Mesajlar</a></li>
         <li><a class="sidebar-link" th:href="@{/messages/trash}"><span class="material-symbols-outlined">delete</span>Çöp Kutusu</a></li>
         <li><a class="sidebar-link" th:href="@{/categories}"><span class="material-symbols-outlined">folder</span>Kategoriler</a></li>
-        <li><a class="sidebar-link" th:href="@{/profile}"><span class="material-symbols-outlined">account_circle</span>Profilim</a></li>
         <li sec:authorize="hasRole('ADMIN')" class="sidebar-divider">
             <a class="sidebar-link" th:href="@{/admin}"><span class="material-symbols-outlined">analytics</span>İstatistikler</a>
         </li>
@@ -28,9 +28,25 @@
         <li sec:authorize="hasRole('ADMIN')"><a class="sidebar-link" th:href="@{/admin/reports}"><span class="material-symbols-outlined">report</span>Şikayetler</a></li>
     </ul>
 
-    <div class="sidebar-divider sidebar-footer">
-        <form th:action="@{/auth/logout}" method="post">
-            <button class="sidebar-link" type="submit"><span class="material-symbols-outlined">logout</span>Çıkış Yap</button>
-        </form>
-    </div>
 </aside>
+    <div class="topbar" th:if="${navigationProfile != null}">
+        <form class="topbar-search" th:action="@{/messages/inbox}" method="get" role="search">
+            <label class="visually-hidden" for="global-message-search">Mesajlarda ara</label>
+            <span class="material-symbols-outlined">search</span>
+            <input id="global-message-search" name="subject" type="search" placeholder="Mesajlarda ara" autocomplete="off">
+        </form>
+        <details class="profile-menu">
+            <summary aria-label="Kullanıcı menüsünü aç">
+                <img th:src="${navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
+                     th:alt="${navigationProfile.firstName + ' profil fotoğrafı'}">
+            </summary>
+            <div class="profile-menu-panel">
+                <p><strong th:text="${navigationProfile.firstName + ' ' + navigationProfile.lastName}"></strong><small th:text="${navigationProfile.email}"></small></p>
+                <a th:href="@{/profile}"><span class="material-symbols-outlined">account_circle</span>Profilim</a>
+                <form th:action="@{/auth/logout}" method="post">
+                    <button type="submit"><span class="material-symbols-outlined">logout</span>Çıkış yap</button>
+                </form>
+            </div>
+        </details>
+    </div>
+</div>
