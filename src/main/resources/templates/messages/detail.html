@@ -33,21 +33,23 @@
                 </div>
             </div>
         </section>
-        <form th:if="${!message.draft}" class="reply-form" th:action="@{/messages/{id}/reply(id=${message.id})}" th:object="${replyMessageRequest}" method="post">
+        <form th:if="${!message.draft}" id="reply-form" class="reply-form" th:action="@{/messages/{id}/reply(id=${message.id})}" th:object="${replyMessageRequest}" method="post">
             <label for="reply-body">Yanıtınız</label>
             <textarea id="reply-body" th:field="*{body}" rows="4" placeholder="Bu konuşmaya yanıt yazın..."></textarea>
             <p th:if="${#fields.hasErrors('body')}" th:errors="*{body}"></p>
-            <button type="submit"><span class="material-symbols-outlined">send</span> Yanıt gönder</button>
         </form>
         <p th:if="${param.replied}" role="status">Yanıtınız gönderildi.</p>
         <p th:if="${param.replyError}" role="alert">Yanıt gönderilemedi.</p>
         <p th:if="${param.reported}" role="status">Mesaj incelemeye alınmak üzere şikayet edildi.</p>
         <p th:if="${param.reportError}" role="alert">Şikayet işlemi tamamlanamadı.</p>
-        <form th:if="${!alreadyReported}" th:action="@{/messages/{id}/report(id=${message.id})}" method="post">
-            <button type="submit">Mesajı şikayet et</button>
-        </form>
+        <div th:if="${!message.draft}" class="message-action-row">
+            <button type="submit" form="reply-form"><span class="material-symbols-outlined">send</span> Yanıt gönder</button>
+            <form th:if="${!alreadyReported}" th:action="@{/messages/{id}/report(id=${message.id})}" method="post">
+                <button type="submit">Mesajı şikayet et</button>
+            </form>
+        </div>
         <p th:if="${alreadyReported}">Bu mesajı şikayet ettiniz.</p>
-        <div th:if="${message.receivedByCurrentUser}">
+        <div th:if="${message.receivedByCurrentUser}" class="message-action-row message-management-actions">
             <form th:action="@{/messages/{id}/category(id=${message.id})}" method="post">
                 <label for="categoryId">Kategori</label>
                 <select id="categoryId" name="categoryId">
