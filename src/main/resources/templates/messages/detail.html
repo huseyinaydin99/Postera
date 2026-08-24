@@ -29,13 +29,23 @@
                      th:alt="${item.senderName + ' profil fotoğrafı'}">
                 <div class="conversation-bubble">
                     <div><strong th:text="${item.senderName}"></strong><time th:text="${#temporals.format(item.sentAt, 'dd.MM.yyyy HH:mm')}"></time></div>
-                    <p th:text="${item.body}"></p>
+                    <div class="rich-message-body" th:utext="${item.body}"></div>
                 </div>
             </div>
         </section>
         <form th:if="${!message.draft}" id="reply-form" class="reply-form" th:action="@{/messages/{id}/reply(id=${message.id})}" th:object="${replyMessageRequest}" method="post">
             <label for="reply-body">Yanıtınız</label>
-            <textarea id="reply-body" th:field="*{body}" rows="4" placeholder="Bu konuşmaya yanıt yazın..."></textarea>
+            <div class="rte-toolbar" role="toolbar" aria-label="Metin biçimlendirme araçları">
+                <button type="button" data-rte-command="bold" title="Kalın"><strong>B</strong></button>
+                <button type="button" data-rte-command="italic" title="İtalik"><em>I</em></button>
+                <button type="button" data-rte-command="insertUnorderedList" title="Madde işaretli liste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                <button type="button" data-rte-command="insertOrderedList" title="Numaralı liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                <button type="button" data-rte-command="formatBlock" data-rte-value="p" title="Paragraf"><span class="material-symbols-outlined">format_paragraph</span></button>
+                <button type="button" data-rte-emoji="😊" title="Emoji ekle">😊</button>
+            </div>
+            <div id="reply-editor" class="rte-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Yanıtınız" data-rte-editor
+                 data-placeholder="Bu konuşmaya yanıt yazın..." th:text="*{body}"></div>
+            <input id="reply-body" type="hidden" th:field="*{body}" data-rte-input>
             <p th:if="${#fields.hasErrors('body')}" th:errors="*{body}"></p>
         </form>
         <p th:if="${param.replied}" role="status">Yanıtınız gönderildi.</p>
@@ -79,5 +89,6 @@
         </div>
     </article>
 </main>
+<script th:src="@{/js/rich-text-editor.js}" defer></script>
 </body>
 </html>

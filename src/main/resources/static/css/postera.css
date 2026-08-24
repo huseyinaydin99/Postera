@@ -237,6 +237,16 @@ th { background: var(--paper); color: var(--ink-500); }
 .conversation-bubble p { margin: 0; white-space: pre-wrap; }
 .reply-form { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
 .reply-form button { display: inline-flex; align-items: center; gap: .4rem; }
+.rte-toolbar { display: flex; align-items: center; gap: .3rem; padding: .45rem; border: 1px solid var(--line); border-bottom: 0; border-radius: 6px 6px 0 0; background: var(--paper); }
+.rte-toolbar button { min-width: 2rem; min-height: 2rem; padding: .3rem .45rem; border: 1px solid transparent; border-radius: 4px; background: transparent; color: var(--ink-700); }
+.rte-toolbar button:hover { background: var(--accent-soft); color: var(--accent); }
+.rte-toolbar .material-symbols-outlined { font-size: 1.1rem; }
+.rte-editor { min-height: 8rem; padding: .75rem; border: 1px solid var(--line); border-radius: 0 0 6px 6px; background: var(--paper-raised); outline: 0; white-space: pre-wrap; }
+.rte-editor:focus { border-color: var(--accent); box-shadow: 0 0 0 .2rem rgba(180, 83, 9, .14); }
+.rte-editor:empty::before { content: attr(data-placeholder); color: var(--ink-500); pointer-events: none; }
+.rich-message-body { white-space: normal; }
+.rich-message-body p:first-child, .rich-message-body ul:first-child, .rich-message-body ol:first-child { margin-top: 0; }
+.rich-message-body p:last-child, .rich-message-body ul:last-child, .rich-message-body ol:last-child { margin-bottom: 0; }
 .message-action-row { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; margin: 1rem 0; }
 .message-action-row form { display: inline-flex; margin: 0; }
 .message-action-row button { display: inline-flex; align-items: center; gap: .4rem; }

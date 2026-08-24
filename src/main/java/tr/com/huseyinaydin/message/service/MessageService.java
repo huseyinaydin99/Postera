@@ -30,6 +30,7 @@ public class MessageService {
     private final MailMessageRepository messageRepository;
     private final AppUserRepository userRepository;
     private final MailCategoryRepository categoryRepository;
+    private final RichTextSanitizer richTextSanitizer;
 
     @Transactional
     public void send(String senderEmail, SendMessageRequest request) {
@@ -158,7 +159,10 @@ public class MessageService {
         }
         message.startConversationIfMissing();
         var receiver = isReceiver(sender, message) ? message.getSender() : message.getReceiver();
-        messageRepository.save(MailMessage.reply(sender, receiver, replySubject(message.getSubject()), body.trim(), message.getConversationId()));
+        if (!richTextSanitizer.hasText(body)) {
+            throw new IllegalArgumentException("Yanıt metni zorunludur.");
+        }
+        messageRepository.save(MailMessage.reply(sender, receiver, replySubject(message.getSubject()), richTextSanitizer.sanitize(body), message.getConversationId()));
     }
 
     @Transactional
@@ -307,7 +311,7 @@ public class MessageService {
     private ConversationMessage toConversationMessage(MailMessage message, Long currentUserId) {
         return new ConversationMessage(
                 message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSender().getProfileImageUrl(),
-                message.getBody(), message.getSentAt(), message.getSender().getId().equals(currentUserId)
+                richTextSanitizer.sanitize(message.getBody()), message.getSentAt(), message.getSender().getId().equals(currentUserId)
         );
     }
 
