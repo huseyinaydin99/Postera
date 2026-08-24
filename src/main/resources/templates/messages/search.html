@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Arama sonuçları | Postera</title></head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <section class="search-results" aria-labelledby="search-title">
+        <h1 id="search-title">Arama sonuçları</h1>
+        <p th:if="${query.isBlank()}">Aramak istediğiniz kelimeyi yazın.</p>
+        <p th:unless="${query.isBlank()}"><strong th:text="${query}"></strong> için bulunan mesajlar</p>
+        <p th:if="${!query.isBlank() and results.empty}">Eşleşen mesaj bulunamadı.</p>
+        <a class="search-result" th:each="result : ${results.content}" th:href="@{/messages/{id}(id=${result.id})}">
+            <div><strong th:text="${result.counterpartName}"></strong><small th:text="${result.counterpartEmail}"></small></div>
+            <div><strong th:text="${result.subject}"></strong><p th:text="${result.bodyPreview}"></p></div>
+            <time th:text="${#temporals.format(result.sentAt, 'dd.MM.yyyy HH:mm')}"></time>
+        </a>
+        <nav class="pagination-bar" th:if="${results.totalPages > 1}" aria-label="Arama sonuçları sayfaları">
+            <a th:if="${results.hasPrevious()}" th:href="@{/messages/search(q=${query},page=${results.number - 1})}">Önceki</a>
+            <span th:text="|${results.number + 1} / ${results.totalPages}|"></span>
+            <a th:if="${results.hasNext()}" th:href="@{/messages/search(q=${query},page=${results.number + 1})}">Sonraki</a>
+        </nav>
+    </section>
+</main>
+</body>
+</html>

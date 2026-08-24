@@ -34,10 +34,12 @@
             <button type="button" class="sidebar-toggle" data-sidebar-toggle aria-label="Menüyü daralt" aria-expanded="true">
                 <span class="material-symbols-outlined">menu</span>
             </button>
-            <form class="topbar-search" th:action="@{/messages/inbox}" method="get" role="search">
+            <form class="topbar-search" th:action="@{/messages/search}" method="get" role="search" data-message-search>
                 <label class="visually-hidden" for="global-message-search">Mesajlarda ara</label>
                 <span class="material-symbols-outlined">search</span>
-                <input id="global-message-search" name="subject" type="search" placeholder="Mesajlarda ara" autocomplete="off">
+                <input id="global-message-search" name="q" type="search" placeholder="Mesajlarda ara" autocomplete="off" data-message-search-input>
+                <button type="submit">Ara</button>
+                <div class="search-suggestions" hidden data-message-search-suggestions></div>
             </form>
         </div>
         <details class="profile-menu">
@@ -64,4 +66,5 @@
         <-| 2026© Postera |->
     </footer>
     <script th:src="@{/js/sidebar-toggle.js}" defer></script>
+    <script th:src="@{/js/message-search.js}" defer></script>
 </div>

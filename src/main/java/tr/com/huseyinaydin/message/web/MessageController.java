@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.ResponseBody;
 import tr.com.huseyinaydin.message.service.MessageService;
 import tr.com.huseyinaydin.category.service.CategoryService;
 import tr.com.huseyinaydin.report.service.MessageReportService;
@@ -73,6 +75,22 @@ public class MessageController {
     String drafts(@RequestParam(defaultValue = "0") int page, Authentication authentication, Model model) {
         model.addAttribute("messages", messageService.drafts(authentication.getName(), page));
         return "messages/drafts";
+    }
+
+    @GetMapping("/search")
+    String search(@RequestParam(name = "q", defaultValue = "") String query,
+                  @RequestParam(defaultValue = "0") int page, Authentication authentication, Model model) {
+        model.addAttribute("query", query.trim());
+        model.addAttribute("results", messageService.search(authentication.getName(), query, page));
+        return "messages/search";
+    }
+
+    @GetMapping(value = "/search/suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    java.util.List<tr.com.huseyinaydin.message.service.MessageSearchItem> searchSuggestions(
+            @RequestParam(name = "q", defaultValue = "") String query, Authentication authentication) {
+        if (query.trim().length() < 2) return java.util.List.of();
+        return messageService.search(authentication.getName(), query, 0).getContent().stream().limit(8).toList();
     }
 
     @GetMapping("/compose")

@@ -53,6 +53,25 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
     @EntityGraph(attributePaths = {"sender", "receiver"})
     List<MailMessage> findByConversationIdOrderBySentAtAsc(String conversationId);
 
+    @EntityGraph(attributePaths = {"sender", "receiver"})
+    @Query("""
+            select message from MailMessage message left join message.receiver receiver
+            where ((message.sender.id = :userId and message.senderDeleted = false)
+                or (message.receiver.id = :userId and message.receiverDeleted = false))
+              and (lower(message.subject) like lower(concat('%', :query, '%'))
+                or lower(message.body) like lower(concat('%', :query, '%'))
+                or lower(message.sender.firstName) like lower(concat('%', :query, '%'))
+                or lower(message.sender.lastName) like lower(concat('%', :query, '%'))
+                or lower(concat(concat(message.sender.firstName, ' '), message.sender.lastName)) like lower(concat('%', :query, '%'))
+                or lower(message.sender.email) like lower(concat('%', :query, '%'))
+                or lower(receiver.firstName) like lower(concat('%', :query, '%'))
+                or lower(receiver.lastName) like lower(concat('%', :query, '%'))
+                or lower(concat(concat(receiver.firstName, ' '), receiver.lastName)) like lower(concat('%', :query, '%'))
+                or lower(receiver.email) like lower(concat('%', :query, '%')))
+            order by message.sentAt desc
+            """)
+    Page<MailMessage> searchOwnedMessages(@Param("userId") Long userId, @Param("query") String query, Pageable pageable);
+
     long countByDraftFalse();
 
     long countByDraftFalseAndSentAtGreaterThanEqualAndSentAtLessThan(Instant from, Instant to);

@@ -109,6 +109,15 @@ public class MessageService {
                 ));
     }
 
+    @Transactional(readOnly = true)
+    public Page<MessageSearchItem> search(String currentUserEmail, String query, int page) {
+        var user = findUser(currentUserEmail);
+        var normalizedQuery = query == null ? "" : query.trim();
+        if (normalizedQuery.isEmpty()) return Page.empty(pageRequest(page));
+        return messageRepository.searchOwnedMessages(user.getId(), normalizedQuery, pageRequest(page))
+                .map(message -> toSearchItem(message, user.getId()));
+    }
+
     @Transactional
     public MessageDetail getDetail(String currentUserEmail, Long messageId) {
         var user = findUser(currentUserEmail);
@@ -313,6 +322,14 @@ public class MessageService {
                 message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSender().getProfileImageUrl(),
                 richTextSanitizer.sanitize(message.getBody()), message.getSentAt(), message.getSender().getId().equals(currentUserId)
         );
+    }
+
+    private MessageSearchItem toSearchItem(MailMessage message, Long ownerId) {
+        var counterpart = message.getSender().getId().equals(ownerId) ? message.getReceiver() : message.getSender();
+        var preview = richTextSanitizer.sanitize(message.getBody()).replaceAll("<[^>]+>", " ").replaceAll("\\s+", " ").trim();
+        if (preview.length() > 140) preview = preview.substring(0, 137) + "…";
+        return new MessageSearchItem(message.getId(), counterpart == null ? "Alıcı belirtilmedi" : fullName(counterpart),
+                counterpart == null ? "" : counterpart.getEmail(), message.getSubject(), preview, message.getSentAt());
     }
 
     private String replySubject(String subject) {
