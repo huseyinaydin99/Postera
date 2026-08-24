@@ -1,11 +1,12 @@
 package tr.com.huseyinaydin.message.web;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 public record ReplyMessageRequest(
-        @NotBlank(message = "Yanıt metni zorunludur.")
         @Size(max = 10000, message = "Yanıt en fazla 10.000 karakter olabilir.")
-        String body
+        String body,
+        List<MultipartFile> images
 ) {
 }

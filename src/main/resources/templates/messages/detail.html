@@ -30,10 +30,13 @@
                 <div class="conversation-bubble">
                     <div><strong th:text="${item.senderName}"></strong><time th:text="${#temporals.format(item.sentAt, 'dd.MM.yyyy HH:mm')}"></time></div>
                     <div class="rich-message-body" th:utext="${item.body}"></div>
+                    <div class="message-images" th:if="${!item.imageUrls.empty}">
+                        <img th:each="imageUrl : ${item.imageUrls}" th:src="${imageUrl}" alt="Mesaja eklenen görsel">
+                    </div>
                 </div>
             </div>
         </section>
-        <form th:if="${!message.draft}" id="reply-form" class="reply-form" th:action="@{/messages/{id}/reply(id=${message.id})}" th:object="${replyMessageRequest}" method="post">
+        <form th:if="${!message.draft}" id="reply-form" class="reply-form" th:action="@{/messages/{id}/reply(id=${message.id})}" th:object="${replyMessageRequest}" method="post" enctype="multipart/form-data">
             <label for="reply-body">Yanıtınız</label>
             <div class="rte-toolbar" role="toolbar" aria-label="Metin biçimlendirme araçları">
                 <button type="button" data-rte-command="bold" title="Kalın"><strong>B</strong></button>
@@ -62,6 +65,9 @@
             <div id="reply-editor" class="rte-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Yanıtınız" data-rte-editor
                  data-placeholder="Bu konuşmaya yanıt yazın..." th:text="*{body}"></div>
             <input id="reply-body" type="hidden" th:field="*{body}" data-rte-input>
+            <label class="message-image-upload" for="reply-images"><span class="material-symbols-outlined">image</span> Görsel ekle <small>En fazla 2 görsel, her biri 5 MB</small></label>
+            <input id="reply-images" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-message-images>
+            <p class="image-upload-error" hidden data-image-upload-error></p>
             <p th:if="${#fields.hasErrors('body')}" th:errors="*{body}"></p>
         </form>
         <p th:if="${param.replied}" role="status">Yanıtınız gönderildi.</p>
@@ -106,5 +112,6 @@
     </article>
 </main>
 <script th:src="@{/js/rich-text-editor.js}" defer></script>
+<script th:src="@{/js/message-image-upload.js}" defer></script>
 </body>
 </html>

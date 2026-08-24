@@ -172,7 +172,7 @@ public class MessageController {
         try {
             model.addAttribute("message", messageService.getDetail(authentication.getName(), messageId));
             model.addAttribute("conversation", messageService.conversation(authentication.getName(), messageId));
-            model.addAttribute("replyMessageRequest", new ReplyMessageRequest(null));
+            model.addAttribute("replyMessageRequest", new ReplyMessageRequest(null, null));
             model.addAttribute("categories", categoryService.list(authentication.getName()));
             model.addAttribute("alreadyReported", reportService.isReportedBy(authentication.getName(), messageId));
             return "messages/detail";
@@ -237,7 +237,7 @@ public class MessageController {
             }
         }
         try {
-            messageService.reply(authentication.getName(), messageId, replyMessageRequest.body());
+            messageService.reply(authentication.getName(), messageId, replyMessageRequest.body(), replyMessageRequest.images());
             return "redirect:/messages/" + messageId + "?replied";
         } catch (IllegalArgumentException exception) {
             return "redirect:/messages/" + messageId + "?replyError";

@@ -47,10 +47,10 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
     Page<MailMessage> findBySenderIdAndDraftTrueAndSenderTrashFalseAndSenderDeletedFalseOrderBySentAtDesc(Long senderId, Pageable pageable);
 
     @Override
-    @EntityGraph(attributePaths = {"sender", "receiver", "category"})
+    @EntityGraph(attributePaths = {"sender", "receiver", "category", "images"})
     Optional<MailMessage> findById(Long id);
 
-    @EntityGraph(attributePaths = {"sender", "receiver"})
+    @EntityGraph(attributePaths = {"sender", "receiver", "images"})
     List<MailMessage> findByConversationIdOrderBySentAtAsc(String conversationId);
 
     @EntityGraph(attributePaths = {"sender", "receiver"})

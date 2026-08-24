@@ -8,6 +8,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,6 +20,8 @@ import tr.com.huseyinaydin.category.domain.MailCategory;
 
 import java.time.Instant;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -61,6 +66,10 @@ public class MailMessage {
     @Column(name = "conversation_id", length = 36)
     private String conversationId;
 
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<MessageImage> images = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
     private AppUser sender;
@@ -100,6 +109,10 @@ public class MailMessage {
         if (conversationId == null) {
             conversationId = UUID.randomUUID().toString();
         }
+    }
+
+    public void addImage(String imageUrl) {
+        images.add(MessageImage.create(this, imageUrl, images.size()));
     }
 
     public void markAsRead() {

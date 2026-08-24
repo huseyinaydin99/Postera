@@ -31,6 +31,7 @@ public class MessageService {
     private final AppUserRepository userRepository;
     private final MailCategoryRepository categoryRepository;
     private final RichTextSanitizer richTextSanitizer;
+    private final MessageImageStorage messageImageStorage;
 
     @Transactional
     public void send(String senderEmail, SendMessageRequest request) {
@@ -160,7 +161,7 @@ public class MessageService {
     }
 
     @Transactional
-    public void reply(String currentUserEmail, Long messageId, String body) {
+    public void reply(String currentUserEmail, Long messageId, String body, java.util.List<org.springframework.web.multipart.MultipartFile> images) {
         var sender = findUser(currentUserEmail);
         var message = findOwnedMessage(sender, messageId);
         if (message.isDraft() || message.getReceiver() == null) {
@@ -168,10 +169,11 @@ public class MessageService {
         }
         message.startConversationIfMissing();
         var receiver = isReceiver(sender, message) ? message.getSender() : message.getReceiver();
-        if (!richTextSanitizer.hasText(body)) {
-            throw new IllegalArgumentException("Yanıt metni zorunludur.");
-        }
-        messageRepository.save(MailMessage.reply(sender, receiver, replySubject(message.getSubject()), richTextSanitizer.sanitize(body), message.getConversationId()));
+        var imageUrls = messageImageStorage.storeAll(images);
+        if (!richTextSanitizer.hasText(body) && imageUrls.isEmpty()) throw new IllegalArgumentException("Yanıt metni veya görsel zorunludur.");
+        var reply = MailMessage.reply(sender, receiver, replySubject(message.getSubject()), richTextSanitizer.sanitize(body), message.getConversationId());
+        imageUrls.forEach(reply::addImage);
+        messageRepository.save(reply);
     }
 
     @Transactional
@@ -320,7 +322,8 @@ public class MessageService {
     private ConversationMessage toConversationMessage(MailMessage message, Long currentUserId) {
         return new ConversationMessage(
                 message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSender().getProfileImageUrl(),
-                richTextSanitizer.sanitize(message.getBody()), message.getSentAt(), message.getSender().getId().equals(currentUserId)
+                richTextSanitizer.sanitize(message.getBody()), message.getImages().stream().map(image -> image.getImageUrl()).toList(),
+                message.getSentAt(), message.getSender().getId().equals(currentUserId)
         );
     }
 

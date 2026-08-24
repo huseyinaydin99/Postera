@@ -20,5 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         var location = Path.of(uploadProperties.profileDirectory()).toAbsolutePath().normalize().toUri().toString();
         registry.addResourceHandler("/uploads/profile/**").addResourceLocations(location.endsWith("/") ? location : location + "/");
+        var messageLocation = Path.of(uploadProperties.messageDirectory()).toAbsolutePath().toUri().toString();
+        registry.addResourceHandler("/uploads/messages/**").addResourceLocations(messageLocation.endsWith("/") ? messageLocation : messageLocation + "/");
     }
 }
