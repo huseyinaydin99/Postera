@@ -120,7 +120,7 @@ button:hover { background: var(--ink-700); }
 .sidebar {
     position: fixed; inset: 0 auto 0 0; z-index: 20; width: 260px; min-height: 100vh;
     padding: 1.75rem 1rem; overflow-y: auto; display: flex; flex-direction: column;
-    background: var(--paper-raised); border-right: 1px solid var(--line);
+    background: var(--paper-raised); border-right: 1px solid var(--line); transition: transform .22s ease, box-shadow .22s ease;
 }
 .sidebar-brand { padding: 0 .75rem; margin-bottom: 1.75rem; }
 .sidebar-brand h1 { margin: 0 0 .15rem; font-size: 1.4rem; }
@@ -150,6 +150,9 @@ body > main, body > header + main {
     display: flex; align-items: center; justify-content: space-between; gap: 1rem;
     border-bottom: 1px solid var(--line); background: rgba(250, 249, 246, .94); backdrop-filter: blur(10px);
 }
+.topbar-left { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.sidebar-toggle { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; min-height: 2.5rem; padding: 0; border: 1px solid var(--line); border-radius: 7px; background: var(--paper-raised); color: var(--ink-700); }
+.sidebar-toggle:hover { background: var(--accent-soft); color: var(--accent); }
 .topbar-search { display: flex; align-items: center; gap: .5rem; width: min(440px, 65vw); margin: 0; padding: .35rem .75rem; border: 1px solid var(--line); border-radius: 7px; background: var(--paper-raised); }
 .topbar-search .material-symbols-outlined { color: var(--ink-500); font-size: 1.2rem; }
 .topbar-search input { min-height: 1.8rem; padding: 0; border: 0; border-radius: 0; background: transparent; }
@@ -174,6 +177,9 @@ body > main, body > header + main {
 .app-footer a { color: var(--accent); }
 .app-footer-github { display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; text-decoration: none; }
 .app-footer-github .material-symbols-outlined { font-size: 1rem; }
+body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+body.sidebar-collapsed > main, body.sidebar-collapsed > header + main { margin-left: 0; }
+body.sidebar-collapsed .topbar, body.sidebar-collapsed .app-footer { left: 0; }
 main > section, main > article, main > form, main > table, main > dl, main > ul, main > ol {
     max-width: 1200px; background: var(--paper-raised); border-color: var(--line); border-radius: 10px;
     box-shadow: 0 1px 3px rgba(26, 35, 50, .04);
@@ -183,7 +189,8 @@ input:focus, textarea:focus, select:focus { outline-color: var(--accent-soft); b
 th { background: var(--paper); color: var(--ink-500); }
 
 @media (max-width: 900px) {
-    .sidebar { position: static; width: 100%; min-height: auto; padding: 1rem; }
+    .sidebar { position: fixed; width: 260px; min-height: 100vh; padding: 1.75rem 1rem; box-shadow: 8px 0 24px rgba(26, 35, 50, .12); transform: translateX(-100%); }
+    body:not(.sidebar-collapsed) .sidebar { transform: translateX(0); }
     .sidebar-nav { display: flex; flex-wrap: wrap; gap: .25rem; }
     .sidebar-nav li { margin: 0 !important; }
     .sidebar-footer { display: none; }

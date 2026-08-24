@@ -30,11 +30,16 @@
 
 </aside>
     <div class="topbar" th:if="${navigationProfile != null}">
-        <form class="topbar-search" th:action="@{/messages/inbox}" method="get" role="search">
-            <label class="visually-hidden" for="global-message-search">Mesajlarda ara</label>
-            <span class="material-symbols-outlined">search</span>
-            <input id="global-message-search" name="subject" type="search" placeholder="Mesajlarda ara" autocomplete="off">
-        </form>
+        <div class="topbar-left">
+            <button type="button" class="sidebar-toggle" data-sidebar-toggle aria-label="Menüyü daralt" aria-expanded="true">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <form class="topbar-search" th:action="@{/messages/inbox}" method="get" role="search">
+                <label class="visually-hidden" for="global-message-search">Mesajlarda ara</label>
+                <span class="material-symbols-outlined">search</span>
+                <input id="global-message-search" name="subject" type="search" placeholder="Mesajlarda ara" autocomplete="off">
+            </form>
+        </div>
         <details class="profile-menu">
             <summary aria-label="Kullanıcı menüsünü aç">
                 <img th:src="${navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
@@ -58,4 +63,5 @@
         </p>
         <-| 2026© Postera |->
     </footer>
+    <script th:src="@{/js/sidebar-toggle.js}" defer></script>
 </div>
