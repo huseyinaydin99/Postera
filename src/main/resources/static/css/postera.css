@@ -227,7 +227,7 @@ th { background: var(--paper); color: var(--ink-500); }
 .participant-card div { display: grid; gap: .1rem; min-width: 0; }
 .participant-card span, .participant-card small { color: var(--ink-500); font-size: .78rem; overflow-wrap: anywhere; }
 .message-sent-at { color: var(--ink-500); font: .78rem var(--font-mono); }
-.conversation { display: grid; gap: 1rem; margin: 1.5rem 0; }
+.conversation { display: grid; gap: 1rem; height: 420px; margin: 1.5rem 0; padding: .25rem .75rem .25rem .25rem; overflow-y: auto; overscroll-behavior: contain; border-bottom: 1px solid var(--line); scrollbar-width: thin; }
 .conversation-message { display: flex; align-items: flex-start; gap: .7rem; max-width: min(720px, 92%); }
 .conversation-message-own { flex-direction: row-reverse; justify-self: end; }
 .conversation-bubble { padding: .85rem 1rem; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
@@ -270,4 +270,5 @@ th { background: var(--paper); color: var(--ink-500); }
 @media (max-width: 640px) {
     .message-participants { grid-template-columns: 1fr; }
     .conversation-message { max-width: 100%; }
+    .conversation { height: 360px; }
 }
