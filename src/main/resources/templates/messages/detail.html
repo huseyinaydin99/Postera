@@ -41,7 +41,23 @@
                 <button type="button" data-rte-command="insertUnorderedList" title="Madde işaretli liste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
                 <button type="button" data-rte-command="insertOrderedList" title="Numaralı liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
                 <button type="button" data-rte-command="formatBlock" data-rte-value="p" title="Paragraf"><span class="material-symbols-outlined">format_paragraph</span></button>
-                <button type="button" data-rte-emoji="😊" title="Emoji ekle">😊</button>
+                <button type="button" data-rte-toggle="emoji-picker" title="Emoji ekle">😊</button>
+                <button type="button" data-rte-toggle="link-picker" title="Bağlantı ekle"><span class="material-symbols-outlined">link</span></button>
+                <button type="button" data-rte-toggle="gif-picker" title="GIF ekle"><span class="material-symbols-outlined">gif_box</span></button>
+                <button type="button" data-rte-command="removeFormat" title="Biçimlendirmeyi kaldır"><span class="material-symbols-outlined">format_clear</span></button>
+            </div>
+            <div class="rte-popover emoji-picker" id="emoji-picker" hidden aria-label="Emoji seçici">
+                <button type="button" th:each="emoji : ${#strings.arraySplit('😀,😂,🤣,😊,😍,😎,🤔,😭,😅,👍,👏,🎉,🔥,❤️,🙏,🤝,🚀,💡,🎯,✅', ',')}" th:text="${emoji}" th:attr="data-rte-emoji=${emoji}"></button>
+            </div>
+            <div class="rte-popover link-picker" id="link-picker" hidden>
+                <label class="visually-hidden" for="rte-link-url">Bağlantı adresi</label>
+                <input id="rte-link-url" type="url" placeholder="https://ornek.com" data-rte-link-url>
+                <button type="button" data-rte-add-link>Bağlantı ekle</button>
+            </div>
+            <div class="rte-popover gif-picker" id="gif-picker" hidden aria-label="Komik GIF seçici">
+                <button type="button" th:each="gif : ${#strings.arraySplit('3o6Zt481isNVuQI1l6,26ufdipQqU2lhNA4g,3o7TKsQ8UQ2p0f9V8A,3o6Zt6ML6BklcajjsA,3o7btPCcdNniyf0ArS,3o6Zt4HU9uwXmXSAuI,l0MYC0LajbaPoEADu,ICOgUNjpvO0PC,xT9IgG50Fb7Mi0prBC,l0MYt5jPR6QX5pnqM,3oEjHI8WJv4x6UPDB6,26n6WywJyh39n1pBu,3oKIPwoeGErMmaI43S,5GoVLqeAOo6PK,13CoXDiaCcCoyk,2A75RyXVzzSI2bx4Gj,9Ai5dIk8xvBm0,3oEduSbSGpGaRX2Vri,12XDYvMJNcmLgQ,3ohs4w0OrUm5GIkBKE', ',')}" th:attr="data-rte-gif=${'https://media.giphy.com/media/' + gif + '/giphy.gif'}">
+                    <img th:src="${'https://media.giphy.com/media/' + gif + '/giphy.gif'}" alt="Komik GIF">
+                </button>
             </div>
             <div id="reply-editor" class="rte-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Yanıtınız" data-rte-editor
                  data-placeholder="Bu konuşmaya yanıt yazın..." th:text="*{body}"></div>
