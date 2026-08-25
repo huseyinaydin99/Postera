@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" th:href="@{/css/postera.css}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1a2332">
     <title>Giriş Yap | Postera</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <link rel="stylesheet" th:href="@{/css/postera.css}">
 </head>
-<body>
-<main>
-    <section aria-labelledby="login-title">
-        <h1 id="login-title">Postera</h1>
-        <p>Hesabınıza giriş yapın.</p>
+<body class="auth-page auth-login">
+<main class="auth-shell">
+    <section class="auth-visual" aria-hidden="true"><div class="auth-visual-copy"><span class="auth-visual-kicker">POSTERA WORKSPACE</span><h2>İletişiminizin ritmini koruyun.</h2><p>Mesajlarınız, kişileriniz ve iş akışınız tek bir güvenli çalışma alanında.</p></div></section>
+    <section class="auth-panel" aria-labelledby="login-title">
+        <a class="auth-brand" th:href="@{/auth/login}" aria-label="Postera giriş sayfası"><span>✉</span> Postera</a>
+        <div class="auth-heading"><p class="auth-eyebrow">TEKRAR HOŞ GELDİNİZ</p><h1 id="login-title">Hesabınıza giriş yapın</h1><p>Mesajlaşma çalışma alanınıza güvenle devam edin.</p></div>
         <div th:replace="~{fragments/alerts :: alerts}"></div>
-        <form th:action="@{/auth/login}" method="post">
-            <div>
+        <form class="auth-form" data-auth-form="login" th:action="@{/auth/login}" method="post" novalidate>
+            <div class="auth-field">
                 <label for="email">E-posta adresi</label>
-                <input id="email" name="email" type="email" autocomplete="email" required autofocus>
+                <input id="email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="255" required autofocus aria-describedby="email-feedback">
+                <small id="email-feedback" class="auth-feedback" aria-live="polite"></small>
             </div>
-            <div>
+            <div class="auth-field">
                 <label for="password">Şifre</label>
-                <input id="password" name="password" type="password" autocomplete="current-password" required>
+                <input id="password" name="password" type="password" autocomplete="current-password" required aria-describedby="password-feedback">
+                <small id="password-feedback" class="auth-feedback" aria-live="polite"></small>
             </div>
-            <button type="submit">Giriş yap</button>
+            <button class="auth-submit" type="submit">Giriş yap <span aria-hidden="true">→</span></button>
         </form>
-        <p>Henüz hesabınız yok mu? <a th:href="@{/auth/register}">Kayıt olun</a>.</p>
-        <p><a th:href="@{/auth/forgot-password}">Şifremi unuttum</a></p>
+        <div class="auth-links"><p>Henüz hesabınız yok mu? <a th:href="@{/auth/register}">Kayıt olun</a>.</p><a th:href="@{/auth/forgot-password}">Şifremi unuttum</a></div>
     </section>
 </main>
+<script th:src="@{/js/auth-validation.js}" defer></script>
 </body>
 </html>

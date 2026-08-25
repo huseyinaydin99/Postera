@@ -1,50 +1,60 @@
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" th:href="@{/css/postera.css}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1a2332">
     <title>Kayıt Ol | Postera</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <link rel="stylesheet" th:href="@{/css/postera.css}">
 </head>
-<body>
-<main>
-    <section aria-labelledby="register-title">
-        <h1 id="register-title">Postera hesabı oluşturun</h1>
-        <p>Mesajlaşma çalışma alanınıza erişmek için bilgilerinizi girin.</p>
+<body class="auth-page auth-register">
+<main class="auth-shell">
+    <section class="auth-visual" aria-hidden="true"><div class="auth-visual-copy"><span class="auth-visual-kicker">BİRLİKTE DAHA AKICI</span><h2>Yeni çalışma alanınız burada başlıyor.</h2><p>Profesyonel iletişimi daha düzenli ve daha kişisel kılan Postera topluluğuna katılın.</p></div></section>
+    <section class="auth-panel" aria-labelledby="register-title">
+        <a class="auth-brand" th:href="@{/auth/login}" aria-label="Postera giriş sayfası"><span>✉</span> Postera</a>
+        <div class="auth-heading"><p class="auth-eyebrow">HESAP OLUŞTURUN</p><h1 id="register-title">Postera'ya katılın</h1><p>İletişim alanınızı birkaç adımda oluşturalım.</p></div>
 
-        <form th:action="@{/auth/register}" th:object="${registrationRequest}" method="post">
-            <div th:if="${#fields.hasGlobalErrors()}" role="alert">
+        <form class="auth-form" data-auth-form="register" th:action="@{/auth/register}" th:object="${registrationRequest}" method="post" novalidate>
+            <div class="auth-server-errors" th:if="${#fields.hasGlobalErrors()}" role="alert">
                 <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
             </div>
-            <div>
+            <div class="auth-name-grid">
+            <div class="auth-field">
                 <label for="firstName">Ad</label>
-                <input id="firstName" th:field="*{firstName}" autocomplete="given-name" required>
+                <input id="firstName" th:field="*{firstName}" autocomplete="given-name" maxlength="100" required>
                 <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></p>
             </div>
-            <div>
+            <div class="auth-field">
                 <label for="lastName">Soyad</label>
-                <input id="lastName" th:field="*{lastName}" autocomplete="family-name" required>
+                <input id="lastName" th:field="*{lastName}" autocomplete="family-name" maxlength="100" required>
                 <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
             </div>
-            <div>
+            </div>
+            <div class="auth-field">
                 <label for="email">E-posta adresi</label>
-                <input id="email" th:field="*{email}" type="email" autocomplete="email" required>
+                <input id="email" th:field="*{email}" type="email" autocomplete="email" inputmode="email" maxlength="255" required aria-describedby="email-feedback">
                 <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+                <small id="email-feedback" class="auth-feedback" aria-live="polite"></small>
             </div>
-            <div>
+            <div class="auth-field">
                 <label for="password">Şifre</label>
-                <input id="password" th:field="*{password}" type="password" autocomplete="new-password" required>
+                <input id="password" th:field="*{password}" type="password" autocomplete="new-password" maxlength="72" required aria-describedby="password-feedback password-rules">
                 <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+                <small id="password-feedback" class="auth-feedback" aria-live="polite"></small>
+                <ul id="password-rules" class="password-rules" aria-label="Şifre kuralları"><li data-rule="length">En az 8 karakter</li><li data-rule="upper">En az 3 büyük harf</li><li data-rule="lower">En az 3 küçük harf</li><li data-rule="digit">En az 3 rakam</li><li data-rule="special">En az 3 özel karakter</li></ul>
             </div>
-            <div>
+            <div class="auth-field">
                 <label for="passwordConfirmation">Şifre tekrarı</label>
-                <input id="passwordConfirmation" th:field="*{passwordConfirmation}" type="password" autocomplete="new-password" required>
+                <input id="passwordConfirmation" th:field="*{passwordConfirmation}" type="password" autocomplete="new-password" maxlength="72" required aria-describedby="passwordConfirmation-feedback">
                 <p th:if="${#fields.hasErrors('passwordConfirmation')}" th:errors="*{passwordConfirmation}"></p>
+                <small id="passwordConfirmation-feedback" class="auth-feedback" aria-live="polite"></small>
             </div>
-            <button type="submit">Hesap oluştur</button>
+            <button class="auth-submit" type="submit">Hesabımı oluştur <span aria-hidden="true">→</span></button>
         </form>
-        <p>Zaten hesabınız var mı? <a th:href="@{/auth/login}">Giriş yapın</a>.</p>
+        <div class="auth-links"><p>Zaten hesabınız var mı? <a th:href="@{/auth/login}">Giriş yapın</a>.</p></div>
     </section>
 </main>
+<script th:src="@{/js/auth-validation.js}" defer></script>
 </body>
 </html>
