@@ -109,6 +109,18 @@ public class MessageService {
                 .map(message -> toSearchItem(message, user.getId()));
     }
 
+    @Transactional(readOnly = true)
+    public MailboxCounts mailboxCounts(String currentUserEmail) {
+        var userId = findUser(currentUserEmail).getId();
+        return new MailboxCounts(
+                messageRepository.countByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalse(userId),
+                messageRepository.countByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalseAndReadFalse(userId),
+                messageRepository.countBySenderIdAndDraftTrueAndSenderTrashFalseAndSenderDeletedFalse(userId),
+                messageRepository.countBySenderIdAndDraftFalseAndSenderTrashFalseAndSenderDeletedFalse(userId),
+                messageRepository.countByReceiverIdAndImportantTrueAndTrashFalseAndReceiverDeletedFalseAndDraftFalse(userId)
+        );
+    }
+
     @Transactional
     public MessageDetail getDetail(String currentUserEmail, Long messageId) {
         var user = findUser(currentUserEmail);

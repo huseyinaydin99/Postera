@@ -136,6 +136,10 @@ button:hover { background: var(--ink-700); }
     display: flex; align-items: center; gap: .75rem; width: 100%; padding: .65rem .75rem; border: 0; border-left: 3px solid transparent;
     border-radius: 6px; background: transparent; color: var(--ink-700); font: 500 .9rem var(--font-body); text-align: left;
 }
+.mailbox-badges { display: inline-flex; align-items: center; gap: .35rem; margin-left: auto; }
+.mailbox-count { min-width: 1.45rem; padding: .12rem .4rem; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font: 600 .7rem var(--font-mono); text-align: center; }
+.mailbox-unread { background: var(--danger); color: #fff; box-shadow: 0 0 0 2px var(--paper-raised); }
+.sidebar-link > .mailbox-count { margin-left: auto; }
 a.sidebar-link:hover, button.sidebar-link:hover { background: var(--accent-soft); color: var(--accent); text-decoration: none; }
 .sidebar-link .material-symbols-outlined { font-size: 20px; }
 .sidebar-divider { border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 1rem; }

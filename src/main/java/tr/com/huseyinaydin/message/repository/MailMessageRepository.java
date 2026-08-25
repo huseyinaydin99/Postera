@@ -72,6 +72,16 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
             """)
     Page<MailMessage> searchOwnedMessages(@Param("userId") Long userId, @Param("query") String query, Pageable pageable);
 
+    long countByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalse(Long receiverId);
+
+    long countByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalseAndReadFalse(Long receiverId);
+
+    long countBySenderIdAndDraftTrueAndSenderTrashFalseAndSenderDeletedFalse(Long senderId);
+
+    long countBySenderIdAndDraftFalseAndSenderTrashFalseAndSenderDeletedFalse(Long senderId);
+
+    long countByReceiverIdAndImportantTrueAndTrashFalseAndReceiverDeletedFalseAndDraftFalse(Long receiverId);
+
     long countByDraftFalse();
 
     long countByDraftFalseAndSentAtGreaterThanEqualAndSentAtLessThan(Instant from, Instant to);
