@@ -47,10 +47,7 @@ public class MessageService {
     public Page<MessageListItem> inbox(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
         return messageRepository.findByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
-                .map(message -> new MessageListItem(
-                        message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSubject(),
-                        message.getSentAt(), message.isRead(), message.isImportant()
-                ));
+                .map(message -> toListItem(message, message.getSender()));
     }
 
     @Transactional(readOnly = true)
@@ -78,10 +75,7 @@ public class MessageService {
     public Page<MessageListItem> sent(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
         return messageRepository.findBySenderIdAndDraftFalseAndSenderTrashFalseAndSenderDeletedFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
-                .map(message -> new MessageListItem(
-                        message.getId(), fullName(message.getReceiver()), message.getReceiver().getEmail(), message.getSubject(),
-                        message.getSentAt(), message.isRead(), message.isImportant()
-                ));
+                .map(message -> toListItem(message, message.getReceiver()));
     }
 
     @Transactional(readOnly = true)
@@ -103,11 +97,7 @@ public class MessageService {
     public Page<MessageListItem> drafts(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
         return messageRepository.findBySenderIdAndDraftTrueAndSenderTrashFalseAndSenderDeletedFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
-                .map(message -> new MessageListItem(
-                        message.getId(), message.getReceiver() == null ? "Alıcı belirtilmedi" : fullName(message.getReceiver()),
-                        message.getReceiver() == null ? "" : message.getReceiver().getEmail(), message.getSubject(),
-                        message.getSentAt(), message.isRead(), message.isImportant()
-                ));
+                .map(message -> toListItem(message, message.getReceiver()));
     }
 
     @Transactional(readOnly = true)
@@ -304,19 +294,23 @@ public class MessageService {
     }
 
     private MessageListItem toInboxListItem(MailMessage message) {
-        return new MessageListItem(
-                message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSubject(),
-                message.getSentAt(), message.isRead(), message.isImportant()
-        );
+        return toListItem(message, message.getSender());
     }
 
     private MessageListItem toListItemForOwner(MailMessage message, Long ownerId) {
         var counterpart = message.getSender().getId().equals(ownerId) ? message.getReceiver() : message.getSender();
-        return new MessageListItem(
-                message.getId(), counterpart == null ? "Alıcı belirtilmedi" : fullName(counterpart),
-                counterpart == null ? "" : counterpart.getEmail(), message.getSubject(), message.getSentAt(),
-                message.isRead(), message.isImportant()
-        );
+        return toListItem(message, counterpart);
+    }
+
+    private MessageListItem toListItem(MailMessage message, AppUser counterpart) {
+        var preview = richTextSanitizer.sanitize(message.getBody()).replaceAll("<[^>]+>", " ").replaceAll("\\s+", " ").trim();
+        if (preview.isBlank() && !message.getImages().isEmpty()) preview = "İçerik";
+        if (preview.isBlank()) preview = "İçerik";
+        if (preview.length() > 72) preview = preview.substring(0, 69) + "…";
+        return new MessageListItem(message.getId(), counterpart == null ? "Alıcı belirtilmedi" : fullName(counterpart),
+                counterpart == null ? "" : counterpart.getEmail(), counterpart == null ? null : counterpart.getProfileImageUrl(),
+                message.getSubject().isBlank() ? "(Konu yok)" : message.getSubject(), preview, message.getSentAt(),
+                message.isRead(), message.isImportant());
     }
 
     private ConversationMessage toConversationMessage(MailMessage message, Long currentUserId) {

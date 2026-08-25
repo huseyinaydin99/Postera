@@ -37,10 +37,9 @@
                     <span class="visually-hidden">Mesajı seç</span>
                 </label>
                 <a th:href="@{/messages/{id}(id=${message.id})}">
-                    <strong th:if="${!message.read}" th:text="${message.counterpartName}"></strong>
-                    <span th:if="${message.read}" th:text="${message.counterpartName}"></span>
-                    <span th:if="${message.important}" aria-label="Önemli mesaj">★</span>
-                    <span th:text="${message.subject}"></span>
+                    <img class="message-list-avatar" th:src="${message.counterpartProfileImageUrl != null ? message.counterpartProfileImageUrl : '/images/default-avatar.svg'}" th:alt="${message.counterpartName + ' profil fotoğrafı'}">
+                    <span class="message-list-copy"><strong th:text="${message.counterpartName}"></strong><small th:text="${message.preview}"></small></span>
+                    <span class="message-list-subject"><span th:if="${message.important}" aria-label="Önemli mesaj">★ </span><span th:text="${message.subject}"></span></span>
                     <time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time>
                 </a>
             </li>
@@ -67,10 +66,9 @@
                     <span class="visually-hidden">Mesajı seç</span>
                 </label>
                 <a th:href="@{/messages/{id}(id=${message.id})}">
-                    <strong th:if="${boxType == 'inbox' and !message.read}" th:text="${message.counterpartName}"></strong>
-                    <span th:if="${boxType != 'inbox' or message.read}" th:text="${message.counterpartName}"></span>
-                    <span th:if="${message.important}" aria-label="Önemli mesaj">★</span>
-                    <span th:text="${message.subject}"></span>
+                    <img class="message-list-avatar" th:src="${message.counterpartProfileImageUrl != null ? message.counterpartProfileImageUrl : '/images/default-avatar.svg'}" th:alt="${message.counterpartName + ' profil fotoğrafı'}">
+                    <span class="message-list-copy"><strong th:text="${message.counterpartName}"></strong><small th:text="${message.preview}"></small></span>
+                    <span class="message-list-subject"><span th:if="${message.important}" aria-label="Önemli mesaj">★ </span><span th:text="${message.subject}"></span></span>
                     <time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time>
                 </a>
             </li>

@@ -25,7 +25,12 @@
         <ul class="message-list">
             <li th:each="message : ${messages.content}" class="message-list-item">
                 <label class="message-selector" hidden data-message-selector><input type="checkbox" name="messageIds" th:value="${message.id}" disabled data-message-checkbox><span class="visually-hidden">Taslağı seç</span></label>
-                <a th:href="@{/messages/drafts/{id}/edit(id=${message.id})}"><span th:text="${message.counterpartName}"></span> — <span th:text="${message.subject.isBlank() ? '(Konu yok)' : message.subject}"></span></a>
+                <a th:href="@{/messages/drafts/{id}/edit(id=${message.id})}">
+                    <img class="message-list-avatar" th:src="${message.counterpartProfileImageUrl != null ? message.counterpartProfileImageUrl : '/images/default-avatar.svg'}" th:alt="${message.counterpartName + ' profil fotoğrafı'}">
+                    <span class="message-list-copy"><strong th:text="${message.counterpartName}"></strong><small th:text="${message.preview}"></small></span>
+                    <span class="message-list-subject" th:text="${message.subject}"></span>
+                    <time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time>
+                </a>
             </li>
         </ul>
     </form>
