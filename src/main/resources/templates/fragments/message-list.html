@@ -4,8 +4,7 @@
         <button type="button" class="trash-toolbar-button" data-selection-toggle>
             <span class="material-symbols-outlined">checklist</span> Seçimi aktifleştir
         </button>
-        <form class="trash-empty-form" th:action="@{/messages/trash/empty}" method="post"
-              onsubmit="return confirm('Çöp kutusundaki tüm mesajlar kalıcı olarak silinecek. Devam etmek istiyor musunuz?');">
+        <form class="trash-empty-form" th:action="@{/messages/trash/empty}" method="post" data-confirm-action="Çöp kutusundaki tüm mesajlar kalıcı olarak silinecek.">
             <button type="submit" class="trash-toolbar-button trash-danger-button">
                 <span class="material-symbols-outlined">delete_forever</span> Çöp kutusunu boşalt
             </button>
@@ -17,15 +16,14 @@
         </button>
     </div>
     <form th:if="${boxType == 'trash' and !messages.empty}" id="trash-selection-form"
-          th:action="@{/messages/trash/selected/delete}" method="post" data-selection-form>
+          th:action="@{/messages/trash/selected/delete}" method="post" data-selection-form data-confirm-action="Seçilen mesajlar kalıcı olarak silinecek.">
         <div class="trash-selection-bar" hidden data-selection-bar>
             <label class="select-all-control" for="select-all-trash">
                 <input id="select-all-trash" type="checkbox" data-select-all disabled>
                 <span>Tümünü seç</span>
             </label>
             <span data-selected-count>0 mesaj seçildi</span>
-            <button type="submit" class="trash-danger-button" disabled data-delete-selected
-                    onclick="return confirm('Seçilen mesajlar kalıcı olarak silinecek. Devam etmek istiyor musunuz?');">
+            <button type="submit" class="trash-danger-button" disabled data-delete-selected>
                 Seçilenleri sil
             </button>
             <button type="button" class="trash-toolbar-button" data-selection-cancel>İptal</button>
@@ -47,7 +45,7 @@
             </li>
         </ul>
     </form>
-    <form th:if="${boxType != 'trash' and !messages.empty}" th:action="@{/messages/selected/trash}" method="post" data-selection-form>
+    <form th:if="${boxType != 'trash' and !messages.empty}" th:action="@{/messages/selected/trash}" method="post" data-selection-form data-confirm-action="Seçilen mesajlar çöp kutusuna taşınacak.">
         <input type="hidden" name="boxType" th:value="${boxType}">
         <div class="trash-selection-bar" hidden data-selection-bar>
             <label class="select-all-control" for="select-all-messages">
@@ -55,8 +53,7 @@
                 <span>Tümünü seç</span>
             </label>
             <span data-selected-count>0 mesaj seçildi</span>
-            <button type="submit" class="trash-danger-button" disabled data-delete-selected
-                    onclick="return confirm('Seçilen mesajlar çöp kutusuna taşınacak. Devam etmek istiyor musunuz?');">
+            <button type="submit" class="trash-danger-button" disabled data-delete-selected>
                 Seçilenleri sil
             </button>
             <button type="button" class="trash-toolbar-button" data-selection-cancel>İptal</button>

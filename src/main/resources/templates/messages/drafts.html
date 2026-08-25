@@ -14,12 +14,12 @@
             <span class="material-symbols-outlined">checklist</span> Seçimi aktifleştir
         </button>
     </div>
-    <form th:if="${!messages.empty}" th:action="@{/messages/selected/trash}" method="post" data-selection-form>
+    <form th:if="${!messages.empty}" th:action="@{/messages/selected/trash}" method="post" data-selection-form data-confirm-action="Seçilen taslaklar çöp kutusuna taşınacak.">
         <input type="hidden" name="boxType" value="drafts">
         <div class="trash-selection-bar" hidden data-selection-bar>
             <label class="select-all-control" for="select-all-drafts"><input id="select-all-drafts" type="checkbox" data-select-all disabled><span>Tümünü seç</span></label>
             <span data-selected-count>0 mesaj seçildi</span>
-            <button type="submit" class="trash-danger-button" disabled data-delete-selected onclick="return confirm('Seçilen taslaklar çöp kutusuna taşınacak. Devam etmek istiyor musunuz?');">Seçilenleri sil</button>
+            <button type="submit" class="trash-danger-button" disabled data-delete-selected>Seçilenleri sil</button>
             <button type="button" class="trash-toolbar-button" data-selection-cancel>İptal</button>
         </div>
         <ul class="message-list">
@@ -41,8 +41,6 @@
         <form th:each="message : ${messages.content}" th:id="${'delete-draft-' + message.id}" th:action="@{/messages/{id}/trash(id=${message.id})}" method="post"><input type="hidden" name="returnTo" value="drafts"></form>
     </div>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:src="@{/js/trash-selection.js}" defer></script>
-<script th:src="@{/js/message-delete-confirmation.js}" defer></script>
 </body>
 </html>

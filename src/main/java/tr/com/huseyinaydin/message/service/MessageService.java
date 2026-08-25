@@ -34,13 +34,14 @@ public class MessageService {
     private final MessageImageStorage messageImageStorage;
 
     @Transactional
-    public void send(String senderEmail, SendMessageRequest request) {
+    public String send(String senderEmail, SendMessageRequest request) {
         var sender = findUser(senderEmail);
         var receiverEmail = request.receiverEmail().trim().toLowerCase(Locale.ROOT);
         var receiver = userRepository.findByEmailIgnoreCase(receiverEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı."));
 
         messageRepository.save(MailMessage.send(sender, receiver, request.subject().trim(), request.body().trim()));
+        return fullName(receiver);
     }
 
     @Transactional(readOnly = true)
@@ -212,11 +213,12 @@ public class MessageService {
     }
 
     @Transactional
-    public void publishDraft(String currentUserEmail, Long messageId, DraftMessageRequest request) {
+    public String publishDraft(String currentUserEmail, Long messageId, DraftMessageRequest request) {
         var receiver = findRequiredReceiver(request.receiverEmail());
         var subject = requireText(request.subject(), "Konu alanı zorunludur.");
         var body = requireText(request.body(), "Mesaj içeriği zorunludur.");
         findDraft(currentUserEmail, messageId).publish(receiver, subject, body);
+        return fullName(receiver);
     }
 
     @Transactional

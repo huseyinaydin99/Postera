@@ -132,15 +132,15 @@ public class MessageController {
     @PostMapping("/drafts/{messageId}")
     String updateDraft(@PathVariable Long messageId, @Valid @ModelAttribute DraftMessageRequest draftMessageRequest,
                        BindingResult bindingResult, Authentication authentication, Model model,
-                       @RequestParam String action) {
+                       @RequestParam String action, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("messageId", messageId);
             return "messages/draft-form";
         }
         try {
             if ("send".equals(action)) {
-                messageService.publishDraft(authentication.getName(), messageId, draftMessageRequest);
-                return "redirect:/messages/sent?sent";
+                redirectAttributes.addAttribute("sentTo", messageService.publishDraft(authentication.getName(), messageId, draftMessageRequest));
+                return "redirect:/messages/sent";
             }
             messageService.updateDraft(authentication.getName(), messageId, draftMessageRequest);
             return "redirect:/messages/drafts?saved";
@@ -154,17 +154,17 @@ public class MessageController {
     @PostMapping
     String send(@Valid @ModelAttribute SendMessageRequest sendMessageRequest,
                 BindingResult bindingResult,
-                Authentication authentication) {
+                Authentication authentication, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "messages/compose";
         }
         try {
-            messageService.send(authentication.getName(), sendMessageRequest);
+            redirectAttributes.addAttribute("sentTo", messageService.send(authentication.getName(), sendMessageRequest));
         } catch (IllegalArgumentException exception) {
             bindingResult.reject("message.send.failed", exception.getMessage());
             return "messages/compose";
         }
-        return "redirect:/messages/sent?sent";
+        return "redirect:/messages/sent";
     }
 
     @GetMapping("/{messageId}")
