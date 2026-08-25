@@ -219,13 +219,19 @@ th { background: var(--paper); color: var(--ink-500); }
 .message-list { margin: 1rem 0 0; padding: 0; list-style: none; }
 .message-list-item { display: flex; align-items: center; gap: .7rem; padding: 0; border-bottom: 1px solid var(--line); }
 .message-list-item:last-child { border-bottom: 0; }
-.message-list-item > a { display: grid; grid-template-columns: 44px minmax(155px, .8fr) minmax(180px, 1.5fr) auto; gap: .85rem; align-items: center; flex: 1; padding: .8rem .7rem; color: var(--ink-900); text-decoration: none; }
+.message-list-item > a, .message-list-header { display: grid; grid-template-columns: 44px minmax(155px, .8fr) minmax(180px, 1.5fr) 88px auto; gap: .85rem; align-items: center; flex: 1; padding: .8rem .7rem; color: var(--ink-900); text-decoration: none; }
 .message-list-item > a:hover { background: var(--accent-soft); }
+.message-list-header { padding: .55rem .7rem; color: var(--ink-500); font: 600 .68rem var(--font-mono); letter-spacing: .03em; text-transform: uppercase; }
 .message-list-avatar { width: 42px; height: 42px; margin: 0; border: 0; border-radius: 50%; object-fit: cover; }
 .message-list-copy { display: grid; gap: .18rem; min-width: 0; }
-.message-list-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.message-list-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 400; }
+.message-list-item-unread .message-list-name, .message-list-item-unread .message-list-subject { font-weight: 700; color: var(--ink-900); }
 .message-list-copy small { color: var(--ink-500); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .message-list-subject { overflow: hidden; color: var(--ink-700); text-overflow: ellipsis; white-space: nowrap; }
+.message-read-status { font-size: .78rem; white-space: nowrap; }
+.message-delete-button { display: inline-flex; align-items: center; gap: .25rem; margin-right: .5rem; padding: .42rem .55rem; border: 1px solid #f4cccc; border-radius: 5px; background: #fff7f7; color: var(--danger); font-size: .75rem; }
+.message-delete-button:hover { background: var(--danger); color: #fff; }
+.message-delete-button .material-symbols-outlined { font-size: 1rem; }
 .message-list-item time { white-space: nowrap; }
 .trash-toolbar, .trash-selection-bar { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin: 1rem 0; }
 .trash-empty-form { display: block; }
@@ -241,8 +247,11 @@ th { background: var(--paper); color: var(--ink-500); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 @media (max-width: 640px) {
+    .message-list-header { display: none; }
     .message-list-item > a { grid-template-columns: 42px minmax(0, 1fr) auto; gap: .6rem; }
     .message-list-subject { grid-column: 2 / 4; }
+    .message-read-status { display: none; }
+    .message-delete-button span:last-child { display: none; }
 }
 
 .message-participants { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.25rem 0; }

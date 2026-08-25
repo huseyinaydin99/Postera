@@ -203,13 +203,16 @@ public class MessageController {
     }
 
     @PostMapping("/{messageId}/trash")
-    String moveToTrash(@PathVariable Long messageId, Authentication authentication) {
+    String moveToTrash(@PathVariable Long messageId,
+                       @RequestParam(defaultValue = "inbox") String returnTo,
+                       Authentication authentication) {
         try {
             messageService.moveToTrash(authentication.getName(), messageId);
         } catch (IllegalArgumentException ignored) {
             // Geçersiz veya yetkisiz işlemlerde listeye dönülür.
         }
-        return "redirect:/messages/inbox";
+        var safeReturnTo = java.util.Set.of("inbox", "drafts", "sent", "important").contains(returnTo) ? returnTo : "inbox";
+        return "redirect:/messages/" + safeReturnTo;
     }
 
     @PostMapping("/{messageId}/restore")
