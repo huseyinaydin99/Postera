@@ -171,6 +171,56 @@ body > main, body > header + main {
 .search-suggestions a:last-child { border-bottom: 0; }
 .search-suggestions a:hover { background: var(--accent-soft); }
 .search-suggestions span, .search-suggestions small { color: var(--ink-500); font-size: .78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar-right { display: flex; align-items: center; gap: .75rem; }
+.topbar-messages-dropdown { position: relative; }
+.topbar-icon-btn {
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; min-width: 38px; height: 38px; min-height: 38px; padding: 0; margin: 0;
+    border: 1px solid var(--line); border-radius: 50%; background: var(--paper-raised); color: var(--ink-700);
+    cursor: pointer; transition: background .15s ease, color .15s ease, border-color .15s ease;
+    justify-self: auto;
+}
+.topbar-icon-btn:hover, .topbar-icon-btn[aria-expanded="true"] {
+    background: var(--accent-soft); color: var(--accent); border-color: #f5d7ad;
+}
+.topbar-icon-btn .material-symbols-outlined { font-size: 21px; }
+.topbar-badge {
+    position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px;
+    border-radius: 99px; background: var(--danger); color: #fff; font-size: 11px; font-weight: 700;
+    font-family: var(--font-mono); line-height: 18px; text-align: center; box-shadow: 0 0 0 2px var(--paper-raised);
+}
+.messages-popover {
+    position: absolute; top: calc(100% + .6rem); right: -10px; z-index: 30;
+    width: min(380px, calc(100vw - 2rem)); border: 1px solid var(--line); border-radius: 12px;
+    background: var(--paper-raised); box-shadow: 0 12px 32px rgba(26, 35, 50, .15); overflow: hidden;
+}
+.messages-popover[hidden] { display: none; }
+.messages-popover-header {
+    display: flex; align-items: center; justify-content: space-between; padding: .85rem 1rem .75rem;
+    border-bottom: 1px solid var(--line); background: var(--paper);
+}
+.messages-popover-header h2 { margin: 0; font-size: 1.1rem; font-weight: 700; font-family: var(--font-display); color: var(--ink-900); }
+.messages-popover-header a { color: var(--accent); font-size: .8rem; font-weight: 600; text-decoration: none; padding: .2rem .4rem; border-radius: 4px; }
+.messages-popover-header a:hover { background: var(--accent-soft); }
+.messages-popover-list { max-height: 380px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.popover-message-item {
+    display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem; border-bottom: 1px solid var(--line);
+    color: var(--ink-900); text-decoration: none; transition: background .12s ease;
+}
+.popover-message-item:last-child { border-bottom: 0; }
+.popover-message-item:hover { background: var(--accent-soft); text-decoration: none; }
+.popover-message-avatar { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); }
+.popover-message-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .15rem; }
+.popover-message-top { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+.popover-message-name { font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.popover-message-time { font-size: .72rem; color: var(--ink-500); font-family: var(--font-mono); flex-shrink: 0; white-space: nowrap; }
+.popover-message-snippet { margin: 0; font-size: .8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.popover-message-item.is-unread .popover-message-name { font-weight: 700; color: var(--ink-900); }
+.popover-message-item.is-unread .popover-message-snippet { font-weight: 700; color: var(--ink-900); }
+.popover-message-item.is-read .popover-message-name { font-weight: 500; color: var(--ink-700); }
+.popover-message-item.is-read .popover-message-snippet { font-weight: 400; color: var(--ink-500); opacity: .88; }
+.popover-unread-dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--paper-raised); }
+.messages-popover-loading, .messages-popover-empty { padding: 1.25rem 1rem; text-align: center; color: var(--ink-500); font-size: .82rem; }
 .profile-menu { position: relative; }
 .profile-menu summary { display: flex; cursor: pointer; list-style: none; }
 .profile-menu summary::-webkit-details-marker { display: none; }

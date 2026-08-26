@@ -19,6 +19,14 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
     @EntityGraph(attributePaths = "sender")
     Page<MailMessage> findByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalseOrderBySentAtDesc(Long receiverId, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"sender", "images"})
+    @Query("""
+            select message from MailMessage message
+            where message.receiver.id = :receiverId and message.draft = false and message.trash = false and message.receiverDeleted = false
+            order by message.sentAt desc
+            """)
+    List<MailMessage> findRecentInboxMessages(@Param("receiverId") Long receiverId, Pageable pageable);
+
     @EntityGraph(attributePaths = "receiver")
     Page<MailMessage> findBySenderIdAndDraftFalseAndSenderTrashFalseAndSenderDeletedFalseOrderBySentAtDesc(Long senderId, Pageable pageable);
 

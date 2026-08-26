@@ -42,19 +42,40 @@
                 <div class="search-suggestions" hidden data-message-search-suggestions></div>
             </form>
         </div>
-        <details class="profile-menu">
-            <summary aria-label="Kullanıcı menüsünü aç">
-                <img th:src="${navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
-                     th:alt="${navigationProfile.firstName + ' profil fotoğrafı'}">
-            </summary>
-            <div class="profile-menu-panel">
-                <p><strong th:text="${navigationProfile.firstName + ' ' + navigationProfile.lastName}"></strong><small th:text="${navigationProfile.email}"></small></p>
-                <a th:href="@{/profile}"><span class="material-symbols-outlined">account_circle</span>Profilim</a>
-                <form th:action="@{/auth/logout}" method="post">
-                    <button type="submit"><span class="material-symbols-outlined">logout</span>Çıkış yap</button>
-                </form>
+        <div class="topbar-right">
+            <div class="topbar-messages-dropdown" data-messages-dropdown>
+                <button type="button" class="topbar-icon-btn" data-messages-dropdown-toggle aria-label="Mesajlar" aria-expanded="false" title="Mesajlar">
+                    <span class="material-symbols-outlined">chat</span>
+                    <span class="topbar-badge" th:if="${mailboxCounts != null and mailboxCounts.inboxUnread > 0}" th:text="${mailboxCounts.inboxUnread > 99 ? '99+' : mailboxCounts.inboxUnread}" data-messages-badge></span>
+                </button>
+                <div class="messages-popover" hidden data-messages-popover>
+                    <div class="messages-popover-header">
+                        <h2>Mesajlar</h2>
+                        <a th:href="@{/messages/inbox}">Tümünü gör</a>
+                    </div>
+                    <div class="messages-popover-list" data-messages-popover-list></div>
+                    <div class="messages-popover-loading" hidden data-messages-loading>
+                        <span>Yükleniyor…</span>
+                    </div>
+                    <div class="messages-popover-empty" hidden data-messages-empty>
+                        <span>Henüz mesajınız yok.</span>
+                    </div>
+                </div>
             </div>
-        </details>
+            <details class="profile-menu">
+                <summary aria-label="Kullanıcı menüsünü aç">
+                    <img th:src="${navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
+                         th:alt="${navigationProfile.firstName + ' profil fotoğrafı'}">
+                </summary>
+                <div class="profile-menu-panel">
+                    <p><strong th:text="${navigationProfile.firstName + ' ' + navigationProfile.lastName}"></strong><small th:text="${navigationProfile.email}"></small></p>
+                    <a th:href="@{/profile}"><span class="material-symbols-outlined">account_circle</span>Profilim</a>
+                    <form th:action="@{/auth/logout}" method="post">
+                        <button type="submit"><span class="material-symbols-outlined">logout</span>Çıkış yap</button>
+                    </form>
+                </div>
+            </details>
+        </div>
     </div>
     <footer class="app-footer">
         <p class="app-footer-github"> © 2026
@@ -68,6 +89,7 @@
     </footer>
     <script th:src="@{/js/sidebar-toggle.js}" defer></script>
     <script th:src="@{/js/message-search.js}" defer></script>
+    <script th:src="@{/js/messages-dropdown.js}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script th:src="@{/js/message-delete-confirmation.js}" defer></script>
     <script th:src="@{/js/postera-alerts.js}" defer></script>

@@ -52,6 +52,22 @@ public class MessageService {
     }
 
     @Transactional(readOnly = true)
+    public RecentMessagesResponse recentMessages(String currentUserEmail, int offset, int limit) {
+        var user = findUser(currentUserEmail);
+        var safeOffset = Math.max(offset, 0);
+        var safeLimit = Math.max(1, Math.min(limit, 50));
+        var total = messageRepository.countByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalse(user.getId());
+        var unreadCount = messageRepository.countByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalseAndReadFalse(user.getId());
+        var pageable = new OffsetPageRequest(safeOffset, safeLimit, Sort.by(Sort.Direction.DESC, "sentAt"));
+        var items = messageRepository.findRecentInboxMessages(user.getId(), pageable).stream()
+                .map(message -> toListItem(message, message.getSender()))
+                .toList();
+        var hasMore = (safeOffset + items.size()) < total;
+        var nextOffset = safeOffset + items.size();
+        return new RecentMessagesResponse(items, total, unreadCount, hasMore, nextOffset);
+    }
+
+    @Transactional(readOnly = true)
     public Page<MessageListItem> inbox(String currentUserEmail, InboxFilter filter) {
         var user = findUser(currentUserEmail);
         Specification<MailMessage> spec = (root, query, cb) -> cb.and(

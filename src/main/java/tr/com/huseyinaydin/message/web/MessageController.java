@@ -93,6 +93,15 @@ public class MessageController {
         return messageService.search(authentication.getName(), query, 0).getContent().stream().limit(8).toList();
     }
 
+    @GetMapping(value = "/api/recent", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public tr.com.huseyinaydin.message.service.RecentMessagesResponse recentMessages(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "6") int limit,
+            Authentication authentication) {
+        return messageService.recentMessages(authentication.getName(), offset, limit);
+    }
+
     @GetMapping("/compose")
     String compose(Model model) {
         model.addAttribute("sendMessageRequest", new SendMessageRequest(null, null, null));
