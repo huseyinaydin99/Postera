@@ -42,6 +42,9 @@ public class TimelinePost {
     @Column(nullable = false)
     private Instant createdAt;
 
+    @Column
+    private Instant updatedAt;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("displayOrder ASC")
     private List<TimelinePostImage> images = new ArrayList<>();
@@ -52,6 +55,15 @@ public class TimelinePost {
         post.content = content;
         post.createdAt = Instant.now();
         return post;
+    }
+
+    public void markAsUpdated() {
+        this.updatedAt = Instant.now();
+    }
+
+    public void updateContent(String newContent) {
+        this.content = newContent;
+        this.updatedAt = Instant.now();
     }
 
     public void addImage(String imageUrl) {

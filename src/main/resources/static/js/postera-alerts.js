@@ -14,4 +14,6 @@
     if (sentTo) toast(`Mesajınız ${sentTo} kişisine gönderildi.`, 'success');
     const shared = new URLSearchParams(window.location.search).get('shared');
     if (shared !== null) toast('Paylaşımınız başarıyla yayınlandı!', 'success');
+    const deleted = new URLSearchParams(window.location.search).get('deleted');
+    if (deleted !== null) toast('Paylaşım başarıyla silindi.', 'success');
 })();

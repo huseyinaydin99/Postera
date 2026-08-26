@@ -78,9 +78,81 @@
                 </div>
             </form>
         </div>
+
+        <!-- Paylaşımlar Akışı (Timeline Feed) -->
+        <div class="timeline-feed">
+            <div th:if="${posts == null or posts.empty}" class="timeline-empty-feed">
+                <span class="material-symbols-outlined">forum</span>
+                <p>Henüz paylaşım yapılmamış. İlk paylaşımı siz yapın!</p>
+            </div>
+
+            <article th:each="post : ${posts}" class="timeline-post-card" th:id="${'post-' + post.id}">
+                <div class="post-card-header">
+                    <div class="post-author-wrapper">
+                        <img class="post-author-avatar"
+                             th:src="${post.authorProfileImageUrl != null ? post.authorProfileImageUrl : '/images/default-avatar.svg'}"
+                             th:alt="${post.authorName + ' profil fotoğrafı'}">
+                        <div class="post-author-meta">
+                            <span class="post-author-name" th:text="${post.authorName}"></span>
+                            <div class="post-time-meta">
+                                <time th:datetime="${post.createdAt}" th:text="${#temporals.format(post.createdAt, 'dd.MM.yyyy HH:mm')}"></time>
+                                <span class="post-edited-badge" th:if="${post.updatedAt != null}" th:title="${'Son düzenleme: ' + #temporals.format(post.updatedAt, 'dd.MM.yyyy HH:mm')}">(Düzenlendi)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Popup Menü (Düzenle / Sil) -->
+                    <details class="post-menu" th:if="${post.ownedByCurrentUser}">
+                        <summary aria-label="Paylaşım seçenekleri">
+                            <span class="material-symbols-outlined">more_horiz</span>
+                        </summary>
+                        <div class="post-menu-panel">
+                            <button type="button" class="post-menu-item" disabled title="Güncelleme işlemi sonraki aşamada eklenecektir.">
+                                <span class="material-symbols-outlined">edit</span> Düzenle
+                            </button>
+                            <form th:action="@{/timeline/{id}/delete(id=${post.id})}" method="post" data-confirm-action="İlgili post silinsin mi?">
+                                <button type="submit" class="post-menu-item post-menu-danger">
+                                    <span class="material-symbols-outlined">delete</span> Sil
+                                </button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Yazı İçeriği (Üstte) -->
+                <div class="rich-message-body post-body-text" th:if="${post.content != null and !#strings.isEmpty(post.content)}" th:utext="${post.content}"></div>
+
+                <!-- Görseller / GIF (Yazının Altında) -->
+                <div class="post-images" th:if="${post.imageUrls != null and !post.imageUrls.empty}"
+                     th:classappend="${#lists.size(post.imageUrls) == 1 ? 'post-images-single' : 'post-images-grid'}">
+                    <img th:each="imageUrl : ${post.imageUrls}" th:src="${imageUrl}" alt="Paylaşım görseli" loading="lazy">
+                </div>
+
+                <!-- Post Alt Aksiyonları (Beğen, Yorum Yaz) -->
+                <div class="post-card-actions">
+                    <button type="button" class="post-action-btn" title="Beğen (Sonraki aşamada aktif edilecek)">
+                        <span class="material-symbols-outlined">thumb_up</span>
+                        <span>Beğen</span>
+                    </button>
+                    <button type="button" class="post-action-btn" title="Yorum Yap (Sonraki aşamada aktif edilecek)">
+                        <span class="material-symbols-outlined">chat_bubble</span>
+                        <span>Yorum Yaz</span>
+                    </button>
+                </div>
+            </article>
+        </div>
     </section>
 </main>
 <script th:src="@{/js/rich-text-editor.js}" defer></script>
 <script th:src="@{/js/message-image-upload.js}" defer></script>
+<script>
+document.addEventListener('click', (e) => {
+    document.querySelectorAll('.post-menu[open]').forEach((menu) => {
+        if (!menu.contains(e.target)) {
+            menu.removeAttribute('open');
+        }
+    });
+});
+</script>
 </body>
 </html>

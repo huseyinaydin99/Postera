@@ -9,5 +9,8 @@ import tr.com.huseyinaydin.timeline.domain.TimelinePost;
 public interface TimelinePostRepository extends JpaRepository<TimelinePost, Long> {
 
     @EntityGraph(attributePaths = {"user", "images"})
+    java.util.List<TimelinePost> findAllByOrderByCreatedAtDesc();
+
+    @EntityGraph(attributePaths = {"user", "images"})
     Page<TimelinePost> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }

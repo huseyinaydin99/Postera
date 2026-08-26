@@ -454,3 +454,54 @@ th { background: var(--paper); color: var(--ink-500); }
 .btn-share { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.65rem 1.4rem; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease; }
 .btn-share:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(180, 83, 9, 0.25); transform: translateY(-1px); }
 .btn-share .material-symbols-outlined { font-size: 18px; }
+
+/* Zaman Tüneli Akışı (Timeline Feed) */
+.timeline-feed { display: grid; gap: 1.25rem; margin-top: 1.5rem; width: 100%; }
+.timeline-post-card {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+    padding: 1.25rem; display: grid; gap: 0.9rem; position: relative;
+}
+.post-card-header { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.post-author-wrapper { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+.post-author-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); flex-shrink: 0; }
+.post-author-meta { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.post-author-name { font-size: 0.95rem; font-weight: 700; color: var(--ink-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.post-time-meta { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--ink-500); font-family: var(--font-mono); }
+.post-edited-badge { color: var(--ink-500); font-size: 0.72rem; font-style: italic; }
+.post-menu { position: relative; }
+.post-menu summary { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; list-style: none; color: var(--ink-500); transition: background 0.15s, color 0.15s; }
+.post-menu summary::-webkit-details-marker { display: none; }
+.post-menu summary:hover { background: var(--accent-soft); color: var(--accent); }
+.post-menu-panel {
+    position: absolute; top: calc(100% + 0.35rem); right: 0; z-index: 20; min-width: 140px;
+    padding: 0.35rem; border: 1px solid var(--line); border-radius: 8px; background: var(--paper-raised);
+    box-shadow: 0 8px 24px rgba(26, 35, 50, 0.12);
+}
+.post-menu-item {
+    display: flex; align-items: center; gap: 0.5rem; width: 100%; padding: 0.5rem 0.65rem; border: 0;
+    border-radius: 5px; background: transparent; color: var(--ink-700); font: 500 0.85rem var(--font-body);
+    text-align: left; cursor: pointer; justify-self: auto; transition: background 0.12s;
+}
+.post-menu-item:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent); }
+.post-menu-item:disabled { opacity: 0.45; cursor: not-allowed; }
+.post-menu-danger { color: var(--danger); }
+.post-menu-danger:hover:not(:disabled) { background: #fff1f2; color: var(--danger); }
+.post-menu form { display: block; margin: 0; }
+.post-body-text { font-size: 0.95rem; line-height: 1.6; color: var(--ink-900); word-break: break-word; }
+.post-images { display: grid; gap: 0.6rem; border-radius: 8px; overflow: hidden; }
+.post-images-single img { display: block; width: 100%; max-height: 520px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+.post-images-grid { grid-template-columns: repeat(2, 1fr); }
+.post-images-grid img { display: block; width: 100%; height: 280px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+.post-card-actions { display: flex; align-items: center; gap: 0.5rem; padding-top: 0.75rem; border-top: 1px solid var(--line); }
+.post-action-btn {
+    display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.45rem 0.85rem; border: 0;
+    border-radius: 6px; background: transparent; color: var(--ink-700); font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s, color 0.15s; justify-self: auto;
+}
+.post-action-btn:hover { background: var(--accent-soft); color: var(--accent); }
+.post-action-btn .material-symbols-outlined { font-size: 20px; }
+.timeline-empty-feed {
+    text-align: center; padding: 2.5rem 1rem; color: var(--ink-500); background: var(--paper);
+    border: 1px dashed var(--line); border-radius: 10px;
+}
+.timeline-empty-feed .material-symbols-outlined { font-size: 40px; color: var(--ink-500); opacity: 0.6; margin-bottom: 0.5rem; }

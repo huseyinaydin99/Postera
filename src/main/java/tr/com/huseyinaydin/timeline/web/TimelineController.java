@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tr.com.huseyinaydin.timeline.service.TimelineService;
 
+import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +27,20 @@ public class TimelineController {
     private final TimelineService timelineService;
 
     @GetMapping
-    public String index(Model model) {
+    public String index(Authentication authentication, Model model) {
+        model.addAttribute("posts", timelineService.listPosts(authentication.getName()));
         return "timeline/index";
+    }
+
+    @PostMapping("/{postId}/delete")
+    public String deletePost(@PathVariable Long postId, Authentication authentication, RedirectAttributes redirectAttributes) {
+        try {
+            timelineService.deletePost(authentication.getName(), postId);
+            redirectAttributes.addAttribute("deleted", "true");
+        } catch (IllegalArgumentException exception) {
+            redirectAttributes.addFlashAttribute("postError", exception.getMessage());
+        }
+        return "redirect:/timeline";
     }
 
     @PostMapping
