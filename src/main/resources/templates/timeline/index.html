@@ -10,15 +10,13 @@
 <header th:replace="~{fragments/navigation :: mainNavigation}"></header>
 <main>
     <section class="timeline-container" aria-labelledby="timeline-title">
-        <div class="timeline-header">
-            <h1 id="timeline-title">Zaman Tüneli</h1>
-            <p>Düşüncelerinizi, duyurularınızı veya anlarınızı paylaşın.</p>
-        </div>
+        <h1 id="timeline-title">Zaman Tüneli</h1>
+        <p class="timeline-subtitle">Düşüncelerinizi, duyurularınızı veya anlarınızı paylaşın.</p>
 
         <p th:if="${postError}" role="alert" th:text="${postError}"></p>
 
-        <!-- Facebook Benzeri Paylaşım Kartı -->
-        <div class="timeline-card timeline-composer">
+        <!-- Facebook Benzeri Paylaşım Kartı / Alanı -->
+        <div class="timeline-composer">
             <div class="composer-header">
                 <img class="composer-avatar"
                      th:src="${navigationProfile != null and navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
