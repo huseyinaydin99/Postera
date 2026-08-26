@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <title>Zaman Tüneli | Postera</title>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <section class="timeline-container" aria-labelledby="timeline-title">
+        <div class="timeline-header">
+            <h1 id="timeline-title">Zaman Tüneli</h1>
+            <p>Düşüncelerinizi, duyurularınızı veya anlarınızı paylaşın.</p>
+        </div>
+
+        <p th:if="${postError}" role="alert" th:text="${postError}"></p>
+
+        <!-- Facebook Benzeri Paylaşım Kartı -->
+        <div class="timeline-card timeline-composer">
+            <div class="composer-header">
+                <img class="composer-avatar"
+                     th:src="${navigationProfile != null and navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
+                     th:alt="${navigationProfile != null ? navigationProfile.firstName + ' profil fotoğrafı' : 'Kullanıcı'}">
+                <div class="composer-user-info">
+                    <strong th:text="${navigationProfile != null ? navigationProfile.firstName + ' ' + navigationProfile.lastName : 'Kullanıcı'}"></strong>
+                    <span class="composer-audience-badge">
+                        <span class="material-symbols-outlined">public</span> Herkese Açık
+                    </span>
+                </div>
+            </div>
+
+            <form id="timeline-form" class="timeline-form" th:action="@{/timeline}" method="post" enctype="multipart/form-data">
+                <div class="rte-toolbar" role="toolbar" aria-label="Metin biçimlendirme araçları">
+                    <button type="button" data-rte-command="bold" title="Kalın"><strong>B</strong></button>
+                    <button type="button" data-rte-command="italic" title="İtalik"><em>I</em></button>
+                    <button type="button" data-rte-command="insertUnorderedList" title="Madde işaretli liste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                    <button type="button" data-rte-command="insertOrderedList" title="Numaralı liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                    <button type="button" data-rte-command="formatBlock" data-rte-value="p" title="Paragraf"><span class="material-symbols-outlined">format_paragraph</span></button>
+                    <button type="button" data-rte-toggle="timeline-emoji-picker" title="Emoji ekle">😊</button>
+                    <button type="button" data-rte-toggle="timeline-link-picker" title="Bağlantı ekle"><span class="material-symbols-outlined">link</span></button>
+                    <button type="button" data-rte-toggle="timeline-gif-picker" title="GIF ekle"><span class="material-symbols-outlined">gif_box</span></button>
+                    <button type="button" data-rte-command="removeFormat" title="Biçimlendirmeyi kaldır"><span class="material-symbols-outlined">format_clear</span></button>
+                </div>
+
+                <div class="rte-popover emoji-picker" id="timeline-emoji-picker" hidden aria-label="Emoji seçici">
+                    <button type="button" th:each="emoji : ${#strings.arraySplit('😀,😂,🤣,😊,😍,😎,🤔,😭,😅,👍,👏,🎉,🔥,❤️,🙏,🤝,🚀,💡,🎯,✅', ',')}" th:text="${emoji}" th:attr="data-rte-emoji=${emoji}"></button>
+                </div>
+                <div class="rte-popover link-picker" id="timeline-link-picker" hidden>
+                    <label class="visually-hidden" for="timeline-link-url">Bağlantı adresi</label>
+                    <input id="timeline-link-url" type="url" placeholder="https://ornek.com" data-rte-link-url>
+                    <button type="button" data-rte-add-link>Bağlantı ekle</button>
+                </div>
+                <div class="rte-popover gif-picker" id="timeline-gif-picker" hidden aria-label="Komik GIF seçici">
+                    <button type="button" th:each="gif : ${#strings.arraySplit('3o6Zt481isNVuQI1l6,26ufdipQqU2lhNA4g,3o7TKsQ8UQ2p0f9V8A,3o6Zt6ML6BklcajjsA,3o7btPCcdNniyf0ArS,3o6Zt4HU9uwXmXSAuI,l0MYC0LajbaPoEADu,ICOgUNjpvO0PC,xT9IgG50Fb7Mi0prBC,l0MYt5jPR6QX5pnqM,3oEjHI8WJv4x6UPDB6,26n6WywJyh39n1pBu,3oKIPwoeGErMmaI43S,5GoVLqeAOo6PK,13CoXDiaCcCoyk,2A75RyXVzzSI2bx4Gj,9Ai5dIk8xvBm0,3oEduSbSGpGaRX2Vri,12XDYvMJNcmLgQ,3ohs4w0OrUm5GIkBKE', ',')}" th:attr="data-rte-gif=${'https://media.giphy.com/media/' + gif + '/giphy.gif'}">
+                        <img th:src="${'https://media.giphy.com/media/' + gif + '/giphy.gif'}" alt="Komik GIF">
+                    </button>
+                </div>
+
+                <div id="timeline-editor" class="rte-editor timeline-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Ne düşünüyorsunuz?" data-rte-editor
+                     data-placeholder="Ne düşünüyorsunuz? Düşüncelerinizi veya bir güncellemeyi paylaşın..."></div>
+                <input id="timeline-content" type="hidden" name="content" data-rte-input>
+
+                <div class="composer-media-bar">
+                    <div class="message-image-upload-wrapper">
+                        <label class="message-image-upload" for="timeline-images">
+                            <span class="material-symbols-outlined">image</span> Görsel ekle <small>En fazla 2 görsel, her biri 5 MB</small>
+                        </label>
+                        <div class="image-preview-container" data-image-preview-container></div>
+                    </div>
+                    <input id="timeline-images" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-message-images>
+                    <p class="image-upload-error" hidden data-image-upload-error></p>
+                </div>
+
+                <div class="composer-actions">
+                    <button type="submit" class="btn-share" data-timeline-share-btn>
+                        <span class="material-symbols-outlined">send</span> Paylaş
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+<script th:src="@{/js/rich-text-editor.js}" defer></script>
+<script th:src="@{/js/message-image-upload.js}" defer></script>
+</body>
+</html>

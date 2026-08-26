@@ -437,3 +437,22 @@ th { background: var(--paper); color: var(--ink-500); }
     .auth-name-grid, .password-rules { grid-template-columns: 1fr; }
     .auth-links { align-items: flex-start; flex-direction: column; gap: .55rem; }
 }
+
+/* Zaman Tüneli (Timeline) */
+.timeline-container { display: grid; gap: 1.25rem; max-width: 680px; margin: 0 auto; }
+.timeline-header { margin-bottom: 0.25rem; }
+.timeline-header h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
+.timeline-header p { margin: 0; color: var(--ink-500); font-size: 0.9rem; }
+.timeline-card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(26, 35, 50, 0.05); }
+.composer-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.composer-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-soft); flex-shrink: 0; }
+.composer-user-info { display: flex; flex-direction: column; gap: 0.2rem; }
+.composer-user-info strong { font-size: 0.95rem; color: var(--ink-900); }
+.composer-audience-badge { display: inline-flex; align-items: center; gap: 0.25rem; width: fit-content; padding: 0.15rem 0.45rem; border-radius: 99px; background: var(--paper); border: 1px solid var(--line); color: var(--ink-500); font-size: 0.72rem; font-weight: 500; }
+.composer-audience-badge .material-symbols-outlined { font-size: 13px; }
+.timeline-editor { min-height: 110px; font-size: 0.95rem; line-height: 1.6; }
+.composer-media-bar { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--line); }
+.composer-actions { display: flex; align-items: center; justify-content: flex-end; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--line); }
+.btn-share { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.65rem 1.4rem; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease; }
+.btn-share:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(180, 83, 9, 0.25); transform: translateY(-1px); }
+.btn-share .material-symbols-outlined { font-size: 18px; }

@@ -1,11 +1,11 @@
 (() => {
-    const form = document.querySelector('#reply-form');
     const input = document.querySelector('[data-message-images]');
+    const form = input?.closest('form') || document.querySelector('#reply-form');
     const previewContainer = document.querySelector('[data-image-preview-container]');
     const error = document.querySelector('[data-image-upload-error]');
     const progress = document.querySelector('[data-upload-progress]');
     const bar = document.querySelector('[data-upload-progress-bar]');
-    if (!form || !input || !error || !progress || !bar) return;
+    if (!form || !input || !error) return;
 
     let selectedFiles = [];
     let previewUrls = [];

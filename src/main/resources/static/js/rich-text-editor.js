@@ -1,7 +1,7 @@
 (() => {
     const editor = document.querySelector('[data-rte-editor]');
     const input = document.querySelector('[data-rte-input]');
-    const form = document.querySelector('#reply-form');
+    const form = editor?.closest('form') || document.querySelector('#reply-form');
     if (!editor || !input || !form) return;
 
     const sync = () => { input.value = editor.innerHTML; };
@@ -28,6 +28,7 @@
     document.querySelectorAll('[data-rte-toggle]').forEach((button) => {
         button.addEventListener('click', () => {
             const popover = document.getElementById(button.dataset.rteToggle);
+            if (!popover) return;
             const willOpen = popover.hidden;
             closePopovers();
             popover.hidden = !willOpen;
@@ -46,21 +47,21 @@
         button.addEventListener('click', () => {
             editor.focus();
             restoreRange();
-            document.execCommand('insertHTML', false, `<img src="${button.dataset.rteGif}">`);
+            document.execCommand('insertHTML', false, `<img class="rich-gif" src="${button.dataset.rteGif}" alt="GIF">`);
             sync();
             closePopovers();
         });
     });
     document.querySelector('[data-rte-add-link]')?.addEventListener('click', () => {
         const urlInput = document.querySelector('[data-rte-link-url]');
-        if (!/^https?:\/\//i.test(urlInput.value)) return;
+        if (!urlInput || !/^https?:\/\//i.test(urlInput.value)) return;
         editor.focus();
         restoreRange();
         const selectedText = window.getSelection().toString();
         if (selectedText) {
             document.execCommand('createLink', false, urlInput.value);
         } else {
-            document.execCommand('insertHTML', false, `<a href="${urlInput.value}">${urlInput.value}</a>`);
+            document.execCommand('insertHTML', false, `<a href="${urlInput.value}" target="_blank" rel="noopener noreferrer">${urlInput.value}</a>`);
         }
         urlInput.value = '';
         sync();

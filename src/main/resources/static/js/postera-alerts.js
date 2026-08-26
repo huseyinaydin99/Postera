@@ -12,4 +12,6 @@
     });
     const sentTo = new URLSearchParams(window.location.search).get('sentTo');
     if (sentTo) toast(`Mesajınız ${sentTo} kişisine gönderildi.`, 'success');
+    const shared = new URLSearchParams(window.location.search).get('shared');
+    if (shared !== null) toast('Paylaşımınız başarıyla yayınlandı!', 'success');
 })();
