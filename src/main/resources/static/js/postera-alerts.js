@@ -1,5 +1,23 @@
 (() => {
-    const options = (text) => ({ title: 'İşlemi onaylıyor musunuz?', text, icon: 'warning', showCancelButton: true, confirmButtonText: 'Evet', cancelButtonText: 'Hayır', confirmButtonColor: '#b45309', cancelButtonColor: '#5b6b85' });
+    const options = (text) => ({
+        title: 'Emin misiniz?',
+        text,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Evet, Sil',
+        cancelButtonText: 'Vazgeç',
+        customClass: {
+            popup: 'postera-swal-popup',
+            title: 'postera-swal-title',
+            htmlContainer: 'postera-swal-text',
+            confirmButton: 'postera-swal-btn postera-swal-confirm',
+            cancelButton: 'postera-swal-btn postera-swal-cancel',
+            icon: 'postera-swal-icon'
+        },
+        buttonsStyling: false,
+        width: '320px',
+        padding: '1rem'
+    });
     const toast = (title, icon = 'info') => window.Swal?.fire({toast: true, position: 'bottom-end', icon, title, showConfirmButton: false, timer: 3000, timerProgressBar: true});
     document.addEventListener('submit', async (event) => {
         const form = event.target.closest('form[data-confirm-action]');
