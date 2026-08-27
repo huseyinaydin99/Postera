@@ -29,7 +29,7 @@ public class TimelineService {
         var user = findUser(currentUserEmail);
         var isAdmin = user.getRoles().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getName()) || "ADMIN".equals(role.getName()));
 
-        return timelinePostRepository.findAllByOrderByCreatedAtDesc().stream()
+        return timelinePostRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
                 .map(post -> toPostItem(post, user, isAdmin))
                 .toList();
     }

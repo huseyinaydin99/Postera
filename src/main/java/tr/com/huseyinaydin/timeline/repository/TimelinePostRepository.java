@@ -13,6 +13,9 @@ import java.util.List;
 public interface TimelinePostRepository extends JpaRepository<TimelinePost, Long> {
 
     @EntityGraph(attributePaths = {"user", "images"})
+    List<TimelinePost> findAllByUserIdOrderByCreatedAtDesc(Long userId);
+
+    @EntityGraph(attributePaths = {"user", "images"})
     List<TimelinePost> findAllByOrderByCreatedAtDesc();
 
     @EntityGraph(attributePaths = {"user", "images"})
@@ -26,7 +29,7 @@ public interface TimelinePostRepository extends JpaRepository<TimelinePost, Long
             FROM Friendship f
             WHERE (f.sender.id = :userId OR f.receiver.id = :userId)
               AND f.status = tr.com.huseyinaydin.friend.domain.FriendshipStatus.ACCEPTED
-        ) OR p.user.id = :userId
+        )
         ORDER BY p.createdAt DESC
     """)
     List<TimelinePost> findFriendsFeedPosts(@Param("userId") Long userId, Pageable pageable);
@@ -38,7 +41,7 @@ public interface TimelinePostRepository extends JpaRepository<TimelinePost, Long
             FROM Friendship f
             WHERE (f.sender.id = :userId OR f.receiver.id = :userId)
               AND f.status = tr.com.huseyinaydin.friend.domain.FriendshipStatus.ACCEPTED
-        ) OR p.user.id = :userId
+        )
     """)
     long countFriendsFeedPosts(@Param("userId") Long userId);
 }

@@ -16,7 +16,7 @@
                 <span class="material-symbols-outlined">dynamic_feed</span>
                 <h1 id="timeline-title">Zaman Tüneli</h1>
             </div>
-            <p class="timeline-page-subtitle">Düşüncelerinizi, duyurularınızı veya anlarınızı paylaşın.</p>
+            <p class="timeline-page-subtitle">Yalnızca sizin tarafınızdan yapılan kişisel paylaşımlar.</p>
         </div>
 
         <p th:if="${postError}" role="alert" th:text="${postError}"></p>
@@ -106,7 +106,7 @@
         <div class="timeline-feed">
             <div th:if="${posts == null or posts.empty}" class="timeline-empty-feed">
                 <span class="material-symbols-outlined">forum</span>
-                <p>Henüz paylaşım yapılmamış. İlk paylaşımı siz yapın!</p>
+                <p>Henüz size ait bir paylaşım bulunmuyor. İlk paylaşımınızı yukarıdaki alandan yapabilirsiniz!</p>
             </div>
 
             <article th:each="post : ${posts}" class="timeline-post-card" th:id="${'post-' + post.id}">
