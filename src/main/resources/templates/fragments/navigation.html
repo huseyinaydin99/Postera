@@ -45,6 +45,25 @@
             </form>
         </div>
         <div class="topbar-right">
+            <div class="topbar-friends-dropdown" data-friends-dropdown>
+                <button type="button" class="topbar-icon-btn" data-friends-dropdown-toggle aria-label="Arkadaşlık İstekleri" aria-expanded="false" title="Arkadaşlık İstekleri">
+                    <span class="material-symbols-outlined">group</span>
+                    <span class="topbar-badge" th:if="${pendingFriendRequestsCount != null and pendingFriendRequestsCount > 0}" th:text="${pendingFriendRequestsCount > 99 ? '99+' : pendingFriendRequestsCount}" data-friends-badge></span>
+                </button>
+                <div class="friends-popover" hidden data-friends-popover>
+                    <div class="friends-popover-header">
+                        <h2>Arkadaşlık İstekleri</h2>
+                        <a th:href="@{/discover}">İnsanları Keşfet</a>
+                    </div>
+                    <div class="friends-popover-list" data-friends-popover-list></div>
+                    <div class="friends-popover-loading" hidden data-friends-loading>
+                        <span>Yükleniyor…</span>
+                    </div>
+                    <div class="friends-popover-empty" hidden data-friends-empty>
+                        <span>Yeni arkadaşlık isteğiniz yok.</span>
+                    </div>
+                </div>
+            </div>
             <div class="topbar-messages-dropdown" data-messages-dropdown>
                 <button type="button" class="topbar-icon-btn" data-messages-dropdown-toggle aria-label="Mesajlar" aria-expanded="false" title="Mesajlar">
                     <span class="material-symbols-outlined">chat</span>
@@ -91,6 +110,7 @@
     </footer>
     <script th:src="@{/js/sidebar-toggle.js}" defer></script>
     <script th:src="@{/js/message-search.js}" defer></script>
+    <script th:src="@{/js/friends-dropdown.js}" defer></script>
     <script th:src="@{/js/messages-dropdown.js}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script th:src="@{/js/message-delete-confirmation.js}" defer></script>

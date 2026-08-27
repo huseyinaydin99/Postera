@@ -221,6 +221,51 @@ body > main, body > header + main {
 .popover-message-item.is-read .popover-message-snippet { font-weight: 400; color: var(--ink-500); opacity: .88; }
 .popover-unread-dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--paper-raised); }
 .messages-popover-loading, .messages-popover-empty { padding: 1.25rem 1rem; text-align: center; color: var(--ink-500); font-size: .82rem; }
+.topbar-friends-dropdown { position: relative; }
+.friends-popover {
+    position: absolute; top: calc(100% + .6rem); right: -10px; z-index: 30;
+    width: min(390px, calc(100vw - 2rem)); border: 1px solid var(--line); border-radius: 12px;
+    background: var(--paper-raised); box-shadow: 0 12px 32px rgba(26, 35, 50, .15); overflow: hidden;
+}
+.friends-popover[hidden] { display: none; }
+.friends-popover-header {
+    display: flex; align-items: center; justify-content: space-between; padding: .85rem 1rem .75rem;
+    border-bottom: 1px solid var(--line); background: var(--paper);
+}
+.friends-popover-header h2 { margin: 0; font-size: 1.05rem; font-weight: 700; font-family: var(--font-display); color: var(--ink-900); }
+.friends-popover-header a { color: var(--accent); font-size: .8rem; font-weight: 600; text-decoration: none; padding: .2rem .4rem; border-radius: 4px; }
+.friends-popover-header a:hover { background: var(--accent-soft); }
+.friends-popover-list { max-height: 380px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.popover-friend-item {
+    display: flex; align-items: center; gap: .65rem; padding: .65rem .85rem; border-bottom: 1px solid var(--line);
+    color: var(--ink-900); transition: background .12s ease;
+}
+.popover-friend-item:last-child { border-bottom: 0; }
+.popover-friend-item:hover { background: rgba(254, 243, 226, 0.4); }
+.popover-friend-avatar { width: 40px; height: 40px; min-width: 40px; flex: 0 0 40px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); }
+.popover-friend-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .08rem; }
+.popover-friend-top { display: flex; align-items: baseline; justify-content: space-between; gap: .4rem; }
+.popover-friend-name { font-size: .85rem; font-weight: 700; color: var(--ink-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.popover-friend-time { font-size: .7rem; color: var(--ink-500); font-family: var(--font-mono); flex-shrink: 0; white-space: nowrap; }
+.popover-friend-email { font-size: .7rem; color: var(--ink-500); font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.popover-friend-action { flex-shrink: 0; }
+.popover-btn-accept {
+    display: inline-flex !important; align-items: center !important; gap: .25rem !important;
+    padding: .28rem .6rem !important; border-radius: 5px !important; background: var(--accent) !important;
+    color: #fff !important; font-size: .74rem !important; font-weight: 600 !important; border: 0 !important;
+    cursor: pointer !important; transition: background .12s ease, transform .1s ease !important;
+    min-height: 26px !important; white-space: nowrap !important; box-shadow: none !important;
+}
+.popover-btn-accept:hover:not(:disabled) { background: var(--accent-hover) !important; transform: translateY(-1px); }
+.popover-btn-accept .material-symbols-outlined { font-size: 14px !important; line-height: 1 !important; }
+.popover-btn-accepted {
+    display: inline-flex !important; align-items: center !important; gap: .25rem !important;
+    padding: .28rem .6rem !important; border-radius: 5px !important; background: var(--success-soft) !important;
+    border: 1px solid #bbf7d0 !important; color: var(--success) !important; font-size: .74rem !important;
+    font-weight: 600 !important; cursor: default !important; min-height: 26px !important; white-space: nowrap !important;
+}
+.popover-btn-accepted .material-symbols-outlined { font-size: 14px !important; line-height: 1 !important; }
+.friends-popover-loading, .friends-popover-empty { padding: 1.25rem 1rem; text-align: center; color: var(--ink-500); font-size: .82rem; }
 .profile-menu { position: relative; }
 .profile-menu summary { display: flex; cursor: pointer; list-style: none; }
 .profile-menu summary::-webkit-details-marker { display: none; }

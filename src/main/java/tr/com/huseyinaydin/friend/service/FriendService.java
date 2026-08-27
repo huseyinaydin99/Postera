@@ -94,6 +94,63 @@ public class FriendService {
         return "PENDING_SENT";
     }
 
+    @Transactional(readOnly = true)
+    public long countPendingRequests(String currentUserEmail) {
+        var currentUser = findUserByEmail(currentUserEmail);
+        return friendshipRepository.countByReceiverIdAndStatus(currentUser.getId(), FriendshipStatus.PENDING);
+    }
+
+    @Transactional(readOnly = true)
+    public FriendRequestsResponse getPendingRequests(String currentUserEmail, int offset, int limit) {
+        var currentUser = findUserByEmail(currentUserEmail);
+        long totalCount = friendshipRepository.countByReceiverIdAndStatus(currentUser.getId(), FriendshipStatus.PENDING);
+        if (totalCount == 0) {
+            return new FriendRequestsResponse(List.of(), 0, false, 0);
+        }
+
+        var pageRequest = new tr.com.huseyinaydin.message.service.OffsetPageRequest(offset, limit);
+        var friendships = friendshipRepository.findPendingRequestsByReceiverId(
+                currentUser.getId(),
+                FriendshipStatus.PENDING,
+                pageRequest
+        );
+
+        var items = friendships.stream().map(f -> new FriendRequestItem(
+                f.getId(),
+                f.getSender().getId(),
+                f.getSender().getFirstName() + " " + f.getSender().getLastName(),
+                f.getSender().getEmail(),
+                f.getSender().getProfileImageUrl(),
+                f.getCreatedAt()
+        )).toList();
+
+        boolean hasMore = (offset + items.size()) < totalCount;
+        int nextOffset = offset + items.size();
+        return new FriendRequestsResponse(items, totalCount, hasMore, nextOffset);
+    }
+
+    @Transactional
+    public void acceptFriendRequest(String currentUserEmail, Long friendshipId) {
+        var currentUser = findUserByEmail(currentUserEmail);
+        var friendship = friendshipRepository.findById(friendshipId)
+                .orElseThrow(() -> new IllegalArgumentException("Arkadaşlık isteği bulunamadı."));
+
+        if (!friendship.getReceiver().getId().equals(currentUser.getId())) {
+            throw new IllegalStateException("Bu arkadaşlık isteğini kabul etme yetkiniz yok.");
+        }
+
+        if (friendship.getStatus() == FriendshipStatus.ACCEPTED) {
+            return;
+        }
+
+        if (friendship.getStatus() != FriendshipStatus.PENDING) {
+            throw new IllegalStateException("Bu istek bekleyen durumda değil.");
+        }
+
+        friendship.accept();
+        friendshipRepository.save(friendship);
+    }
+
     private String resolveStatus(Long currentUserId, Friendship friendship) {
         if (friendship == null) {
             return "NONE";
