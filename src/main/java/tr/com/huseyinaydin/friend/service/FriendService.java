@@ -13,12 +13,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import tr.com.huseyinaydin.notification.domain.NotificationType;
+import tr.com.huseyinaydin.notification.service.NotificationService;
+
 @Service
 @RequiredArgsConstructor
 public class FriendService {
 
     private final AppUserRepository userRepository;
     private final FriendshipRepository friendshipRepository;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<DiscoverUserItem> listDiscoverUsers(String currentUserEmail, String query) {
@@ -78,6 +82,15 @@ public class FriendService {
                     return "PENDING_SENT";
                 } else {
                     friendship.accept();
+                    String actorName = sender.getFirstName() + " " + sender.getLastName();
+                    notificationService.createNotification(
+                            friendship.getSender(),
+                            sender,
+                            NotificationType.FRIEND_REQUEST_ACCEPTED,
+                            "Arkadaşlık İsteği Kabul Edildi",
+                            actorName + " arkadaşlık isteğinizi kabul etti.",
+                            "/home"
+                    );
                     return "FRIENDS";
                 }
             }
@@ -149,6 +162,17 @@ public class FriendService {
 
         friendship.accept();
         friendshipRepository.save(friendship);
+
+        // Notify the original sender that their friend request was accepted
+        String actorName = currentUser.getFirstName() + " " + currentUser.getLastName();
+        notificationService.createNotification(
+                friendship.getSender(),
+                currentUser,
+                NotificationType.FRIEND_REQUEST_ACCEPTED,
+                "Arkadaşlık İsteği Kabul Edildi",
+                actorName + " arkadaşlık isteğinizi kabul etti.",
+                "/home"
+        );
     }
 
     private String resolveStatus(Long currentUserId, Friendship friendship) {

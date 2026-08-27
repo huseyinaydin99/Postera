@@ -84,6 +84,25 @@
                     </div>
                 </div>
             </div>
+            <div class="topbar-notifications-dropdown" data-notifications-dropdown>
+                <button type="button" class="topbar-icon-btn" data-notifications-dropdown-toggle aria-label="Bildirimler" aria-expanded="false" title="Bildirimler">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="topbar-badge" th:if="${unreadNotificationsCount != null and unreadNotificationsCount > 0}" th:text="${unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}" data-notifications-badge></span>
+                </button>
+                <div class="notifications-popover" hidden data-notifications-popover>
+                    <div class="notifications-popover-header">
+                        <h2>Bildirimler</h2>
+                        <button type="button" class="btn-mark-all-read" data-mark-all-read title="Tümünü okundu olarak işaretle">Tümünü okundu işaretle</button>
+                    </div>
+                    <div class="notifications-popover-list" data-notifications-popover-list></div>
+                    <div class="notifications-popover-loading" hidden data-notifications-loading>
+                        <span>Yükleniyor…</span>
+                    </div>
+                    <div class="notifications-popover-empty" hidden data-notifications-empty>
+                        <span>Henüz bildiriminiz yok.</span>
+                    </div>
+                </div>
+            </div>
             <details class="profile-menu">
                 <summary aria-label="Kullanıcı menüsünü aç">
                     <img th:src="${navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
@@ -111,6 +130,7 @@
     </footer>
     <script th:src="@{/js/sidebar-toggle.js}" defer></script>
     <script th:src="@{/js/message-search.js}" defer></script>
+    <script th:src="@{/js/notifications-dropdown.js}" defer></script>
     <script th:src="@{/js/friends-dropdown.js}" defer></script>
     <script th:src="@{/js/messages-dropdown.js}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
