@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <title>İnsanları Keşfet | Postera</title>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: mainNavigation}"></header>
+<main>
+    <section class="discover-container" aria-labelledby="discover-title">
+        <!-- Başlık Alanı -->
+        <div class="discover-page-header">
+            <div class="discover-page-title">
+                <span class="material-symbols-outlined">person_search</span>
+                <h1 id="discover-title">İnsanları Keşfet</h1>
+            </div>
+            <p class="discover-page-subtitle">Kullanıcıları arayın, yeni insanlarla tanışın ve arkadaşlık isteği gönderin.</p>
+        </div>
+
+        <!-- Arama Alanı -->
+        <div class="discover-search-card">
+            <div class="discover-search-input-wrapper">
+                <span class="material-symbols-outlined discover-search-icon">search</span>
+                <input type="search" id="discover-search-input" class="discover-search-input"
+                       placeholder="İsim, soyisim veya e-posta ile aramak için yazın..."
+                       th:value="${query}"
+                       autocomplete="off"
+                       data-discover-search-input>
+                <button type="button" class="discover-search-clear" hidden data-discover-clear title="Temizle">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Başlangıç Durumu (Arama Yapılmadığında) -->
+        <div class="discover-prompt" th:classappend="${query != null and !#strings.isEmpty(query)} ? 'is-hidden' : ''" data-discover-prompt>
+            <span class="material-symbols-outlined">person_search</span>
+            <h2>Kullanıcı Aramaya Başlayın</h2>
+            <p>Arkadaş eklemek ve kullanıcıları keşfetmek için yukarıdaki arama kutusuna isim, soyisim veya e-posta yazın.</p>
+        </div>
+
+        <!-- Yükleniyor Durumu -->
+        <div class="discover-loading" hidden data-discover-loading>
+            <span class="material-symbols-outlined spin-icon">progress_activity</span>
+            <span>Kullanıcılar aranıyor…</span>
+        </div>
+
+        <!-- Kullanıcı Listesi / 3'lü Grid -->
+        <div class="discover-grid" data-discover-grid>
+            <div th:each="user : ${users}" class="discover-user-card" th:attr="data-user-id=${user.id}">
+                <div class="discover-card-top">
+                    <img class="discover-user-avatar"
+                         th:src="${user.profileImageUrl != null ? user.profileImageUrl : '/images/default-avatar.svg'}"
+                         th:alt="${user.fullName + ' profil fotoğrafı'}">
+                    <div class="discover-user-info">
+                        <strong class="discover-user-name" th:text="${user.fullName}"></strong>
+                        <span class="discover-user-email" th:text="${user.email}"></span>
+                    </div>
+                </div>
+
+                <div class="discover-card-action">
+                    <button th:if="${user.friendshipStatus == 'NONE'}"
+                            type="button"
+                            class="btn-friend-action btn-send-request"
+                            data-send-request
+                            th:attr="data-user-id=${user.id}">
+                        <span class="material-symbols-outlined">person_add</span>
+                        <span>Arkadaşlık İsteği Gönder</span>
+                    </button>
+
+                    <button th:if="${user.friendshipStatus == 'PENDING_SENT'}"
+                            type="button"
+                            class="btn-friend-action btn-request-sent"
+                            disabled>
+                        <span class="material-symbols-outlined">done</span>
+                        <span>İstek Gönderildi</span>
+                    </button>
+
+                    <button th:if="${user.friendshipStatus == 'PENDING_RECEIVED'}"
+                            type="button"
+                            class="btn-friend-action btn-send-request"
+                            data-send-request
+                            th:attr="data-user-id=${user.id}">
+                        <span class="material-symbols-outlined">how_to_reg</span>
+                        <span>İsteği Kabul Et</span>
+                    </button>
+
+                    <button th:if="${user.friendshipStatus == 'FRIENDS'}"
+                            type="button"
+                            class="btn-friend-action btn-already-friends"
+                            disabled>
+                        <span class="material-symbols-outlined">people</span>
+                        <span>Arkadaşsınız</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Boş Durum (Arama Yapıldı ama Sonuç Bulunamadı) -->
+        <div class="discover-empty" th:classappend="${query == null or #strings.isEmpty(query) or (users != null and !users.empty)} ? 'is-hidden' : ''" data-discover-empty>
+            <span class="material-symbols-outlined">person_off</span>
+            <p>Aramanızla eşleşen kullanıcı bulunamadı.</p>
+        </div>
+    </section>
+</main>
+<script th:src="@{/js/discover.js}" defer></script>
+</body>
+</html>

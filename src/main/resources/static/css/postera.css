@@ -1126,3 +1126,363 @@ button.post-menu-danger:hover:not(:disabled),
     opacity: 0.6;
     margin-bottom: 0.25rem;
 }
+
+/* İnsanları Keşfet (Discover / People Search) */
+.discover-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.discover-page-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.discover-page-title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.discover-page-title .material-symbols-outlined {
+    font-size: 1.35rem;
+    color: var(--accent);
+}
+
+.discover-page-title h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.discover-page-subtitle {
+    margin: 0;
+    color: var(--ink-500);
+    font-size: 0.82rem;
+}
+
+.discover-search-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.55rem 0.75rem;
+    box-shadow: 0 1px 2px rgba(26, 35, 50, 0.03);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.discover-search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.discover-search-icon {
+    position: absolute;
+    left: 0.65rem;
+    color: var(--ink-500);
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.discover-search-input {
+    width: 100%;
+    min-height: 36px;
+    height: 36px;
+    padding: 0.35rem 2.2rem 0.35rem 2.2rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper-raised);
+    font-size: 0.85rem;
+    color: var(--ink-900);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+}
+
+.discover-search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.08);
+    outline: none;
+}
+
+.discover-search-clear {
+    position: absolute;
+    right: 0.5rem;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-500);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.15s, color 0.15s;
+}
+
+.discover-search-clear:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.discover-search-clear .material-symbols-outlined {
+    font-size: 14px;
+}
+
+.discover-prompt {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    color: var(--ink-500);
+    background: var(--paper);
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.discover-prompt.is-hidden {
+    display: none !important;
+}
+
+.discover-prompt .material-symbols-outlined {
+    font-size: 36px;
+    color: var(--accent);
+    opacity: 0.85;
+    margin-bottom: 0.2rem;
+}
+
+.discover-prompt h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink-900);
+    margin: 0;
+}
+
+.discover-prompt p {
+    font-size: 0.82rem;
+    color: var(--ink-500);
+    margin: 0;
+    max-width: 440px;
+}
+
+.discover-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 1.5rem;
+    color: var(--ink-500);
+    font-size: 0.83rem;
+}
+
+/* 3'lü Grid Dizilimi */
+.discover-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+    .discover-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
+    .discover-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.discover-user-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 0.65rem 0.75rem 0.55rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.45rem;
+    box-shadow: 0 1px 2px rgba(26, 35, 50, 0.03);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+    min-width: 0;
+    margin: 0 !important;
+}
+
+.discover-user-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 6px rgba(26, 35, 50, 0.06);
+}
+
+.discover-card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.discover-user-avatar {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    max-width: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid var(--line);
+    flex-shrink: 0;
+    box-shadow: 0 1px 2px rgba(26, 35, 50, 0.06);
+    margin: 0 !important;
+}
+
+.discover-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.discover-user-name {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--ink-900);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block;
+}
+
+.discover-user-email {
+    font-size: 0.71rem;
+    color: var(--ink-500);
+    font-family: var(--font-mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block;
+}
+
+.discover-card-action {
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+}
+
+.btn-friend-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.3rem !important;
+    width: 100% !important;
+    padding: 0.32rem 0.65rem !important;
+    border-radius: 5px !important;
+    font-size: 0.76rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: background 0.15s, color 0.15s, transform 0.1s, box-shadow 0.15s !important;
+    min-height: 27px !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    box-sizing: border-box !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+}
+
+.btn-friend-action .material-symbols-outlined {
+    font-size: 14px !important;
+    line-height: 1 !important;
+}
+
+.btn-send-request {
+    background: var(--accent) !important;
+    color: #fff !important;
+}
+
+.btn-send-request:hover:not(:disabled) {
+    background: var(--accent-hover) !important;
+    box-shadow: 0 2px 6px rgba(180, 83, 9, 0.2) !important;
+}
+
+.btn-request-sent {
+    background: var(--paper) !important;
+    border: 1px solid var(--line) !important;
+    color: var(--ink-500) !important;
+    cursor: default !important;
+}
+
+.btn-request-sent .material-symbols-outlined {
+    color: var(--success) !important;
+}
+
+.btn-already-friends {
+    background: var(--success-soft) !important;
+    border: 1px solid #bbf7d0 !important;
+    color: var(--success) !important;
+    cursor: default !important;
+}
+
+.discover-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--ink-500);
+    background: var(--paper);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.discover-empty.is-hidden {
+    display: none !important;
+}
+
+.discover-empty .material-symbols-outlined {
+    font-size: 32px;
+    color: var(--ink-500);
+    opacity: 0.6;
+    margin-bottom: 0.25rem;
+}
+
+.spin-icon {
+    animation: postera-spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes postera-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
