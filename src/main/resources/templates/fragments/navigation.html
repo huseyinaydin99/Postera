@@ -14,6 +14,7 @@
     </a>
 
     <ul class="sidebar-nav">
+        <li><a class="sidebar-link" th:href="@{/}"><span class="material-symbols-outlined">home</span>Ana Sayfa</a></li>
         <li><a class="sidebar-link" th:href="@{/messages/inbox}"><span class="material-symbols-outlined">inbox</span>Gelen Kutusu <span class="mailbox-badges"><span class="mailbox-count" th:text="${mailboxCounts.inboxTotal}">0</span><span class="mailbox-count mailbox-unread" th:if="${mailboxCounts.inboxUnread > 0}" th:text="${mailboxCounts.inboxUnread}">0</span></span></a></li>
         <li><a class="sidebar-link" th:href="@{/timeline}"><span class="material-symbols-outlined">dynamic_feed</span>Zaman Tüneli</a></li>
         <li><a class="sidebar-link" th:href="@{/discover}"><span class="material-symbols-outlined">person_search</span>İnsanları Keşfet</a></li>

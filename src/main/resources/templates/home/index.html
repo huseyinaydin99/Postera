@@ -3,14 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
-    <title>Postera</title>
+    <title>Ana Sayfa | Postera</title>
 </head>
 <body>
 <header th:replace="~{fragments/navigation :: mainNavigation}"></header>
 <main>
-    <h1>Postera</h1>
-    <p>Mesajlaşma çalışma alanınız hazırlanıyor.</p>
+    <section class="timeline-container" aria-labelledby="home-feed-title">
+        <!-- Başlık Alanı -->
+        <div class="timeline-page-header">
+            <div class="timeline-page-title">
+                <span class="material-symbols-outlined">home</span>
+                <h1 id="home-feed-title">Ana Sayfa</h1>
+            </div>
+            <p class="timeline-page-subtitle">Arkadaşlarınızın ve sizin en yeni paylaşımlarınız.</p>
+        </div>
+
+        <p th:if="${postError}" role="alert" th:text="${postError}"></p>
+
+        <!-- Modern & Kompakt Paylaşım Kartı -->
+        <div class="timeline-composer">
+            <div class="composer-header">
+                <img class="composer-avatar"
+                     th:src="${navigationProfile != null and navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
+                     th:alt="${navigationProfile != null ? navigationProfile.firstName + ' profil fotoğrafı' : 'Kullanıcı'}">
+                <div class="composer-user-info">
+                    <strong th:text="${navigationProfile != null ? navigationProfile.firstName + ' ' + navigationProfile.lastName : 'Kullanıcı'}"></strong>
+                    <span class="composer-audience-badge">
+                        <span class="material-symbols-outlined">public</span> Herkese Açık
+                    </span>
+                </div>
+            </div>
+
+            <form id="timeline-form" class="timeline-form" th:action="@{/timeline}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="redirectUrl" value="/">
+                <div id="timeline-editor" class="rte-editor timeline-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Ne düşünüyorsunuz?" data-rte-editor
+                     data-placeholder="Ne düşünüyorsunuz? Düşüncelerinizi veya bir güncellemeyi paylaşın..."></div>
+                <input id="timeline-content" type="hidden" name="content" data-rte-input>
+
+                <!-- Görsel Önizleme Alanı -->
+                <div class="composer-preview-area">
+                    <div class="image-preview-container" data-image-preview-container></div>
+                    <p class="image-upload-error" hidden data-image-upload-error></p>
+                </div>
+                <input id="timeline-images" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-message-images hidden>
+
+                <!-- Popover Panelleri -->
+                <div class="rte-popover emoji-picker" id="timeline-emoji-picker" hidden aria-label="Emoji seçici">
+                    <button type="button" th:each="emoji : ${#strings.arraySplit('😀,😂,🤣,😊,😍,😎,🤔,😭,😅,👍,👏,🎉,🔥,❤️,🙏,🤝,🚀,💡,🎯,✅', ',')}" th:text="${emoji}" th:attr="data-rte-emoji=${emoji}"></button>
+                </div>
+                <div class="rte-popover link-picker" id="timeline-link-picker" hidden>
+                    <label class="visually-hidden" for="timeline-link-url">Bağlantı adresi</label>
+                    <input id="timeline-link-url" type="url" placeholder="https://ornek.com" data-rte-link-url>
+                    <button type="button" data-rte-add-link>Ekle</button>
+                </div>
+                <div class="rte-popover gif-picker" id="timeline-gif-picker" hidden aria-label="Komik GIF seçici">
+                    <button type="button" th:each="gif : ${#strings.arraySplit('3o6Zt481isNVuQI1l6,26ufdipQqU2lhNA4g,3o7TKsQ8UQ2p0f9V8A,3o6Zt6ML6BklcajjsA,3o7btPCcdNniyf0ArS,3o6Zt4HU9uwXmXSAuI,l0MYC0LajbaPoEADu,ICOgUNjpvO0PC,xT9IgG50Fb7Mi0prBC,l0MYt5jPR6QX5pnqM,3oEjHI8WJv4x6UPDB6,26n6WywJyh39n1pBu,3oKIPwoeGErMmaI43S,5GoVLqeAOo6PK,13CoXDiaCcCoyk,2A75RyXVzzSI2bx4Gj,9Ai5dIk8xvBm0,3oEduSbSGpGaRX2Vri,12XDYvMJNcmLgQ,3ohs4w0OrUm5GIkBKE', ',')}" th:attr="data-rte-gif=${'https://media.giphy.com/media/' + gif + '/giphy.gif'}">
+                        <img th:src="${'https://media.giphy.com/media/' + gif + '/giphy.gif'}" alt="Komik GIF">
+                    </button>
+                </div>
+
+                <!-- Alt Aksiyon Çubuğu (Toolbar + Medya + Paylaş Butonu) -->
+                <div class="composer-bottom-bar">
+                    <div class="composer-toolbar">
+                        <!-- Biçimlendirme Araçları -->
+                        <div class="rte-toolbar" role="toolbar" aria-label="Metin biçimlendirme">
+                            <button type="button" data-rte-command="bold" title="Kalın"><strong>B</strong></button>
+                            <button type="button" data-rte-command="italic" title="İtalik"><em>I</em></button>
+                            <button type="button" data-rte-command="insertUnorderedList" title="Madde işaretli liste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                            <button type="button" data-rte-command="insertOrderedList" title="Numaralı liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                            <button type="button" data-rte-toggle="timeline-link-picker" title="Bağlantı ekle"><span class="material-symbols-outlined">link</span></button>
+                            <button type="button" data-rte-command="removeFormat" title="Biçimlendirmeyi kaldır"><span class="material-symbols-outlined">format_clear</span></button>
+                        </div>
+
+                        <span class="composer-toolbar-divider"></span>
+
+                        <!-- Medya Ekleme Araçları -->
+                        <div class="composer-media-tools">
+                            <label class="composer-tool-btn media-tool-photo" for="timeline-images" title="Görsel ekle (En fazla 2 adet, 5 MB)">
+                                <span class="material-symbols-outlined">image</span>
+                                <span>Görsel</span>
+                            </label>
+                            <button type="button" class="composer-tool-btn media-tool-gif" data-rte-toggle="timeline-gif-picker" title="GIF ekle">
+                                <span class="material-symbols-outlined">gif_box</span>
+                                <span>GIF</span>
+                            </button>
+                            <button type="button" class="composer-tool-btn media-tool-emoji" data-rte-toggle="timeline-emoji-picker" title="Emoji ekle">
+                                <span class="material-symbols-outlined">sentiment_satisfied</span>
+                                <span>Emoji</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-share" data-timeline-share-btn>
+                        <span class="material-symbols-outlined">send</span>
+                        <span>Paylaş</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Paylaşımlar Akışı (Home Feed) -->
+        <div class="timeline-feed" id="home-feed" data-home-feed th:attr="data-has-more=${hasMore}, data-next-offset=${nextOffset}">
+            <div th:if="${posts == null or posts.empty}" class="timeline-empty-feed" data-feed-empty>
+                <span class="material-symbols-outlined">dynamic_feed</span>
+                <p>Henüz arkadaşlarınızın bir paylaşımı yok. Yeni arkadaşlar ekleyerek ana sayfanızı hareketlendirebilirsiniz!</p>
+                <a th:href="@{/discover}" class="btn-friend-action btn-send-request" style="margin-top: 0.6rem; text-decoration: none; display: inline-flex; width: auto;">
+                    <span class="material-symbols-outlined">person_search</span>
+                    <span>İnsanları Keşfet</span>
+                </a>
+            </div>
+
+            <article th:each="post : ${posts}" class="timeline-post-card" th:id="${'post-' + post.id}">
+                <div class="post-card-header">
+                    <div class="post-author-wrapper">
+                        <img class="post-author-avatar"
+                             th:src="${post.authorProfileImageUrl != null ? post.authorProfileImageUrl : '/images/default-avatar.svg'}"
+                             th:alt="${post.authorName + ' profil fotoğrafı'}">
+                        <div class="post-author-meta">
+                            <span class="post-author-name" th:text="${post.authorName}"></span>
+                            <div class="post-time-meta">
+                                <time th:datetime="${post.createdAt}" th:text="${#temporals.format(post.createdAt, 'dd.MM.yyyy HH:mm')}"></time>
+                                <span class="post-edited-badge" th:if="${post.updatedAt != null}" th:title="${'Son düzenleme: ' + #temporals.format(post.updatedAt, 'dd.MM.yyyy HH:mm')}">(Düzenlendi)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Popup Menü (Düzenle / Sil) -->
+                    <details class="post-menu" th:if="${post.ownedByCurrentUser}">
+                        <summary aria-label="Paylaşım seçenekleri">
+                            <span class="material-symbols-outlined">more_horiz</span>
+                        </summary>
+                        <div class="post-menu-panel">
+                            <button type="button" class="post-menu-item" disabled title="Güncelleme işlemi sonraki aşamada eklenecektir.">
+                                <span class="material-symbols-outlined">edit</span> Düzenle
+                            </button>
+                            <form th:action="@{/timeline/{id}/delete(id=${post.id}, redirectUrl='/')}" method="post" data-confirm-action="İlgili post silinsin mi?">
+                                <button type="submit" class="post-menu-item post-menu-danger">
+                                    <span class="material-symbols-outlined">delete</span> Sil
+                                </button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Yazı İçeriği (Üstte) -->
+                <div class="rich-message-body post-body-text" th:if="${post.content != null and !#strings.isEmpty(post.content)}" th:utext="${post.content}"></div>
+
+                <!-- Görseller / GIF (Yazının Altında) -->
+                <div class="post-images" th:if="${post.imageUrls != null and !post.imageUrls.empty}"
+                     th:classappend="${#lists.size(post.imageUrls) == 1 ? 'post-images-single' : 'post-images-grid'}">
+                    <img th:each="imageUrl : ${post.imageUrls}" th:src="${imageUrl}" alt="Paylaşım görseli" loading="lazy">
+                </div>
+
+                <!-- Post Alt Aksiyonları (Beğen, Yorum Yaz) -->
+                <div class="post-card-actions">
+                    <button type="button" class="post-action-btn" title="Beğen (Sonraki aşamada aktif edilecek)">
+                        <span class="material-symbols-outlined">thumb_up</span>
+                        <span>Beğen</span>
+                    </button>
+                    <button type="button" class="post-action-btn" title="Yorum Yap (Sonraki aşamada aktif edilecek)">
+                        <span class="material-symbols-outlined">chat_bubble</span>
+                        <span>Yorum Yaz</span>
+                    </button>
+                </div>
+            </article>
+        </div>
+
+        <!-- Yükleniyor Durumu (Sonsuz Kaydırma) -->
+        <div class="timeline-loading-more" hidden data-feed-loading>
+            <span class="material-symbols-outlined spin-icon">progress_activity</span>
+            <span>Daha fazla paylaşım yükleniyor…</span>
+        </div>
+    </section>
 </main>
+<script th:src="@{/js/rich-text-editor.js}" defer></script>
+<script th:src="@{/js/message-image-upload.js}" defer></script>
+<script th:src="@{/js/home-feed.js}" defer></script>
+<script>
+document.addEventListener('click', (e) => {
+    document.querySelectorAll('.post-menu[open]').forEach((menu) => {
+        if (!menu.contains(e.target)) {
+            menu.removeAttribute('open');
+        }
+    });
+});
+</script>
 </body>
 </html>

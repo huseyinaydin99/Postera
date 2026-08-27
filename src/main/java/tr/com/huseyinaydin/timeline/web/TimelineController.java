@@ -33,12 +33,19 @@ public class TimelineController {
     }
 
     @PostMapping("/{postId}/delete")
-    public String deletePost(@PathVariable Long postId, Authentication authentication, RedirectAttributes redirectAttributes) {
+    public String deletePost(
+            @PathVariable Long postId,
+            @RequestParam(name = "redirectUrl", required = false) String redirectUrl,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
         try {
             timelineService.deletePost(authentication.getName(), postId);
             redirectAttributes.addAttribute("deleted", "true");
         } catch (IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("postError", exception.getMessage());
+        }
+        if (redirectUrl != null && !redirectUrl.isBlank()) {
+            return "redirect:" + redirectUrl;
         }
         return "redirect:/timeline";
     }
@@ -47,16 +54,19 @@ public class TimelineController {
     public String sharePost(
             @RequestParam(name = "content", required = false) String content,
             @RequestParam(name = "images", required = false) List<MultipartFile> images,
+            @RequestParam(name = "redirectUrl", required = false) String redirectUrl,
             Authentication authentication,
             RedirectAttributes redirectAttributes) {
         try {
             timelineService.createPost(authentication.getName(), content, images);
             redirectAttributes.addAttribute("shared", "true");
-            return "redirect:/timeline";
         } catch (IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("postError", exception.getMessage());
-            return "redirect:/timeline";
         }
+        if (redirectUrl != null && !redirectUrl.isBlank()) {
+            return "redirect:" + redirectUrl;
+        }
+        return "redirect:/timeline";
     }
 
     @PostMapping("/api/posts")

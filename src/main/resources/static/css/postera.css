@@ -1531,3 +1531,19 @@ button.post-menu-danger:hover:not(:disabled),
     to { transform: rotate(360deg); }
 }
 
+.timeline-loading-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    color: var(--ink-500);
+    font-size: 0.84rem;
+    font-weight: 500;
+}
+
+.timeline-loading-more[hidden] {
+    display: none !important;
+}
+
+

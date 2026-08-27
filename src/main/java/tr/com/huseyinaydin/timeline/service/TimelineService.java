@@ -30,27 +30,51 @@ public class TimelineService {
         var isAdmin = user.getRoles().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getName()) || "ADMIN".equals(role.getName()));
 
         return timelinePostRepository.findAllByOrderByCreatedAtDesc().stream()
-                .map(post -> {
-                    var author = post.getUser();
-                    var authorName = author.getFirstName() + " " + author.getLastName();
-                    var isOwned = author.getId().equals(user.getId()) || isAdmin;
-                    var imageUrls = post.getImages().stream().map(TimelinePostImage::getImageUrl).toList();
-                    var sanitizedContent = richTextSanitizer.sanitize(post.getContent());
-
-                    return new TimelinePostItem(
-                            post.getId(),
-                            author.getId(),
-                            authorName,
-                            author.getEmail(),
-                            author.getProfileImageUrl(),
-                            sanitizedContent,
-                            imageUrls,
-                            post.getCreatedAt(),
-                            post.getUpdatedAt(),
-                            isOwned
-                    );
-                })
+                .map(post -> toPostItem(post, user, isAdmin))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public TimelineFeedResponse getFriendsFeed(String currentUserEmail, int offset, int limit) {
+        var user = findUser(currentUserEmail);
+        var isAdmin = user.getRoles().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getName()) || "ADMIN".equals(role.getName()));
+
+        long totalCount = timelinePostRepository.countFriendsFeedPosts(user.getId());
+        if (totalCount == 0) {
+            return new TimelineFeedResponse(List.of(), 0, false, 0);
+        }
+
+        var pageRequest = new tr.com.huseyinaydin.message.service.OffsetPageRequest(offset, limit);
+        var posts = timelinePostRepository.findFriendsFeedPosts(user.getId(), pageRequest);
+
+        var items = posts.stream()
+                .map(post -> toPostItem(post, user, isAdmin))
+                .toList();
+
+        boolean hasMore = (offset + items.size()) < totalCount;
+        int nextOffset = offset + items.size();
+        return new TimelineFeedResponse(items, totalCount, hasMore, nextOffset);
+    }
+
+    private TimelinePostItem toPostItem(TimelinePost post, AppUser user, boolean isAdmin) {
+        var author = post.getUser();
+        var authorName = author.getFirstName() + " " + author.getLastName();
+        var isOwned = author.getId().equals(user.getId()) || isAdmin;
+        var imageUrls = post.getImages().stream().map(TimelinePostImage::getImageUrl).toList();
+        var sanitizedContent = richTextSanitizer.sanitize(post.getContent());
+
+        return new TimelinePostItem(
+                post.getId(),
+                author.getId(),
+                authorName,
+                author.getEmail(),
+                author.getProfileImageUrl(),
+                sanitizedContent,
+                imageUrls,
+                post.getCreatedAt(),
+                post.getUpdatedAt(),
+                isOwned
+        );
     }
 
     @Transactional
