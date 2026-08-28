@@ -153,6 +153,14 @@
             });
     };
 
+    const reloadMessages = () => {
+        list.innerHTML = '';
+        currentOffset = 0;
+        hasMore = true;
+        initialLoaded = false;
+        loadMessages(0, 6, true);
+    };
+
     const openDropdown = () => {
         isOpen = true;
         popover.hidden = false;
@@ -161,12 +169,14 @@
         if (profileMenu) profileMenu.removeAttribute('open');
 
         if (!initialLoaded) {
-            list.innerHTML = '';
-            currentOffset = 0;
-            hasMore = true;
-            loadMessages(0, 6, true);
+            reloadMessages();
         }
     };
+
+    document.addEventListener('postera:navigation-counters-updated', (e) => {
+        initialLoaded = false;
+        if (isOpen) reloadMessages();
+    });
 
     const closeDropdown = () => {
         isOpen = false;
