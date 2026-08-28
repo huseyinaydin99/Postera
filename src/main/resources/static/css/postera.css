@@ -189,6 +189,9 @@ body > main, body > header + main {
     border-radius: 99px; background: var(--danger); color: #fff; font-size: 11px; font-weight: 700;
     font-family: var(--font-mono); line-height: 18px; text-align: center; box-shadow: 0 0 0 2px var(--paper-raised);
 }
+.topbar-badge.is-updated { animation: topbar-badge-pulse .55s ease-out; }
+@keyframes topbar-badge-pulse { 0% { transform: scale(1); } 45% { transform: scale(1.35); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .topbar-badge.is-updated { animation: none; } }
 .messages-popover {
     position: absolute; top: calc(100% + .6rem); right: -10px; z-index: 30;
     width: min(380px, calc(100vw - 2rem)); border: 1px solid var(--line); border-radius: 12px;
@@ -1584,5 +1587,4 @@ button.post-menu-danger:hover:not(:disabled),
 .timeline-loading-more[hidden] {
     display: none !important;
 }
-
 
