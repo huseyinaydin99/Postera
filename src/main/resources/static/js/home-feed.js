@@ -121,10 +121,14 @@
                 </button>
                 ${reactionPicker()}
                 </div>
-                <button type="button" class="post-action-btn" title="Yorum Yap (Sonraki aşamada aktif edilecek)">
+                <button type="button" class="post-comment-toggle" data-toggle-comments title="Yorumlar">
                     <span class="material-symbols-outlined">chat_bubble</span>
-                    <span>Yorum Yaz</span>
+                    <span>Yorum</span>
+                    <span data-comment-count>${post.commentCount || 0}</span>
                 </button>
+            </div>
+            <div class="post-comments-section" hidden data-post-id="${post.id}">
+                <div class="post-comments-list" data-comments-list></div>
             </div>
         `;
 

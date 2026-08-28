@@ -179,10 +179,14 @@
                         <button type="button" data-post-reaction="HEART" title="Kalp" aria-label="Kalp">❤️</button>
                     </div>
                     </div>
-                    <button type="button" class="post-action-btn" title="Yorum Yap (Sonraki aşamada aktif edilecek)">
+                    <button type="button" class="post-comment-toggle" data-toggle-comments title="Yorumlar">
                         <span class="material-symbols-outlined">chat_bubble</span>
-                        <span>Yorum Yaz</span>
+                        <span>Yorum</span>
+                        <span data-comment-count th:text="${post.commentCount}">0</span>
                     </button>
+                </div>
+                <div class="post-comments-section" hidden th:attr="data-post-id=${post.id}">
+                    <div class="post-comments-list" data-comments-list></div>
                 </div>
             </article>
         </div>
@@ -197,6 +201,7 @@
 <script th:src="@{/js/rich-text-editor.js}" defer></script>
 <script th:src="@{/js/message-image-upload.js}" defer></script>
 <script th:src="@{/js/home-feed.js}" defer></script>
+<script th:src="@{/js/post-comments.js}" defer></script>
 <script>
 document.addEventListener('click', (e) => {
     document.querySelectorAll('.post-menu[open]').forEach((menu) => {

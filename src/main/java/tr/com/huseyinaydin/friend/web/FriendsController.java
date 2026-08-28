@@ -22,6 +22,12 @@ public class FriendsController {
 
     private final FriendService friendService;
 
+    @GetMapping("/api/list")
+    @ResponseBody
+    public ResponseEntity<?> getFriendsList(Authentication authentication) {
+        return ResponseEntity.ok(friendService.getFriendsList(authentication.getName()));
+    }
+
     @GetMapping("/api/requests")
     @ResponseBody
     public FriendRequestsResponse getRequests(

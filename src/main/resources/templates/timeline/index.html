@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
     <title>Zaman Tüneli | Postera</title>
 </head>
@@ -157,10 +159,14 @@
                         <span class="material-symbols-outlined">thumb_up</span>
                         <span>Beğen</span>
                     </button>
-                    <button type="button" class="post-action-btn" title="Yorum Yap (Sonraki aşamada aktif edilecek)">
+                    <button type="button" class="post-comment-toggle" data-toggle-comments title="Yorumlar">
                         <span class="material-symbols-outlined">chat_bubble</span>
-                        <span>Yorum Yaz</span>
+                        <span>Yorum</span>
+                        <span data-comment-count th:text="${post.commentCount}">0</span>
                     </button>
+                </div>
+                <div class="post-comments-section" hidden th:attr="data-post-id=${post.id}">
+                    <div class="post-comments-list" data-comments-list></div>
                 </div>
             </article>
         </div>
@@ -168,6 +174,7 @@
 </main>
 <script th:src="@{/js/rich-text-editor.js}" defer></script>
 <script th:src="@{/js/message-image-upload.js}" defer></script>
+<script th:src="@{/js/post-comments.js}" defer></script>
 <script>
 document.addEventListener('click', (e) => {
     document.querySelectorAll('.post-menu[open]').forEach((menu) => {

@@ -3,19 +3,15 @@ package tr.com.huseyinaydin.timeline.service;
 import java.time.Instant;
 import java.util.List;
 
-public record TimelinePostItem(
+public record CommentItem(
         Long id,
-        Long userId,
+        Long postId,
+        Long authorId,
         String authorName,
-        String authorEmail,
         String authorProfileImageUrl,
+        Long parentId,
         String content,
-        List<String> imageUrls,
         Instant createdAt,
-        Instant updatedAt,
         boolean ownedByCurrentUser,
-        List<TimelineReactionSummary> reactions,
-        String currentUserReaction,
-        long commentCount
-) {
-}
+        List<CommentItem> replies
+) {}

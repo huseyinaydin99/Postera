@@ -183,6 +183,24 @@ public class FriendService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public List<java.util.Map<String, Object>> getFriendsList(String currentUserEmail) {
+        var currentUser = findUserByEmail(currentUserEmail);
+        var friendships = friendshipRepository.findAllByUserId(currentUser.getId());
+        return friendships.stream()
+                .filter(f -> f.getStatus() == FriendshipStatus.ACCEPTED)
+                .map(f -> {
+                    var other = f.getSender().getId().equals(currentUser.getId()) ? f.getReceiver() : f.getSender();
+                    return java.util.Map.<String, Object>of(
+                            "id", other.getId(),
+                            "name", other.getFirstName() + " " + other.getLastName(),
+                            "email", other.getEmail(),
+                            "profileImageUrl", other.getProfileImageUrl() != null ? other.getProfileImageUrl() : ""
+                    );
+                })
+                .toList();
+    }
+
     private String resolveStatus(Long currentUserId, Friendship friendship) {
         if (friendship == null) {
             return "NONE";

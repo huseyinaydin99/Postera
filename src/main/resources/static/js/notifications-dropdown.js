@@ -81,7 +81,11 @@
 
         const iconBadge = document.createElement('span');
         iconBadge.className = 'popover-notification-icon-badge';
-        const icon = item.type === 'POST_REACTION' ? 'favorite' : item.type === 'SYSTEM' ? 'info' : 'people';
+        const icon = item.type === 'POST_REACTION' ? 'favorite'
+            : item.type === 'POST_COMMENT' ? 'chat_bubble'
+            : item.type === 'COMMENT_REPLY' ? 'reply'
+            : item.type === 'COMMENT_MENTION' ? 'alternate_email'
+            : item.type === 'SYSTEM' ? 'info' : 'people';
         iconBadge.innerHTML = `<span class="material-symbols-outlined">${icon}</span>`;
 
         avatarWrapper.appendChild(avatar);

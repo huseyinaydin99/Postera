@@ -1628,3 +1628,76 @@ button.post-menu-danger:hover:not(:disabled),
 .timeline-loading-more[hidden] {
     display: none !important;
 }
+
+/* ── Post Comments ─────────────────────────────────────────────────────────── */
+.post-comments-section { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); margin-top: 0.1rem; padding-top: 0.1rem; }
+.post-comments-list { display: flex; flex-direction: column; gap: 0; padding: 0.25rem 0 0; }
+.comment-item { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.28rem 0; }
+.comment-item.is-reply { padding-left: 2.4rem; }
+.comment-avatar { width: 28px; height: 28px; min-width: 28px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); flex-shrink: 0; margin-top: 0.08rem; }
+.comment-body { flex: 1; min-width: 0; }
+.comment-bubble { display: inline-block; max-width: 100%; padding: 0.28rem 0.6rem; border-radius: 10px; background: var(--paper-raised); border: 1px solid var(--line); font-size: 0.82rem; line-height: 1.4; color: var(--ink-900); word-break: break-word; }
+.comment-bubble strong { font-size: 0.79rem; color: var(--ink-900); display: block; margin-bottom: 0.04rem; line-height: 1.3; }
+.comment-mention { color: var(--accent); font-weight: 600; }
+.comment-meta { display: flex; align-items: center; gap: 0.45rem; margin-top: 0.12rem; padding-left: 0.15rem; }
+.comment-time { font-size: 0.67rem; color: var(--ink-500); font-family: var(--font-mono); }
+.comment-reply-btn, .comment-delete-btn { background: transparent; border: 0; padding: 0; color: var(--ink-500); font-size: 0.71rem; font-weight: 600; cursor: pointer; min-height: auto; border-radius: 3px; transition: color 0.12s; line-height: 1; }
+.comment-reply-btn:hover { color: var(--accent); background: transparent; }
+.comment-delete-btn:hover { color: var(--danger); background: transparent; }
+.comment-loading { display: block; color: var(--ink-500); font-size: 0.78rem; padding: 0.4rem 0; }
+.comment-empty-state { display: block; color: var(--ink-500); font-size: 0.78rem; padding: 0.3rem 0 0.1rem; font-style: italic; }
+.comment-input-row { display: flex; align-items: flex-start; gap: 0.45rem; padding: 0.3rem 0 0.25rem; }
+.comment-input-row.is-reply { padding-left: 2.4rem; }
+.comment-input-avatar { width: 26px; height: 26px; min-width: 26px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--line); flex-shrink: 0; margin-top: 0.22rem; }
+.comment-input-wrap { flex: 1; min-width: 0; position: relative; }
+.comment-input {
+    width: 100%; min-height: 32px; max-height: 120px; padding: 0.3rem 2.4rem 0.3rem 0.65rem;
+    border: 1px solid var(--line); border-radius: 16px; background: var(--paper-raised);
+    font: 0.82rem var(--font-body); color: var(--ink-900); resize: none; overflow-y: auto;
+    line-height: 1.4; box-sizing: border-box; transition: border-color 0.15s, box-shadow 0.15s;
+    display: block;
+}
+.comment-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(180,83,9,0.08); outline: 0; }
+.comment-input::placeholder { color: var(--ink-500); opacity: 0.8; }
+.comment-send-btn {
+    position: absolute; right: 0.32rem; bottom: 0.28rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; min-height: 24px; padding: 0; border: 0; border-radius: 50%;
+    background: var(--accent); color: #fff; cursor: pointer; transition: background 0.12s, transform 0.1s;
+    justify-self: auto;
+}
+.comment-send-btn:hover { background: var(--accent-hover); transform: scale(1.08); }
+.comment-send-btn .material-symbols-outlined { font-size: 14px; }
+.comment-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.comment-cancel-reply { align-self: center; background: transparent; border: 0; padding: 0 0.1rem; color: var(--ink-500); font-size: 0.71rem; cursor: pointer; min-height: auto; white-space: nowrap; transition: color 0.12s; }
+.comment-cancel-reply:hover { color: var(--danger); background: transparent; }
+.comment-mention-suggestions {
+    position: absolute; z-index: 50; bottom: calc(100% + 4px); left: 0;
+    width: min(260px, 90vw); max-height: 180px; overflow-y: auto;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--paper-raised);
+    box-shadow: 0 8px 20px rgba(26,35,50,0.14); display: none;
+}
+.comment-mention-suggestions.is-open { display: block; }
+.mention-suggestion-item {
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.42rem 0.65rem;
+    cursor: pointer; border-bottom: 1px solid var(--line); transition: background 0.1s;
+}
+.mention-suggestion-item:last-child { border-bottom: 0; }
+.mention-suggestion-item:hover, .mention-suggestion-item.is-active { background: var(--accent-soft); }
+.mention-suggestion-item img { width: 26px; height: 26px; min-width: 26px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); }
+.mention-suggestion-item span { font-size: 0.8rem; font-weight: 600; color: var(--ink-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mention-suggestion-item small { font-size: 0.7rem; color: var(--ink-500); font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.post-comment-toggle {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.22rem 0.6rem; border: 0; border-radius: 5px;
+    background: transparent; color: var(--ink-700); font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; transition: background 0.12s, color 0.12s; min-height: 30px; line-height: 1;
+}
+.post-comment-toggle:hover, .post-comment-toggle.is-active { background: var(--accent-soft); color: var(--accent); }
+.post-comment-toggle .material-symbols-outlined { font-size: 15px; color: var(--ink-500); transition: color 0.12s; }
+.post-comment-toggle:hover .material-symbols-outlined, .post-comment-toggle.is-active .material-symbols-outlined { color: var(--accent); }
+.comment-highlight { animation: comment-highlight-pulse 2s ease-out; border-radius: 8px; }
+@keyframes comment-highlight-pulse {
+    0%   { background: rgba(180,83,9,0.12); }
+    100% { background: transparent; }
+}

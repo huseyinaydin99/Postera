@@ -17,6 +17,7 @@ import tr.com.huseyinaydin.timeline.repository.TimelinePostReactionRepository;
 import tr.com.huseyinaydin.notification.domain.NotificationType;
 import tr.com.huseyinaydin.notification.service.NotificationService;
 import tr.com.huseyinaydin.friend.service.FriendService;
+import tr.com.huseyinaydin.timeline.repository.PostCommentRepository;
 
 import java.util.List;
 
@@ -31,15 +32,17 @@ public class TimelineService {
     private final TimelinePostReactionRepository reactionRepository;
     private final NotificationService notificationService;
     private final FriendService friendService;
+    private final PostCommentRepository commentRepository;
 
     @Transactional(readOnly = true)
     public List<TimelinePostItem> listPosts(String currentUserEmail) {
         var user = findUser(currentUserEmail);
         var isAdmin = user.getRoles().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getName()) || "ADMIN".equals(role.getName()));
-
-        return timelinePostRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
-                .map(post -> toPostItem(post, user, isAdmin))
-                .toList();
+        var posts = timelinePostRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId());
+        var postIds = posts.stream().map(p -> p.getId()).toList();
+        var counts = commentRepository.countGroupedByPostIds(postIds).stream()
+                .collect(java.util.stream.Collectors.toMap(r -> (Long) r[0], r -> (Long) r[1]));
+        return posts.stream().map(post -> toPostItem(post, user, isAdmin, counts.getOrDefault(post.getId(), 0L))).toList();
     }
 
     @Transactional(readOnly = true)
@@ -54,9 +57,12 @@ public class TimelineService {
 
         var pageRequest = new tr.com.huseyinaydin.message.service.OffsetPageRequest(offset, limit);
         var posts = timelinePostRepository.findFriendsFeedPosts(user.getId(), pageRequest);
+        var postIds = posts.stream().map(p -> p.getId()).toList();
+        var counts = commentRepository.countGroupedByPostIds(postIds).stream()
+                .collect(java.util.stream.Collectors.toMap(r -> (Long) r[0], r -> (Long) r[1]));
 
         var items = posts.stream()
-                .map(post -> toPostItem(post, user, isAdmin))
+                .map(post -> toPostItem(post, user, isAdmin, counts.getOrDefault(post.getId(), 0L)))
                 .toList();
 
         boolean hasMore = (offset + items.size()) < totalCount;
@@ -64,7 +70,7 @@ public class TimelineService {
         return new TimelineFeedResponse(items, totalCount, hasMore, nextOffset);
     }
 
-    private TimelinePostItem toPostItem(TimelinePost post, AppUser user, boolean isAdmin) {
+    private TimelinePostItem toPostItem(TimelinePost post, AppUser user, boolean isAdmin, long commentCount) {
         var author = post.getUser();
         var authorName = author.getFirstName() + " " + author.getLastName();
         var isOwned = author.getId().equals(user.getId()) || isAdmin;
@@ -84,7 +90,8 @@ public class TimelineService {
                 post.getUpdatedAt(),
                 isOwned,
                 reactionSummary.reactions(),
-                reactionSummary.currentUserReaction()
+                reactionSummary.currentUserReaction(),
+                commentCount
         );
     }
 
