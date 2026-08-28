@@ -4,7 +4,8 @@
         { key: 'unreadMessages', badge: '[data-messages-badge]', button: '[data-messages-dropdown-toggle]', label: 'Mesajlar' },
         { key: 'unreadNotifications', badge: '[data-notifications-badge]', button: '[data-notifications-dropdown-toggle]', label: 'Bildirimler' }
     ];
-    const intervalMs = 15000;
+    // Tek uç nokta üç sayacı birlikte taşıdığı için kısa ve hafif bir yenileme aralığı yeterlidir.
+    const intervalMs = 10000;
     let inFlight = false;
 
     const formatCount = (count) => count > 99 ? '99+' : String(count);
@@ -48,6 +49,7 @@
     };
 
     document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+    window.addEventListener('focus', refresh);
     window.PosteraNavigationCounters = { refresh };
     refresh();
     window.setInterval(refresh, intervalMs);

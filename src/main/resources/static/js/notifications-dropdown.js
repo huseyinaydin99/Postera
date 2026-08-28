@@ -131,6 +131,7 @@
                     } else {
                         badge.hidden = true;
                     }
+                    badge.dataset.count = String(newCount);
                 }
 
                 try {
@@ -176,6 +177,7 @@
                     } else {
                         badge.hidden = true;
                     }
+                    badge.dataset.count = String(data.unreadCount);
                 }
 
                 if (isInitial && (!data.notifications || data.notifications.length === 0)) {
@@ -279,7 +281,11 @@
                         const dot = item.querySelector('.popover-unread-dot');
                         if (dot) dot.remove();
                     });
-                    if (badge) badge.hidden = true;
+                    if (badge) {
+                        badge.hidden = true;
+                        badge.dataset.count = '0';
+                    }
+                    window.PosteraNavigationCounters?.refresh();
                 }
             } catch (err) {
                 console.error(err);

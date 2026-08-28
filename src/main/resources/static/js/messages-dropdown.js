@@ -122,6 +122,7 @@
                     } else {
                         badge.hidden = true;
                     }
+                    badge.dataset.count = String(data.unreadCount);
                 }
 
                 if (isInitial && (!data.messages || data.messages.length === 0)) {

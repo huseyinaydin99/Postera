@@ -141,6 +141,7 @@
                     } else {
                         badge.hidden = true;
                     }
+                    badge.dataset.count = String(data.totalCount);
                 }
 
                 if (isInitial && (!data.requests || data.requests.length === 0)) {
@@ -254,7 +255,9 @@
                     } else {
                         badge.hidden = true;
                     }
+                    badge.dataset.count = String(newCount);
                 }
+                window.PosteraNavigationCounters?.refresh();
             } else {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
