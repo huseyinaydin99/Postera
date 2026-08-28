@@ -114,6 +114,14 @@ public class FriendService {
     }
 
     @Transactional(readOnly = true)
+    public boolean areFriends(Long firstUserId, Long secondUserId) {
+        if (firstUserId.equals(secondUserId)) return true;
+        return friendshipRepository.findRelationBetween(firstUserId, secondUserId)
+                .map(friendship -> friendship.getStatus() == FriendshipStatus.ACCEPTED)
+                .orElse(false);
+    }
+
+    @Transactional(readOnly = true)
     public FriendRequestsResponse getPendingRequests(String currentUserEmail, int offset, int limit) {
         var currentUser = findUserByEmail(currentUserEmail);
         long totalCount = friendshipRepository.countByReceiverIdAndStatus(currentUser.getId(), FriendshipStatus.PENDING);

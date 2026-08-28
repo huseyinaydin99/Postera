@@ -39,6 +39,11 @@
         return '_csrf';
     };
 
+    const reactionLabels = { LIKE: 'Beğen', LAUGH: 'Gülme', ANGRY: 'Kızgınlık', SURPRISED: 'Şaşkınlık', SUPPORT: 'Yanındayım', HEART: 'Kalp' };
+    const reactionPicker = () => `<div class="post-reaction-picker" role="menu" aria-label="Emoji tepkileri">
+        <button type="button" data-post-reaction="LAUGH" title="Gülme" aria-label="Gülme">😂</button><button type="button" data-post-reaction="ANGRY" title="Kızgınlık" aria-label="Kızgınlık">😠</button><button type="button" data-post-reaction="SURPRISED" title="Şaşkınlık" aria-label="Şaşkınlık">😮</button><button type="button" data-post-reaction="SUPPORT" title="Yanındayım" aria-label="Yanındayım">🤝</button><button type="button" data-post-reaction="HEART" title="Kalp" aria-label="Kalp">❤️</button></div>`;
+    const reactionSummary = (reactions = []) => reactions.length ? `<div class="post-reaction-summary" data-post-reaction-summary>${reactions.map((reaction) => `<span class="post-reaction-count" title="${escapeHtml(reaction.label)}"><span>${reaction.emoji}</span><span>${reaction.count}</span></span>`).join('')}</div>` : '<div class="post-reaction-summary" data-post-reaction-summary hidden></div>';
+
     const createPostElement = (post) => {
         const article = document.createElement('article');
         article.className = 'timeline-post-card';
@@ -107,11 +112,15 @@
             </div>
             ${contentHtml}
             ${imagesHtml}
+            ${reactionSummary(post.reactions)}
             <div class="post-card-actions">
-                <button type="button" class="post-action-btn" title="Beğen (Sonraki aşamada aktif edilecek)">
+                <div class="post-reaction-control" data-post-id="${post.id}">
+                <button type="button" class="post-action-btn post-like-btn ${post.currentUserReaction === 'LIKE' ? 'is-active' : ''}" data-post-reaction="LIKE" title="Beğen">
                     <span class="material-symbols-outlined">thumb_up</span>
                     <span>Beğen</span>
                 </button>
+                ${reactionPicker()}
+                </div>
                 <button type="button" class="post-action-btn" title="Yorum Yap (Sonraki aşamada aktif edilecek)">
                     <span class="material-symbols-outlined">chat_bubble</span>
                     <span>Yorum Yaz</span>
@@ -121,6 +130,43 @@
 
         return article;
     };
+
+    const csrfHeaders = () => {
+        const token = document.querySelector('meta[name="_csrf"]')?.content;
+        const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+        return token && header ? { [header]: token } : {};
+    };
+
+    const updateReactionView = (control, data) => {
+        const summary = control.closest('.timeline-post-card')?.querySelector('[data-post-reaction-summary]');
+        if (summary) {
+            summary.hidden = !data.reactions?.length;
+            summary.innerHTML = (data.reactions || []).map((reaction) => `<span class="post-reaction-count" title="${escapeHtml(reaction.label)}"><span>${reaction.emoji}</span><span>${reaction.count}</span></span>`).join('');
+        }
+        const likeButton = control.querySelector('[data-post-reaction="LIKE"]');
+        if (likeButton) likeButton.classList.toggle('is-active', data.currentUserReaction === 'LIKE');
+        control.querySelectorAll('[data-post-reaction]').forEach((button) => button.classList.toggle('is-selected', button.dataset.postReaction === data.currentUserReaction));
+    };
+
+    feedContainer.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-post-reaction]');
+        if (!button) return;
+        const control = button.closest('[data-post-id]');
+        if (!control || button.disabled) return;
+        button.disabled = true;
+        try {
+            const response = await fetch(`/timeline/api/posts/${control.dataset.postId}/reactions`, {
+                method: 'POST', headers: { ...csrfHeaders(), 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+                body: new URLSearchParams({ reaction: button.dataset.postReaction })
+            });
+            if (!response.ok) throw new Error('Tepki kaydedilemedi.');
+            updateReactionView(control, await response.json());
+        } catch (error) {
+            window.PosteraAlerts?.toast?.('Tepkiniz kaydedilemedi. Lütfen tekrar deneyin.', 'error');
+        } finally {
+            button.disabled = false;
+        }
+    });
 
     const loadMorePosts = async () => {
         if (isLoading || !hasMore) return;

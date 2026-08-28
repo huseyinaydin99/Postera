@@ -1158,7 +1158,7 @@ button.post-menu-danger:hover:not(:disabled),
 
 .post-card-actions {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 0.25rem;
     padding-top: 0.25rem;
     padding-bottom: 0;
@@ -1166,6 +1166,16 @@ button.post-menu-danger:hover:not(:disabled),
     margin-top: 0.05rem;
     margin-bottom: 0;
 }
+.post-reaction-summary { display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; min-height: 0; margin-top: .1rem; }
+.post-reaction-summary[hidden] { display: none; }
+.post-reaction-count { display: inline-flex; align-items: center; gap: .15rem; padding: .12rem .38rem; border: 1px solid var(--line); border-radius: 99px; background: var(--paper-raised); color: var(--ink-700); font-size: .72rem; }
+.post-reaction-control { position: relative; display: inline-flex; align-items: stretch; }
+/* Menü ile buton arasındaki alan hover zincirini kesmemelidir. */
+.post-reaction-control::before { position: absolute; bottom: 100%; left: 0; width: 100%; height: .5rem; content: ''; }
+.post-reaction-picker { position: absolute; z-index: 12; bottom: calc(100% + .45rem); left: 0; display: flex; align-items: center; gap: .1rem; padding: .35rem; border: 1px solid var(--line); border-radius: 99px; background: var(--paper-raised); box-shadow: 0 8px 20px rgba(26, 35, 50, .16); opacity: 0; pointer-events: none; transform: translateY(.25rem) scale(.96); transform-origin: bottom left; transition: opacity .14s ease, transform .14s ease; }
+.post-reaction-control:hover .post-reaction-picker, .post-reaction-control:focus-within .post-reaction-picker { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+.post-reaction-picker button { display: grid; width: 2rem; height: 2rem; padding: 0; place-items: center; border: 0; border-radius: 50%; background: transparent; cursor: pointer; font-size: 1.12rem; transition: background .12s ease, transform .12s ease; }
+.post-reaction-picker button:hover, .post-reaction-picker button.is-selected { background: var(--accent-soft); transform: scale(1.15); }
 
 .post-action-btn {
     display: inline-flex;
@@ -1180,13 +1190,17 @@ button.post-menu-danger:hover:not(:disabled),
     font-weight: 600;
     cursor: pointer;
     transition: background 0.12s, color 0.12s;
-    min-height: 24px;
+    justify-content: center;
+    min-height: 30px;
+    line-height: 1;
 }
 
 .post-action-btn:hover {
     background: var(--accent-soft);
     color: var(--accent);
 }
+.post-action-btn.is-active { background: var(--accent-soft); color: var(--accent); }
+.post-action-btn.is-active .material-symbols-outlined { color: var(--accent); font-variation-settings: 'FILL' 1; }
 
 .post-action-btn .material-symbols-outlined {
     font-size: 15px;
@@ -1587,4 +1601,3 @@ button.post-menu-danger:hover:not(:disabled),
 .timeline-loading-more[hidden] {
     display: none !important;
 }
-

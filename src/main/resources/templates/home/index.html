@@ -158,12 +158,27 @@
                     <img th:each="imageUrl : ${post.imageUrls}" th:src="${imageUrl}" alt="Paylaşım görseli" loading="lazy">
                 </div>
 
-                <!-- Post Alt Aksiyonları (Beğen, Yorum Yaz) -->
+                <div class="post-reaction-summary" data-post-reaction-summary th:if="${post.reactions != null and !post.reactions.empty}">
+                    <span th:each="reaction : ${post.reactions}" class="post-reaction-count" th:title="${reaction.label}">
+                        <span th:text="${reaction.emoji}"></span><span th:text="${reaction.count}"></span>
+                    </span>
+                </div>
+
+                <!-- Post Alt Aksiyonları -->
                 <div class="post-card-actions">
-                    <button type="button" class="post-action-btn" title="Beğen (Sonraki aşamada aktif edilecek)">
+                    <div class="post-reaction-control" th:attr="data-post-id=${post.id}">
+                    <button type="button" class="post-action-btn post-like-btn" data-post-reaction="LIKE" th:classappend="${post.currentUserReaction == 'LIKE'} ? 'is-active'" title="Beğen">
                         <span class="material-symbols-outlined">thumb_up</span>
                         <span>Beğen</span>
                     </button>
+                    <div class="post-reaction-picker" role="menu" aria-label="Emoji tepkileri">
+                        <button type="button" data-post-reaction="LAUGH" title="Gülme" aria-label="Gülme">😂</button>
+                        <button type="button" data-post-reaction="ANGRY" title="Kızgınlık" aria-label="Kızgınlık">😠</button>
+                        <button type="button" data-post-reaction="SURPRISED" title="Şaşkınlık" aria-label="Şaşkınlık">😮</button>
+                        <button type="button" data-post-reaction="SUPPORT" title="Yanındayım" aria-label="Yanındayım">🤝</button>
+                        <button type="button" data-post-reaction="HEART" title="Kalp" aria-label="Kalp">❤️</button>
+                    </div>
+                    </div>
                     <button type="button" class="post-action-btn" title="Yorum Yap (Sonraki aşamada aktif edilecek)">
                         <span class="material-symbols-outlined">chat_bubble</span>
                         <span>Yorum Yaz</span>

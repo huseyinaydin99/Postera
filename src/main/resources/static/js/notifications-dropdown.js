@@ -81,7 +81,8 @@
 
         const iconBadge = document.createElement('span');
         iconBadge.className = 'popover-notification-icon-badge';
-        iconBadge.innerHTML = `<span class="material-symbols-outlined">people</span>`;
+        const icon = item.type === 'POST_REACTION' ? 'favorite' : item.type === 'SYSTEM' ? 'info' : 'people';
+        iconBadge.innerHTML = `<span class="material-symbols-outlined">${icon}</span>`;
 
         avatarWrapper.appendChild(avatar);
         avatarWrapper.appendChild(iconBadge);
@@ -92,7 +93,8 @@
 
         const text = document.createElement('p');
         text.className = 'popover-notification-text';
-        text.innerHTML = `<strong>${escapeHtml(item.actorName)}</strong> arkadaşlık isteğinizi kabul etti.`;
+        const message = item.message || 'Yeni bir bildiriminiz var.';
+        text.innerHTML = `<strong>${escapeHtml(item.actorName)}</strong> ${escapeHtml(message.replace(`${item.actorName} `, ''))}`;
 
         const time = document.createElement('time');
         time.className = 'popover-notification-time';

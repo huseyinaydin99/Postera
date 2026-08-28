@@ -13,6 +13,8 @@ public record TimelinePostItem(
         List<String> imageUrls,
         Instant createdAt,
         Instant updatedAt,
-        boolean ownedByCurrentUser
+        boolean ownedByCurrentUser,
+        List<TimelineReactionSummary> reactions,
+        String currentUserReaction
 ) {
 }

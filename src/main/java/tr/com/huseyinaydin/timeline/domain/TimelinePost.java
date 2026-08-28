@@ -49,6 +49,9 @@ public class TimelinePost {
     @OrderBy("displayOrder ASC")
     private List<TimelinePostImage> images = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TimelinePostReaction> reactions = new ArrayList<>();
+
     public static TimelinePost create(AppUser user, String content) {
         var post = new TimelinePost();
         post.user = user;
@@ -73,4 +76,6 @@ public class TimelinePost {
     public List<TimelinePostImage> getImages() {
         return Collections.unmodifiableList(images);
     }
+
+    public List<TimelinePostReaction> getReactions() { return Collections.unmodifiableList(reactions); }
 }

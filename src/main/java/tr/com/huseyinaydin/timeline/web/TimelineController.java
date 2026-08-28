@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Map;
+import tr.com.huseyinaydin.timeline.domain.TimelineReactionType;
 
 @Controller
 @RequestMapping("/timeline")
@@ -80,6 +81,18 @@ public class TimelineController {
             return ResponseEntity.ok(Map.of("success", true, "postId", postId, "message", "Paylaşımınız yayınlandı."));
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "error", exception.getMessage()));
+        }
+    }
+
+    @PostMapping("/api/posts/{postId}/reactions")
+    @ResponseBody
+    public ResponseEntity<?> reactToPost(@PathVariable Long postId,
+                                         @RequestParam TimelineReactionType reaction,
+                                         Authentication authentication) {
+        try {
+            return ResponseEntity.ok(timelineService.react(authentication.getName(), postId, reaction));
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(Map.of("error", exception.getMessage()));
         }
     }
 }
