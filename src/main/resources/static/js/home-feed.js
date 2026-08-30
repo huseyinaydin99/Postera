@@ -62,7 +62,7 @@
                         <span class="material-symbols-outlined">more_horiz</span>
                     </summary>
                     <div class="post-menu-panel">
-                        <button type="button" class="post-menu-item" disabled title="Güncelleme işlemi sonraki aşamada eklenecektir.">
+                        <button type="button" class="post-menu-item" data-edit-post="${post.id}">
                             <span class="material-symbols-outlined">edit</span> Düzenle
                         </button>
                         <form action="/timeline/${post.id}/delete?redirectUrl=/" method="post" data-confirm-action="İlgili post silinsin mi?">

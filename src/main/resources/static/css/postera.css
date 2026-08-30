@@ -1767,3 +1767,43 @@ button.post-menu-danger:hover:not(:disabled),
 .rxm-user-name { font-size: .85rem; font-weight: 600; color: var(--ink-900); }
 .rxm-empty { text-align: center; color: var(--ink-500); font-size: .82rem; padding: 1.5rem 0; }
 .rxm-loading { color: var(--ink-500); font-size: .82rem; padding: .25rem .5rem; }
+
+/* ── Post Edit Modal ────────────────────────────────────────────────────── */
+.ped-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 910; opacity: 0; pointer-events: none; transition: opacity .18s ease; }
+.ped-backdrop.ped-visible { opacity: 1; pointer-events: auto; }
+.ped-modal { position: fixed; top: 50%; left: 50%; z-index: 911; width: min(600px, 96vw); max-height: 88vh; transform: translate(-50%, -48%) scale(.97); opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 16px 48px rgba(0,0,0,.18); display: flex; flex-direction: column; overflow: hidden; }
+.ped-modal.ped-visible { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+.ped-header { display: flex; align-items: center; justify-content: space-between; padding: .75rem 1rem .6rem; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.ped-title { font-weight: 700; font-size: .95rem; color: var(--ink-900); }
+.ped-close { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; background: transparent; border-radius: 50%; cursor: pointer; color: var(--ink-500); transition: background .12s, color .12s; padding: 0; }
+.ped-close:hover { background: var(--accent-soft); color: var(--accent); }
+.ped-close .material-symbols-outlined { font-size: 18px; }
+.ped-body { flex: 1; overflow-y: auto; padding: .75rem 1rem .5rem; display: flex; flex-direction: column; gap: .5rem; position: relative; }
+.ped-editor { min-height: 100px; max-height: 280px; overflow-y: auto; padding: .55rem .7rem; border: 1px solid var(--line); border-radius: 8px; background: var(--paper-raised); font-size: .9rem; line-height: 1.55; color: var(--ink-900); outline: none; word-break: break-word; }
+.ped-editor:focus { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent); }
+.ped-editor:empty::before { content: attr(data-placeholder); color: var(--ink-400); pointer-events: none; }
+.ped-image-strip { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ped-img-item { position: relative; width: 80px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); flex-shrink: 0; }
+.ped-img-item img { width: 100%; height: 100%; object-fit: cover !important; border: none !important; border-radius: 0 !important; margin: 0 !important; }
+.ped-img-remove { position: absolute; top: 2px; right: 2px; width: 20px !important; height: 20px !important; min-height: unset !important; padding: 0 !important; border: none !important; border-radius: 50% !important; background: rgba(0,0,0,.55) !important; color: #fff !important; cursor: pointer; display: flex !important; align-items: center; justify-content: center; }
+.ped-img-remove .material-symbols-outlined { font-size: 13px; }
+.ped-img-error { font-size: .78rem; color: #dc2626; margin: 0; }
+.ped-popover { position: absolute; z-index: 5; bottom: calc(100% + .3rem); left: 0; background: var(--paper-raised); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.14); padding: .4rem; max-width: 100%; }
+.ped-emoji-pop { display: flex; flex-wrap: wrap; gap: .15rem; max-width: 260px; }
+.ped-emoji-btn { width: 2rem; height: 2rem; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-size: 1.1rem; display: grid; place-items: center; transition: background .1s; }
+.ped-emoji-btn:hover { background: var(--accent-soft); }
+.ped-gif-pop { display: flex; flex-wrap: wrap; gap: .3rem; max-width: 320px; max-height: 180px; overflow-y: auto; }
+.ped-gif-btn { border: none; background: transparent; padding: 0; cursor: pointer; border-radius: 6px; overflow: hidden; }
+.ped-gif-btn img { width: 72px; height: 54px; object-fit: cover !important; border: none !important; border-radius: 6px !important; margin: 0 !important; display: block; }
+.ped-toolbar { display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; border-top: 1px solid var(--line); flex-shrink: 0; flex-wrap: wrap; }
+.ped-fmt-tools { display: flex; gap: .2rem; }
+.ped-fmt-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 6px; background: transparent; cursor: pointer; color: var(--ink-700); font-size: .82rem; transition: background .1s, border-color .1s; padding: 0; min-height: unset !important; }
+.ped-fmt-btn .material-symbols-outlined { font-size: 15px; }
+.ped-fmt-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.ped-media-tools { display: flex; gap: .2rem; margin-left: .25rem; }
+.ped-tool-btn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 6px; background: transparent; cursor: pointer; color: var(--ink-600); transition: background .1s, border-color .1s; padding: 0; min-height: unset !important; }
+.ped-tool-btn .material-symbols-outlined { font-size: 17px; }
+.ped-tool-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.ped-save-btn { margin-left: auto; display: inline-flex; align-items: center; gap: .3rem; padding: .38rem .9rem; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-weight: 600; font-size: .85rem; cursor: pointer; transition: opacity .12s; min-height: unset !important; }
+.ped-save-btn:disabled { opacity: .55; cursor: not-allowed; }
+.ped-save-btn .material-symbols-outlined { font-size: 16px; }

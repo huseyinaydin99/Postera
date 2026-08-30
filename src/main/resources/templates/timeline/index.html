@@ -132,7 +132,7 @@
                             <span class="material-symbols-outlined">more_horiz</span>
                         </summary>
                         <div class="post-menu-panel">
-                            <button type="button" class="post-menu-item" disabled title="Güncelleme işlemi sonraki aşamada eklenecektir.">
+                            <button type="button" class="post-menu-item" data-edit-post th:attr="data-edit-post=${post.id}">
                                 <span class="material-symbols-outlined">edit</span> Düzenle
                             </button>
                             <form th:action="@{/timeline/{id}/delete(id=${post.id})}" method="post" data-confirm-action="İlgili post silinsin mi?">
@@ -184,6 +184,7 @@
 <script th:src="@{/js/message-image-upload.js}" defer></script>
 <script th:src="@{/js/post-comments.js}" defer></script>
 <script th:src="@{/js/reaction-modal.js}" defer></script>
+<script th:src="@{/js/post-editor.js}" defer></script>
 <script>
 document.addEventListener('click', (e) => {
     document.querySelectorAll('.post-menu[open]').forEach((menu) => {

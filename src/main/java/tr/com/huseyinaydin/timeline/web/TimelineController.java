@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tr.com.huseyinaydin.timeline.service.TimelineService;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,31 @@ public class TimelineController {
             return ResponseEntity.ok(Map.of("success", true, "postId", postId, "message", "Paylaşımınız yayınlandı."));
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "error", exception.getMessage()));
+        }
+    }
+
+    @GetMapping("/api/posts/{postId}")
+    @ResponseBody
+    public ResponseEntity<?> getPost(@PathVariable Long postId, Authentication authentication) {
+        try {
+            return ResponseEntity.ok(timelineService.getPostForEdit(authentication.getName(), postId));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/api/posts/{postId}")
+    @ResponseBody
+    public ResponseEntity<?> updatePost(
+            @PathVariable Long postId,
+            @RequestParam(name = "content", required = false) String content,
+            @RequestParam(name = "images", required = false) List<MultipartFile> images,
+            @RequestParam(name = "keepImageUrls", required = false) List<String> keepImageUrls,
+            Authentication authentication) {
+        try {
+            return ResponseEntity.ok(timelineService.updatePost(authentication.getName(), postId, content, images, keepImageUrls));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 

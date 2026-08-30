@@ -73,6 +73,10 @@ public class TimelinePost {
         images.add(TimelinePostImage.create(this, imageUrl, images.size()));
     }
 
+    public void clearImages() {
+        images.clear();
+    }
+
     public List<TimelinePostImage> getImages() {
         return Collections.unmodifiableList(images);
     }

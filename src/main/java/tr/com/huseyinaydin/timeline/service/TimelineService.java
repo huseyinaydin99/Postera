@@ -179,6 +179,46 @@ public class TimelineService {
     }
 
     @Transactional(readOnly = true)
+    public TimelinePostItem getPostForEdit(String currentUserEmail, Long postId) {
+        var user = findUser(currentUserEmail);
+        var post = timelinePostRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Paylaşım bulunamadı."));
+        var isAdmin = user.getRoles().stream().anyMatch(r -> "ROLE_ADMIN".equals(r.getName()) || "ADMIN".equals(r.getName()));
+        if (!post.getUser().getId().equals(user.getId()) && !isAdmin)
+            throw new IllegalArgumentException("Bu paylaşımı düzenleme yetkiniz yok.");
+        return toPostItem(post, user, isAdmin, 0L);
+    }
+
+    @Transactional
+    public TimelinePostItem updatePost(String currentUserEmail, Long postId, String content, List<MultipartFile> newImages, List<String> keepImageUrls) {
+        var user = findUser(currentUserEmail);
+        var post = timelinePostRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Paylaşım bulunamadı."));
+        var isAdmin = user.getRoles().stream().anyMatch(r -> "ROLE_ADMIN".equals(r.getName()) || "ADMIN".equals(r.getName()));
+        if (!post.getUser().getId().equals(user.getId()) && !isAdmin)
+            throw new IllegalArgumentException("Bu paylaşımı düzenleme yetkiniz yok.");
+
+        var sanitized = richTextSanitizer.sanitize(content);
+        var uploadedUrls = messageImageStorage.storeAll(newImages);
+
+        var kept = keepImageUrls == null ? List.<String>of() : keepImageUrls;
+        var totalImages = kept.size() + uploadedUrls.size();
+        if (totalImages > 2) throw new IllegalArgumentException("Bir paylaşımda en fazla 2 görsel olabilir.");
+        if (!richTextSanitizer.hasText(content) && totalImages == 0)
+            throw new IllegalArgumentException("Paylaşım için metin veya en az bir görsel gereklidir.");
+
+        post.updateContent(sanitized);
+        post.clearImages();
+        kept.forEach(post::addImage);
+        uploadedUrls.forEach(post::addImage);
+
+        timelinePostRepository.flush();
+        var counts = commentRepository.countGroupedByPostIds(List.of(postId)).stream()
+                .collect(java.util.stream.Collectors.toMap(r -> (Long) r[0], r -> (Long) r[1]));
+        return toPostItem(post, user, isAdmin, counts.getOrDefault(postId, 0L));
+    }
+
+    @Transactional(readOnly = true)
     public java.util.Map<String, java.util.List<ReactionUserItem>> getReactionUsers(Long postId) {
         var reactions = reactionRepository.findAllByPostId(postId);
         var result = new java.util.LinkedHashMap<String, java.util.List<ReactionUserItem>>();
