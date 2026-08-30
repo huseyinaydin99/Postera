@@ -178,6 +178,21 @@ public class TimelineService {
         timelinePostRepository.delete(post);
     }
 
+    @Transactional(readOnly = true)
+    public java.util.Map<String, java.util.List<ReactionUserItem>> getReactionUsers(Long postId) {
+        var reactions = reactionRepository.findAllByPostId(postId);
+        var result = new java.util.LinkedHashMap<String, java.util.List<ReactionUserItem>>();
+        for (var r : reactions) {
+            var key = r.getReactionType().name();
+            result.computeIfAbsent(key, k -> new java.util.ArrayList<>())
+                  .add(new ReactionUserItem(
+                          r.getUser().getId(),
+                          r.getUser().getFirstName() + " " + r.getUser().getLastName(),
+                          r.getUser().getProfileImageUrl()));
+        }
+        return result;
+    }
+
     private AppUser findUser(String email) {
         return userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new IllegalStateException("Kullanıcı bulunamadı."));

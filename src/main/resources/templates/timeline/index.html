@@ -153,6 +153,14 @@
                     <img th:each="imageUrl : ${post.imageUrls}" th:src="${imageUrl}" alt="Paylaşım görseli" loading="lazy">
                 </div>
 
+                <div class="post-reaction-summary" data-post-reaction-summary th:if="${post.reactions != null and !post.reactions.empty}">
+                    <span th:each="reaction : ${post.reactions}" class="post-reaction-count"
+                          th:title="${reaction.label}"
+                          th:attr="data-post-id=${post.id}, data-reaction-type=${reaction.type}">
+                        <span th:text="${reaction.emoji}"></span><span th:text="${reaction.count}"></span>
+                    </span>
+                </div>
+
                 <!-- Post Alt Aksiyonları (Beğen, Yorum Yaz) -->
                 <div class="post-card-actions">
                     <button type="button" class="post-action-btn" title="Beğen (Sonraki aşamada aktif edilecek)">
@@ -175,6 +183,7 @@
 <script th:src="@{/js/rich-text-editor.js}" defer></script>
 <script th:src="@{/js/message-image-upload.js}" defer></script>
 <script th:src="@{/js/post-comments.js}" defer></script>
+<script th:src="@{/js/reaction-modal.js}" defer></script>
 <script>
 document.addEventListener('click', (e) => {
     document.querySelectorAll('.post-menu[open]').forEach((menu) => {

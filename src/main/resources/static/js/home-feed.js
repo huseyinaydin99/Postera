@@ -42,7 +42,7 @@
     const reactionLabels = { LIKE: 'Beğen', LAUGH: 'Gülme', ANGRY: 'Kızgınlık', SURPRISED: 'Şaşkınlık', SUPPORT: 'Yanındayım', HEART: 'Kalp' };
     const reactionPicker = () => `<div class="post-reaction-picker" role="menu" aria-label="Emoji tepkileri">
         <button type="button" data-post-reaction="LAUGH" title="Gülme" aria-label="Gülme">😂</button><button type="button" data-post-reaction="ANGRY" title="Kızgınlık" aria-label="Kızgınlık">😠</button><button type="button" data-post-reaction="SURPRISED" title="Şaşkınlık" aria-label="Şaşkınlık">😮</button><button type="button" data-post-reaction="SUPPORT" title="Yanındayım" aria-label="Yanındayım">🤝</button><button type="button" data-post-reaction="HEART" title="Kalp" aria-label="Kalp">❤️</button></div>`;
-    const reactionSummary = (reactions = []) => reactions.length ? `<div class="post-reaction-summary" data-post-reaction-summary>${reactions.map((reaction) => `<span class="post-reaction-count" title="${escapeHtml(reaction.label)}"><span>${reaction.emoji}</span><span>${reaction.count}</span></span>`).join('')}</div>` : '<div class="post-reaction-summary" data-post-reaction-summary hidden></div>';
+    const reactionSummary = (reactions = [], postId) => reactions.length ? `<div class="post-reaction-summary" data-post-reaction-summary>${reactions.map((reaction) => `<span class="post-reaction-count" title="${escapeHtml(reaction.label)}" data-post-id="${postId}" data-reaction-type="${reaction.type}"><span>${reaction.emoji}</span><span>${reaction.count}</span></span>`).join('')}</div>` : '<div class="post-reaction-summary" data-post-reaction-summary hidden></div>';
 
     const createPostElement = (post) => {
         const article = document.createElement('article');
@@ -112,7 +112,7 @@
             </div>
             ${contentHtml}
             ${imagesHtml}
-            ${reactionSummary(post.reactions)}
+            ${reactionSummary(post.reactions, post.id)}
             <div class="post-card-actions">
                 <div class="post-reaction-control" data-post-id="${post.id}">
                 <button type="button" class="post-action-btn post-like-btn ${post.currentUserReaction === 'LIKE' ? 'is-active' : ''}" data-post-reaction="LIKE" title="Beğen">
@@ -145,7 +145,7 @@
         const summary = control.closest('.timeline-post-card')?.querySelector('[data-post-reaction-summary]');
         if (summary) {
             summary.hidden = !data.reactions?.length;
-            summary.innerHTML = (data.reactions || []).map((reaction) => `<span class="post-reaction-count" title="${escapeHtml(reaction.label)}"><span>${reaction.emoji}</span><span>${reaction.count}</span></span>`).join('');
+            summary.innerHTML = (data.reactions || []).map((reaction) => `<span class="post-reaction-count" title="${escapeHtml(reaction.label)}" data-post-id="${control.dataset.postId}" data-reaction-type="${reaction.type}"><span>${reaction.emoji}</span><span>${reaction.count}</span></span>`).join('');
         }
         const likeButton = control.querySelector('[data-post-reaction="LIKE"]');
         if (likeButton) likeButton.classList.toggle('is-active', data.currentUserReaction === 'LIKE');

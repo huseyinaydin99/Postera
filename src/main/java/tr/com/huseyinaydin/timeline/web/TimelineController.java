@@ -84,6 +84,12 @@ public class TimelineController {
         }
     }
 
+    @GetMapping("/api/posts/{postId}/reactions/users")
+    @ResponseBody
+    public ResponseEntity<?> getReactionUsers(@PathVariable Long postId) {
+        return ResponseEntity.ok(timelineService.getReactionUsers(postId));
+    }
+
     @PostMapping("/api/posts/{postId}/reactions")
     @ResponseBody
     public ResponseEntity<?> reactToPost(@PathVariable Long postId,

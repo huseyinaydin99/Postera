@@ -120,10 +120,7 @@
         div.innerHTML = `
             <img class="comment-avatar" src="${escHtml(c.authorProfileImageUrl || '/images/default-avatar.svg')}" alt="${escHtml(c.authorName)}">
             <div class="comment-body">
-                <div class="comment-bubble">
-                    <strong>${escHtml(c.authorName)}</strong>
-                    ${highlightMentions(c.content)}
-                </div>
+                <div class="comment-bubble"><span class="comment-author">${escHtml(c.authorName)}</span> ${highlightMentions(c.content)}</div>
                 <div class="comment-meta">
                     <time class="comment-time">${formatDate(c.createdAt)}</time>
                     <button type="button" class="comment-reply-btn" data-reply-to="${c.id}" data-reply-author="${escHtml(c.authorName)}">Cevapla</button>
