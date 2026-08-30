@@ -22,12 +22,6 @@
             <div class="ped-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Paylaşım içeriği"></div>
             <div class="ped-image-strip" hidden></div>
             <p class="ped-img-error" hidden></p>
-            <div class="ped-popover ped-emoji-pop" hidden>
-                ${EMOJIS.map(e => `<button type="button" class="ped-emoji-btn" data-emoji="${e}">${e}</button>`).join('')}
-            </div>
-            <div class="ped-popover ped-gif-pop" hidden>
-                ${GIFS.map(g => `<button type="button" class="ped-gif-btn" data-gif="https://media.giphy.com/media/${g}/giphy.gif"><img src="https://media.giphy.com/media/${g}/giphy.gif" alt="GIF" loading="lazy"></button>`).join('')}
-            </div>
         </div>
         <div class="ped-toolbar">
             <div class="ped-fmt-tools">
@@ -41,16 +35,22 @@
                     <span class="material-symbols-outlined">image</span>
                     <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden class="ped-file-input">
                 </label>
-                <button type="button" class="ped-tool-btn ped-toggle-emoji" title="Emoji">
+                <button type="button" class="ped-tool-btn ped-toggle-emoji" title="Emoji" aria-expanded="false" aria-controls="ped-emoji-popover">
                     <span class="material-symbols-outlined">sentiment_satisfied</span>
                 </button>
-                <button type="button" class="ped-tool-btn ped-toggle-gif" title="GIF">
+                <button type="button" class="ped-tool-btn ped-toggle-gif" title="GIF" aria-expanded="false" aria-controls="ped-gif-popover">
                     <span class="material-symbols-outlined">gif_box</span>
                 </button>
             </div>
             <button type="button" class="ped-save-btn">
                 <span class="material-symbols-outlined">check</span> Kaydet
             </button>
+        </div>
+        <div id="ped-emoji-popover" class="ped-popover ped-emoji-pop" hidden>
+            ${EMOJIS.map(e => `<button type="button" class="ped-emoji-btn" data-emoji="${e}">${e}</button>`).join('')}
+        </div>
+        <div id="ped-gif-popover" class="ped-popover ped-gif-pop" hidden>
+            ${GIFS.map(g => `<button type="button" class="ped-gif-btn" data-gif="https://media.giphy.com/media/${g}/giphy.gif"><img src="https://media.giphy.com/media/${g}/giphy.gif" alt="GIF" loading="lazy"></button>`).join('')}
         </div>`;
 
     document.body.appendChild(backdrop);
@@ -71,8 +71,14 @@
     let savedRange = null;
 
     // ── Open / Close ──────────────────────────────────────────────────────────
+    const closePopovers = () => {
+        emojiPop.hidden = true;
+        gifPop.hidden = true;
+        emojiToggleBtn.setAttribute('aria-expanded', 'false');
+        gifToggleBtn.setAttribute('aria-expanded', 'false');
+    };
     const openModal = () => { backdrop.classList.add('ped-visible'); modal.classList.add('ped-visible'); document.body.style.overflow = 'hidden'; };
-    const closeModal = () => { backdrop.classList.remove('ped-visible'); modal.classList.remove('ped-visible'); document.body.style.overflow = ''; };
+    const closeModal = () => { backdrop.classList.remove('ped-visible'); modal.classList.remove('ped-visible'); document.body.style.overflow = ''; closePopovers(); };
 
     backdrop.addEventListener('click', closeModal);
     modal.querySelector('.ped-close').addEventListener('click', closeModal);
@@ -83,50 +89,94 @@
         const sel = window.getSelection();
         if (sel.rangeCount && editor.contains(sel.anchorNode)) savedRange = sel.getRangeAt(0).cloneRange();
     };
-    const restoreRange = () => {
-        if (!savedRange) { editor.focus(); return; }
+    const insertAtCursor = (node) => {
+        editor.focus();
         const sel = window.getSelection();
+        let range;
+        if (savedRange) {
+            range = savedRange;
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (sel.rangeCount) {
+            range = sel.getRangeAt(0);
+        } else {
+            // fallback: append to end
+            range = document.createRange();
+            range.selectNodeContents(editor);
+            range.collapse(false);
+        }
+        range.deleteContents();
+        range.insertNode(node);
+        range.setStartAfter(node);
+        range.collapse(true);
         sel.removeAllRanges();
-        sel.addRange(savedRange);
+        sel.addRange(range);
+        savedRange = range.cloneRange();
     };
     editor.addEventListener('keyup', saveRange);
     editor.addEventListener('mouseup', saveRange);
+    editor.addEventListener('blur', saveRange);
 
     // ── Formatting buttons ────────────────────────────────────────────────────
     modal.querySelectorAll('[data-cmd]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            editor.focus();
-            restoreRange();
+        btn.addEventListener('mousedown', e => {
+            e.preventDefault();
             document.execCommand(btn.dataset.cmd, false, null);
         });
     });
 
     // ── Emoji ─────────────────────────────────────────────────────────────────
-    modal.querySelector('.ped-toggle-emoji').addEventListener('click', () => {
-        emojiPop.hidden = !emojiPop.hidden;
+    const emojiToggleBtn = modal.querySelector('.ped-toggle-emoji');
+    const gifToggleBtn   = modal.querySelector('.ped-toggle-gif');
+
+    const positionPopover = (pop, toggleBtn) => {
+        const buttonRect = toggleBtn.getBoundingClientRect();
+        const modalRect = modal.getBoundingClientRect();
+        const inset = 8;
+        const maxLeft = Math.max(inset, modal.clientWidth - pop.offsetWidth - inset);
+        const maxTop = Math.max(inset, modal.clientHeight - pop.offsetHeight - inset);
+
+        // The popover is an absolutely positioned child of the modal, so it
+        // remains within the dialog rather than drifting with the viewport.
+        const left = Math.min(Math.max(buttonRect.left - modalRect.left, inset), maxLeft);
+        const top = Math.min(Math.max(buttonRect.top - modalRect.top - pop.offsetHeight - inset, inset), maxTop);
+        pop.style.left = `${left}px`;
+        pop.style.top = `${top}px`;
+    };
+
+    emojiToggleBtn.addEventListener('click', () => {
+        const opening = emojiPop.hidden;
+        emojiPop.hidden = !opening;
         gifPop.hidden = true;
+        emojiToggleBtn.setAttribute('aria-expanded', String(opening));
+        gifToggleBtn.setAttribute('aria-expanded', 'false');
+        if (opening) positionPopover(emojiPop, emojiToggleBtn);
     });
     emojiPop.addEventListener('click', e => {
         const btn = e.target.closest('.ped-emoji-btn');
         if (!btn) return;
-        editor.focus();
-        restoreRange();
-        document.execCommand('insertText', false, btn.dataset.emoji);
-        emojiPop.hidden = true;
+        insertAtCursor(document.createTextNode(btn.dataset.emoji));
+        closePopovers();
     });
 
     // ── GIF ───────────────────────────────────────────────────────────────────
-    modal.querySelector('.ped-toggle-gif').addEventListener('click', () => {
-        gifPop.hidden = !gifPop.hidden;
+    gifToggleBtn.addEventListener('click', () => {
+        const opening = gifPop.hidden;
+        gifPop.hidden = !opening;
         emojiPop.hidden = true;
+        gifToggleBtn.setAttribute('aria-expanded', String(opening));
+        emojiToggleBtn.setAttribute('aria-expanded', 'false');
+        if (opening) positionPopover(gifPop, gifToggleBtn);
     });
     gifPop.addEventListener('click', e => {
         const btn = e.target.closest('.ped-gif-btn');
         if (!btn) return;
-        editor.focus();
-        restoreRange();
-        document.execCommand('insertHTML', false, `<img class="rich-gif" src="${btn.dataset.gif}" alt="GIF">`);
-        gifPop.hidden = true;
+        const img = document.createElement('img');
+        img.className = 'rich-gif';
+        img.src = btn.dataset.gif;
+        img.alt = 'GIF';
+        insertAtCursor(img);
+        closePopovers();
     });
 
     // ── Image strip rendering ─────────────────────────────────────────────────
@@ -186,8 +236,7 @@
         keepUrls = [];
         newFiles = [];
         imgError.hidden = true;
-        emojiPop.hidden = true;
-        gifPop.hidden = true;
+        closePopovers();
         renderStrip();
         saveBtn.disabled = true;
         openModal();

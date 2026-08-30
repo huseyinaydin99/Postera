@@ -418,15 +418,16 @@ th { background: var(--paper); color: var(--ink-500); }
 .rte-editor { min-height: 8rem; padding: .75rem; border: 1px solid var(--line); border-radius: 0 0 6px 6px; background: var(--paper-raised); outline: 0; white-space: pre-wrap; }
 .rte-editor:focus { border-color: var(--accent); box-shadow: 0 0 0 .2rem rgba(180, 83, 9, .14); }
 .rte-editor:empty::before { content: attr(data-placeholder); color: var(--ink-500); pointer-events: none; }
-.rte-popover { display: flex; flex-wrap: wrap; gap: .35rem; margin: .4rem 0; padding: .55rem; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); box-shadow: 0 5px 12px rgba(26, 35, 50, .08); }
-.rte-popover[hidden] { display: none; }
-.emoji-picker button { min-width: 2rem; min-height: 2rem; padding: .2rem; border: 0; border-radius: 4px; background: transparent; font-size: 1.15rem; }
+.rte-popover { position: absolute; bottom: calc(100% + 6px); left: 0; z-index: 200; display: flex; flex-wrap: wrap; gap: .35rem; padding: .55rem; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 8px 24px rgba(26,35,50,.16); min-width: max-content; }
+.rte-popover[hidden] { display: none !important; }
+.emoji-picker { max-width: 260px; }
+.emoji-picker button { width: 2.1rem; height: 2.1rem; min-width: unset; min-height: unset; padding: .2rem; border: 0; border-radius: 4px; background: transparent; font-size: 1.15rem; cursor: pointer; }
 .emoji-picker button:hover { background: var(--accent-soft); }
 .link-picker { align-items: center; }
 .link-picker input { width: min(290px, 65vw); min-height: 2.2rem; }
 .link-picker button { min-height: 2.2rem; }
-.gif-picker { display: grid; grid-template-columns: repeat(5, 1fr); max-height: 260px; overflow-y: auto; }
-.gif-picker button { height: 66px; padding: 0; overflow: hidden; border: 1px solid transparent; border-radius: 4px; background: var(--paper); }
+.gif-picker { display: grid; grid-template-columns: repeat(4, 72px); max-height: 240px; width: max-content; overflow-y: auto; gap: .2rem; }
+.gif-picker button { width: 72px; height: 60px; padding: 0; overflow: hidden; border: 1px solid transparent; border-radius: 4px; background: var(--paper); cursor: pointer; }
 .gif-picker button:hover { border-color: var(--accent); }
 .gif-picker img { width: 100%; height: 100%; object-fit: cover; }
 .rich-message-body { white-space: normal; }
@@ -685,6 +686,7 @@ th { background: var(--paper); color: var(--ink-500); }
 }
 
 .composer-bottom-bar {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1771,7 +1773,7 @@ button.post-menu-danger:hover:not(:disabled),
 /* ── Post Edit Modal ────────────────────────────────────────────────────── */
 .ped-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 910; opacity: 0; pointer-events: none; transition: opacity .18s ease; }
 .ped-backdrop.ped-visible { opacity: 1; pointer-events: auto; }
-.ped-modal { position: fixed; top: 50%; left: 50%; z-index: 911; width: min(600px, 96vw); max-height: 88vh; transform: translate(-50%, -48%) scale(.97); opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 16px 48px rgba(0,0,0,.18); display: flex; flex-direction: column; overflow: hidden; }
+.ped-modal { position: fixed; top: 50%; left: 50%; z-index: 911; width: min(600px, 96vw); max-height: 88vh; transform: translate(-50%, -48%) scale(.97); opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 16px 48px rgba(0,0,0,.18); display: flex; flex-direction: column; overflow: visible; }
 .ped-modal.ped-visible { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
 .ped-header { display: flex; align-items: center; justify-content: space-between; padding: .75rem 1rem .6rem; border-bottom: 1px solid var(--line); flex-shrink: 0; }
 .ped-title { font-weight: 700; font-size: .95rem; color: var(--ink-900); }
@@ -1788,11 +1790,12 @@ button.post-menu-danger:hover:not(:disabled),
 .ped-img-remove { position: absolute; top: 2px; right: 2px; width: 20px !important; height: 20px !important; min-height: unset !important; padding: 0 !important; border: none !important; border-radius: 50% !important; background: rgba(0,0,0,.55) !important; color: #fff !important; cursor: pointer; display: flex !important; align-items: center; justify-content: center; }
 .ped-img-remove .material-symbols-outlined { font-size: 13px; }
 .ped-img-error { font-size: .78rem; color: #dc2626; margin: 0; }
-.ped-popover { position: absolute; z-index: 5; bottom: calc(100% + .3rem); left: 0; background: var(--paper-raised); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.14); padding: .4rem; max-width: 100%; }
-.ped-emoji-pop { display: flex; flex-wrap: wrap; gap: .15rem; max-width: 260px; }
+.ped-popover { position: absolute; z-index: 920; background: var(--paper-raised); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: .4rem; }
+.ped-popover[hidden] { display: none !important; }
+.ped-emoji-pop { display: flex; flex-wrap: wrap; gap: .15rem; max-width: 280px; }
 .ped-emoji-btn { width: 2rem; height: 2rem; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-size: 1.1rem; display: grid; place-items: center; transition: background .1s; }
 .ped-emoji-btn:hover { background: var(--accent-soft); }
-.ped-gif-pop { display: flex; flex-wrap: wrap; gap: .3rem; max-width: 320px; max-height: 180px; overflow-y: auto; }
+.ped-gif-pop { display: flex; flex-wrap: wrap; gap: .3rem; max-width: 340px; max-height: 200px; overflow-y: auto; }
 .ped-gif-btn { border: none; background: transparent; padding: 0; cursor: pointer; border-radius: 6px; overflow: hidden; }
 .ped-gif-btn img { width: 72px; height: 54px; object-fit: cover !important; border: none !important; border-radius: 6px !important; margin: 0 !important; display: block; }
 .ped-toolbar { display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; border-top: 1px solid var(--line); flex-shrink: 0; flex-wrap: wrap; }

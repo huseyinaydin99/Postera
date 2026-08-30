@@ -50,23 +50,22 @@
                 </div>
                 <input id="timeline-images" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-message-images hidden>
 
-                <!-- Popover Panelleri -->
-                <div class="rte-popover emoji-picker" id="timeline-emoji-picker" hidden aria-label="Emoji seçici">
-                    <button type="button" th:each="emoji : ${#strings.arraySplit('😀,😂,🤣,😊,😍,😎,🤔,😭,😅,👍,👏,🎉,🔥,❤️,🙏,🤝,🚀,💡,🎯,✅', ',')}" th:text="${emoji}" th:attr="data-rte-emoji=${emoji}"></button>
-                </div>
-                <div class="rte-popover link-picker" id="timeline-link-picker" hidden>
-                    <label class="visually-hidden" for="timeline-link-url">Bağlantı adresi</label>
-                    <input id="timeline-link-url" type="url" placeholder="https://ornek.com" data-rte-link-url>
-                    <button type="button" data-rte-add-link>Ekle</button>
-                </div>
-                <div class="rte-popover gif-picker" id="timeline-gif-picker" hidden aria-label="Komik GIF seçici">
-                    <button type="button" th:each="gif : ${#strings.arraySplit('3o6Zt481isNVuQI1l6,26ufdipQqU2lhNA4g,3o7TKsQ8UQ2p0f9V8A,3o6Zt6ML6BklcajjsA,3o7btPCcdNniyf0ArS,3o6Zt4HU9uwXmXSAuI,l0MYC0LajbaPoEADu,ICOgUNjpvO0PC,xT9IgG50Fb7Mi0prBC,l0MYt5jPR6QX5pnqM,3oEjHI8WJv4x6UPDB6,26n6WywJyh39n1pBu,3oKIPwoeGErMmaI43S,5GoVLqeAOo6PK,13CoXDiaCcCoyk,2A75RyXVzzSI2bx4Gj,9Ai5dIk8xvBm0,3oEduSbSGpGaRX2Vri,12XDYvMJNcmLgQ,3ohs4w0OrUm5GIkBKE', ',')}" th:attr="data-rte-gif=${'https://media.giphy.com/media/' + gif + '/giphy.gif'}">
-                        <img th:src="${'https://media.giphy.com/media/' + gif + '/giphy.gif'}" alt="Komik GIF">
-                    </button>
-                </div>
-
                 <!-- Alt Aksiyon Çubuğu (Toolbar + Medya + Paylaş Butonu) -->
                 <div class="composer-bottom-bar">
+                    <!-- Popover Panelleri -->
+                    <div class="rte-popover emoji-picker" id="timeline-emoji-picker" hidden aria-label="Emoji seçici">
+                        <button type="button" th:each="emoji : ${#strings.arraySplit('😀,😂,🤣,😊,😍,😎,🤔,😭,😅,👍,👏,🎉,🔥,❤️,🙏,🤝,🚀,💡,🎯,✅', ',')}" th:text="${emoji}" th:attr="data-rte-emoji=${emoji}"></button>
+                    </div>
+                    <div class="rte-popover link-picker" id="timeline-link-picker" hidden>
+                        <label class="visually-hidden" for="timeline-link-url">Bağlantı adresi</label>
+                        <input id="timeline-link-url" type="url" placeholder="https://ornek.com" data-rte-link-url>
+                        <button type="button" data-rte-add-link>Ekle</button>
+                    </div>
+                    <div class="rte-popover gif-picker" id="timeline-gif-picker" hidden aria-label="Komik GIF seçici">
+                        <button type="button" th:each="gif : ${#strings.arraySplit('3o6Zt481isNVuQI1l6,26ufdipQqU2lhNA4g,3o7TKsQ8UQ2p0f9V8A,3o6Zt6ML6BklcajjsA,3o7btPCcdNniyf0ArS,3o6Zt4HU9uwXmXSAuI,l0MYC0LajbaPoEADu,ICOgUNjpvO0PC,xT9IgG50Fb7Mi0prBC,l0MYt5jPR6QX5pnqM,3oEjHI8WJv4x6UPDB6,26n6WywJyh39n1pBu,3oKIPwoeGErMmaI43S,5GoVLqeAOo6PK,13CoXDiaCcCoyk,2A75RyXVzzSI2bx4Gj,9Ai5dIk8xvBm0,3oEduSbSGpGaRX2Vri,12XDYvMJNcmLgQ,3ohs4w0OrUm5GIkBKE', ',')}" th:attr="data-rte-gif=${'https://media.giphy.com/media/' + gif + '/giphy.gif'}">
+                            <img th:src="${'https://media.giphy.com/media/' + gif + '/giphy.gif'}" alt="Komik GIF">
+                        </button>
+                    </div>
                     <div class="composer-toolbar">
                         <!-- Biçimlendirme Araçları -->
                         <div class="rte-toolbar" role="toolbar" aria-label="Metin biçimlendirme">
