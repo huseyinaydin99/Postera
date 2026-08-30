@@ -1633,38 +1633,58 @@ button.post-menu-danger:hover:not(:disabled),
 }
 
 /* ── Post Comments ─────────────────────────────────────────────────────────── */
-.post-comments-section { border-top: 1px solid var(--line); margin-top: 0.15rem; padding: 0.3rem 0 0; }
-.post-comments-list { display: flex; flex-direction: column; gap: 0.1rem; padding: 0 0 0.1rem; }
-.comment-item { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 0.45rem; padding: 0.2rem 0; }
-.comment-item.is-reply { padding-left: 2.2rem; }
+/*
+ * Comment UI deliberately resets the broad article > div rules.  A comment
+ * consists of an avatar column and a fluid content column, so every bubble,
+ * metadata row and composer starts on the same visual grid.
+ */
+.post-comments-section {
+    width: 100%;
+    margin: .55rem 0 0 !important;
+    padding: .65rem 0 .15rem;
+    border-top: 1px solid var(--line);
+    white-space: normal;
+}
+.post-comments-list { display: flex; flex-direction: column; gap: .5rem; padding: 0 0 .55rem; }
+.comment-item {
+    display: grid !important;
+    grid-template-columns: 32px minmax(0, 1fr);
+    align-items: start;
+    column-gap: .6rem;
+    padding: .1rem 0;
+    margin: 0 !important;
+    min-width: 0;
+}
+.comment-item.is-reply { margin-left: 2.6rem !important; }
 .comment-avatar {
-    width: 28px !important; height: 28px !important; min-width: 28px !important; max-width: 28px !important;
+    grid-column: 1;
+    width: 32px !important; height: 32px !important; min-width: 32px !important; max-width: 32px !important;
     border-radius: 50% !important; object-fit: cover !important;
     border: 1.5px solid var(--line) !important;
-    flex-shrink: 0 !important; margin: 0 !important; display: inline-block !important;
-    box-sizing: border-box !important; vertical-align: top !important;
-    align-self: flex-start !important;
+    margin: 0 !important; display: block !important; box-sizing: border-box !important;
 }
-.comment-body { flex: 1; min-width: 0; }
+.comment-body { grid-column: 2; display: grid; gap: .25rem; min-width: 0; }
 .comment-bubble {
     display: block;
-    padding: 0.3rem 0.65rem;
-    border-radius: 10px;
-    background: var(--paper-raised);
+    width: fit-content;
+    max-width: 100%;
+    padding: .42rem .7rem;
+    border-radius: 4px 12px 12px 12px;
+    background: color-mix(in srgb, var(--paper-raised) 92%, var(--accent-soft));
     border: 1px solid var(--line);
     font-size: 0.82rem;
     line-height: 1.45;
     color: var(--ink-900);
     word-break: break-word;
     box-sizing: border-box;
-    /* Reset any inherited block-level spacing */
-    margin: 0;
+    margin: 0 !important;
+    white-space: normal;
 }
 .comment-bubble > * { margin: 0; padding: 0; }
 .comment-bubble p, .comment-bubble ul, .comment-bubble ol, .comment-bubble li { margin: 0; padding: 0; }
 .comment-author { font-weight: 700; font-size: 0.82rem; color: var(--ink-900); margin-right: 0.25rem; }
 .comment-mention { color: var(--accent); font-weight: 600; }
-.comment-meta { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.08rem; padding-left: 0.1rem; }
+.comment-meta { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; min-height: 1rem; margin: 0; padding: 0 .1rem; }
 .comment-time { font-size: 0.67rem; color: var(--ink-500); font-family: var(--font-mono); }
 .comment-reply-btn,
 .comment-delete-btn {
@@ -1675,18 +1695,26 @@ button.post-menu-danger:hover:not(:disabled),
 }
 .comment-reply-btn:hover { color: var(--accent) !important; background: transparent !important; }
 .comment-delete-btn:hover { color: var(--danger) !important; background: transparent !important; }
-.comment-loading { display: block; color: var(--ink-500); font-size: 0.78rem; padding: 0.4rem 0; }
-.comment-empty-state { display: block; color: var(--ink-500); font-size: 0.78rem; padding: 0.3rem 0 0.1rem; font-style: italic; }
-.comment-input-row { display: flex; align-items: flex-start; gap: 0.45rem; padding: 0.3rem 0 0.2rem; }
-.comment-input-row.is-reply { padding-left: 2.2rem; }
+.comment-loading { display: block; color: var(--ink-500); font-size: 0.78rem; padding: .4rem 0; }
+.comment-empty-state { display: block; color: var(--ink-500); font-size: 0.78rem; padding: .3rem 0; font-style: italic; }
+.comment-input-row {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: .6rem;
+    padding: .15rem 0 .35rem;
+    margin: 0 !important;
+    min-width: 0;
+}
+.comment-input-row.is-reply { margin-left: 2.6rem !important; }
 .comment-input-avatar {
-    width: 26px; height: 26px; min-width: 26px; max-width: 26px;
+    grid-column: 1;
+    width: 32px; height: 32px; min-width: 32px; max-width: 32px;
     border-radius: 50% !important; object-fit: cover;
     border: 1.5px solid var(--line) !important;
-    flex-shrink: 0; margin-top: 0.2rem; display: block;
-    box-sizing: border-box !important;
+    margin: 0; display: block; box-sizing: border-box !important;
 }
-.comment-input-wrap { flex: 1; min-width: 0; position: relative; }
+.comment-input-wrap { grid-column: 2; min-width: 0; position: relative; }
 .comment-input {
     display: block; width: 100%; min-height: 32px; max-height: 120px;
     padding: 0.3rem 2.4rem 0.3rem 0.65rem;
@@ -1711,7 +1739,7 @@ button.post-menu-danger:hover:not(:disabled),
 .comment-send-btn .material-symbols-outlined { font-size: 14px; }
 .comment-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .comment-cancel-reply {
-    align-self: center; background: transparent !important; border: 0 !important;
+    grid-column: 3; align-self: center; background: transparent !important; border: 0 !important;
     padding: 0 0.1rem !important; color: var(--ink-500); font-size: 0.71rem;
     cursor: pointer; min-height: auto !important; white-space: nowrap; transition: color 0.12s;
 }
@@ -1744,6 +1772,13 @@ button.post-menu-danger:hover:not(:disabled),
 .post-comment-toggle.is-active .material-symbols-outlined { color: var(--accent); }
 .comment-highlight { animation: comment-highlight-pulse 2s ease-out; border-radius: 8px; }
 @keyframes comment-highlight-pulse { 0% { background: rgba(180,83,9,0.12); } 100% { background: transparent; } }
+
+@media (max-width: 560px) {
+    .comment-item.is-reply,
+    .comment-input-row.is-reply { margin-left: 1.25rem !important; }
+    .comment-input-row { grid-template-columns: 32px minmax(0, 1fr); }
+    .comment-cancel-reply { grid-column: 2; justify-self: start; margin-top: .25rem; }
+}
 
 /* ── Reaction Modal ─────────────────────────────────────────────────────── */
 .rxm-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 900; opacity: 0; pointer-events: none; transition: opacity .18s ease; }
