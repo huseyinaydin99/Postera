@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpSession;
 import tr.com.huseyinaydin.auth.service.RegistrationService;
 import tr.com.huseyinaydin.auth.service.PasswordResetService;
 
@@ -62,7 +63,8 @@ public class AuthController {
 
     @PostMapping("/register")
     String register(@Valid @ModelAttribute RegistrationRequest registrationRequest,
-                    BindingResult bindingResult) {
+                    BindingResult bindingResult,
+                    HttpSession session) {
         if (!Objects.equals(registrationRequest.password(), registrationRequest.passwordConfirmation())) {
             bindingResult.rejectValue("passwordConfirmation", "password.mismatch", "Şifreler birbiriyle eşleşmiyor.");
         }
@@ -71,13 +73,42 @@ public class AuthController {
             return "auth/register";
         }
 
+        final String email;
         try {
-            registrationService.register(registrationRequest);
+            email = registrationService.register(registrationRequest);
         } catch (IllegalArgumentException exception) {
             bindingResult.reject("registration.failed", exception.getMessage());
             return "auth/register";
         }
 
-        return "redirect:/auth/login?registered";
+        session.setAttribute("pendingVerificationEmail", email);
+        return "redirect:/auth/verify-email";
+    }
+
+    @GetMapping("/verify-email")
+    String verifyEmailForm(@RequestParam(required = false) String email, HttpSession session, Model model) {
+        if (email == null || email.isBlank()) email = (String) session.getAttribute("pendingVerificationEmail");
+        if (email == null || email.isBlank()) return "redirect:/auth/register";
+        model.addAttribute("email", email.trim());
+        model.addAttribute("emailVerificationRequest", new EmailVerificationRequest(null));
+        return "auth/verify-email";
+    }
+
+    @PostMapping("/verify-email")
+    String verifyEmail(@RequestParam String email,
+                       @Valid @ModelAttribute EmailVerificationRequest emailVerificationRequest,
+                       BindingResult bindingResult,
+                       Model model,
+                       HttpSession session) {
+        model.addAttribute("email", email.trim());
+        if (bindingResult.hasErrors()) return "auth/verify-email";
+        try {
+            registrationService.verifyEmail(email, emailVerificationRequest.code());
+            session.removeAttribute("pendingVerificationEmail");
+            return "redirect:/auth/login?verified";
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("verification.failed", exception.getMessage());
+            return "auth/verify-email";
+        }
     }
 }

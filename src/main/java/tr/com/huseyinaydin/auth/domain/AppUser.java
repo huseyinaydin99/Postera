@@ -73,6 +73,16 @@ public class AppUser {
         return user;
     }
 
+    public static AppUser createPending(String firstName, String lastName, String email, String passwordHash) {
+        var user = create(firstName, lastName, email, passwordHash);
+        user.active = false;
+        return user;
+    }
+
+    public void activate() {
+        active = true;
+    }
+
     public void assignRole(AppRole role) {
         roles.add(role);
     }

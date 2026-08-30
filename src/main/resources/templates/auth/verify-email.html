@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1a2332">
+    <title>E-posta Doğrulama | Postera</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <link rel="stylesheet" th:href="@{/css/postera.css}">
+</head>
+<body class="auth-page auth-verification">
+<main class="verification-shell">
+    <section class="verification-card" aria-labelledby="verification-title">
+        <a class="auth-brand" th:href="@{/auth/login}" aria-label="Postera giriş sayfası"><span>✉</span> Postera</a>
+        <div class="verification-icon" aria-hidden="true"><span class="material-symbols-outlined">mark_email_read</span></div>
+        <p class="auth-eyebrow">E-POSTA DOĞRULAMA</p>
+        <h1 id="verification-title">Kodunuzu girin</h1>
+        <p class="verification-copy"><strong th:text="${email}">ornek@postera.com</strong> adresine gönderdiğimiz 6 haneli kodla hesabınızı etkinleştirin.</p>
+        <p class="verification-notice" th:if="${param.required}" role="alert">Giriş yapmak için önce e-posta adresinizi doğrulamanız gerekir.</p>
+
+        <form class="verification-form" th:action="@{/auth/verify-email}" th:object="${emailVerificationRequest}" method="post" novalidate>
+            <input type="hidden" name="email" th:value="${email}">
+            <div class="auth-server-errors" th:if="${#fields.hasGlobalErrors()}" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
+            <div class="verification-code-fields" data-verification-code aria-label="6 haneli doğrulama kodu">
+                <input class="verification-digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="1. hane" autofocus>
+                <input class="verification-digit" type="text" inputmode="numeric" maxlength="1" aria-label="2. hane">
+                <input class="verification-digit" type="text" inputmode="numeric" maxlength="1" aria-label="3. hane">
+                <input class="verification-digit" type="text" inputmode="numeric" maxlength="1" aria-label="4. hane">
+                <input class="verification-digit" type="text" inputmode="numeric" maxlength="1" aria-label="5. hane">
+                <input class="verification-digit" type="text" inputmode="numeric" maxlength="1" aria-label="6. hane">
+            </div>
+            <input type="hidden" th:field="*{code}" data-verification-code-value>
+            <p class="verification-field-error" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></p>
+            <button class="auth-submit" type="submit">Hesabımı doğrula <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="verification-help">Kod 15 dakika geçerlidir. E-postayı göremiyorsanız spam klasörünü kontrol edin.</p>
+        <a class="verification-back" th:href="@{/auth/login}">← Giriş sayfasına dön</a>
+    </section>
+</main>
+<script th:src="@{/js/email-verification.js}" defer></script>
+</body>
+</html>
