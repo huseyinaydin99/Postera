@@ -16,6 +16,7 @@
         field.classList.toggle('is-invalid', Boolean(!valid && field.value));
     };
     const validateEmail = () => {
+        if (!email) return true;
         const valid = emailPattern.test(email.value.trim());
         const message = valid || !email.value ? '' : 'Geçerli bir e-posta adresi girin.';
         email.setCustomValidity(message); feedback(email, message || (email.value ? 'E-posta adresi uygun.' : ''), valid); return valid;
@@ -23,7 +24,8 @@
     const count = (expression, value) => (value.match(expression) || []).length;
     const passwordRules = (value) => ({ length: value.length >= 8, upper: count(/[A-Z]/g, value) >= 3, lower: count(/[a-z]/g, value) >= 3, digit: count(/\d/g, value) >= 3, special: count(/[^A-Za-z0-9\s]/g, value) >= 3 });
     const validatePassword = () => {
-        if (type !== 'register') {
+        if (!password) return true;
+        if (type !== 'register' && type !== 'reset-password') {
             const valid = password.value.trim().length > 0; const message = valid || !password.value ? '' : 'Şifre alanı zorunludur.';
             password.setCustomValidity(message); feedback(password, message, valid); return valid;
         }
@@ -39,8 +41,10 @@
         confirmation.setCustomValidity(message); feedback(confirmation, message || (confirmation.value ? 'Şifreler eşleşiyor.' : ''), valid); return valid;
     };
     const validate = () => [validateEmail(), validatePassword(), validateConfirmation()].every(Boolean);
-    email.addEventListener('input', validateEmail);
-    password.addEventListener('input', () => { validatePassword(); validateConfirmation(); });
-    confirmation?.addEventListener('input', validateConfirmation);
+    if (email) email.addEventListener('input', validateEmail);
+    if (password) {
+        password.addEventListener('input', () => { validatePassword(); validateConfirmation(); });
+    }
+    if (confirmation) confirmation.addEventListener('input', validateConfirmation);
     form.addEventListener('submit', (event) => { if (!validate()) { event.preventDefault(); form.querySelector(':invalid')?.focus(); } });
 })();
