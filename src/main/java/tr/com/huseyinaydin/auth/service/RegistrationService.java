@@ -3,7 +3,11 @@ package tr.com.huseyinaydin.auth.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +36,7 @@ public class RegistrationService {
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationCodeRepository verificationCodeRepository;
     private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
     @Value("${spring.mail.username:}")
     private String senderAddress;
@@ -60,7 +65,7 @@ public class RegistrationService {
         verificationCodeRepository.save(tr.com.huseyinaydin.auth.domain.EmailVerificationCode.create(
                 user, hash(code), Instant.now().plus(Duration.ofMinutes(15))
         ));
-        sendVerificationEmail(email, code);
+        sendVerificationEmail(email, user.getFirstName(), code);
         return email;
     }
 
@@ -80,14 +85,24 @@ public class RegistrationService {
         verificationCodeRepository.delete(verification);
     }
 
-    private void sendVerificationEmail(String email, String code) {
-        var message = new SimpleMailMessage();
-        message.setTo(email);
-        if (!senderAddress.isBlank()) message.setFrom(senderAddress);
-        message.setSubject("Postera e-posta doğrulama kodunuz");
-        message.setText("Postera hesabınızı etkinleştirmek için doğrulama kodunuz: " + code
-                + "\n\nBu kod 15 dakika boyunca geçerlidir. Kodu kimseyle paylaşmayın.");
-        mailSender.send(message);
+    private void sendVerificationEmail(String email, String name, String code) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setTo(email);
+            if (!senderAddress.isBlank()) helper.setFrom(senderAddress);
+            helper.setSubject("Postera e-posta doğrulama kodunuz");
+
+            Context context = new Context();
+            context.setVariable("name", name);
+            context.setVariable("code", code);
+            String htmlContent = templateEngine.process("email/verification-code", context);
+
+            helper.setText(htmlContent, true);
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Doğrulama e-postası gönderilirken bir hata oluştu.", e);
+        }
     }
 
     private String createCode() {

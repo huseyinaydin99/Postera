@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postera E-Posta Doğrulama Kodu</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #334155;
+            -webkit-font-smoothing: antialiased;
+        }
+        table {
+            border-spacing: 0;
+            width: 100%;
+        }
+        td {
+            padding: 0;
+        }
+        img {
+            border: 0;
+        }
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #f4f6f8;
+            padding-bottom: 40px;
+            padding-top: 40px;
+        }
+        .main-table {
+            background-color: #ffffff;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+        }
+        .header {
+            background-color: #1a2332;
+            padding: 24px;
+            text-align: center;
+            border-top: 4px solid #b45309;
+        }
+        .brand {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .brand-icon {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+            border-radius: 6px;
+            background-color: #b45309;
+            color: #ffffff;
+            font-size: 16px;
+            margin-right: 8px;
+        }
+        .content {
+            padding: 40px 32px;
+        }
+        .greeting {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+        .text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-top: 0;
+            margin-bottom: 24px;
+            color: #475569;
+        }
+        .code-container {
+            background-color: #fef3e2;
+            border: 1px solid #f5d7ad;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 32px;
+            margin-bottom: 32px;
+        }
+        .code-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #b45309;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .code-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: #1a2332;
+            letter-spacing: 6px;
+            margin: 0;
+        }
+        .divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin-top: 32px;
+            margin-bottom: 24px;
+        }
+        .warning-text {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .footer p {
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <center class="wrapper">
+        <table class="main-table">
+            <!-- Header -->
+            <tr>
+                <td class="header">
+                    <span class="brand">
+                        <span class="brand-icon">✉</span>Postera
+                    </span>
+                </td>
+            </tr>
+            <!-- Content -->
+            <tr>
+                <td class="content">
+                    <h1 class="greeting">Merhaba <span th:text="${name}">Kullanıcımız</span>,</h1>
+                    <p class="text">Postera'ya hoş geldiniz! Hesabınızı etkinleştirmek ve güvenliğinizi doğrulamak için aşağıdaki doğrulama kodunu kullanabilirsiniz.</p>
+                    
+                    <div class="code-container">
+                        <div class="code-label">E-Posta Doğrulama Kodu</div>
+                        <h2 class="code-value" th:text="${code}">123456</h2>
+                    </div>
+                    
+                    <p class="text">Bu doğrulama kodu güvenlik gerekçesiyle <strong>15 dakika</strong> boyunca geçerlidir.</p>
+                    
+                    <div class="divider"></div>
+                    <p class="warning-text">Eğer bu hesabı siz oluşturmadıysanız, lütfen bu e-postayı dikkate almayın. Hesabınız doğrulanmadığı sürece etkinleştirilmeyecektir.</p>
+                </td>
+            </tr>
+            <!-- Footer -->
+            <tr>
+                <td class="footer">
+                    <p>© 2026 Postera. Tüm hakları saklıdır.</p>
+                    <p>Güvenli iletişim çalışma alanınız.</p>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>

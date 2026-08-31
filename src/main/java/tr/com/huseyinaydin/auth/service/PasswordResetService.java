@@ -3,7 +3,11 @@ package tr.com.huseyinaydin.auth.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,7 @@ public class PasswordResetService {
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
     @Value("${postera.app.base-url}") private String applicationBaseUrl;
     @Value("${spring.mail.username:}") private String senderAddress;
 
@@ -35,12 +40,24 @@ public class PasswordResetService {
         tokenRepository.deleteByUserId(user.getId());
         var rawToken = createRawToken();
         tokenRepository.save(PasswordResetToken.create(user, hash(rawToken), Instant.now().plus(Duration.ofMinutes(30))));
-        var message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
-        if (!senderAddress.isBlank()) message.setFrom(senderAddress);
-        message.setSubject("Postera parola sıfırlama bağlantısı");
-        message.setText("Parolanızı yenilemek için 30 dakika içinde bu bağlantıyı açın:\n" + applicationBaseUrl + "/auth/reset-password?token=" + rawToken);
-        mailSender.send(message);
+        
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setTo(user.getEmail());
+            if (!senderAddress.isBlank()) helper.setFrom(senderAddress);
+            helper.setSubject("Postera parola sıfırlama talebi");
+
+            Context context = new Context();
+            context.setVariable("name", user.getFirstName());
+            context.setVariable("resetLink", applicationBaseUrl + "/auth/reset-password?token=" + rawToken);
+            String htmlContent = templateEngine.process("email/password-reset", context);
+
+            helper.setText(htmlContent, true);
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("E-posta gönderilirken bir hata oluştu.", e);
+        }
     }
 
     @Transactional
