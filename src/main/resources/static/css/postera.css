@@ -358,8 +358,8 @@ th { background: var(--paper); color: var(--ink-500); }
 }
 
 /* E-posta doğrulama — tek viewport, odaklı kod girişi */
-.auth-verification { height: 100vh; overflow: hidden; background: radial-gradient(circle at 15% 15%, var(--accent-soft), transparent 31%), var(--paper); }
-.verification-shell { display: grid; min-height: 100%; place-items: center; padding: 1.5rem; }
+.auth-verification { height: 100vh; overflow: hidden; background: radial-gradient(circle at 15% 15%, var(--accent-soft), transparent 31%), var(--paper); display: flex; align-items: center; justify-content: center; }
+.verification-shell { width: 100%; display: flex; justify-content: center; align-items: center; padding: 1.5rem; box-sizing: border-box; }
 .verification-card { width: min(100%, 31rem); padding: clamp(1.75rem, 5vw, 3rem); border: 1px solid var(--line); border-radius: 18px; background: var(--paper-raised); box-shadow: 0 22px 55px rgba(26, 35, 50, .12); text-align: center; }
 .verification-card .auth-brand { display: inline-flex; align-items: center; }
 .verification-icon { display: grid; width: 3.8rem; height: 3.8rem; margin: 1.8rem auto 1.25rem; place-items: center; border-radius: 14px; background: var(--accent-soft); color: var(--accent); }
@@ -369,7 +369,7 @@ th { background: var(--paper); color: var(--ink-500); }
 .verification-copy { margin: .75rem auto 1.5rem; color: var(--ink-500); line-height: 1.6; }
 .verification-copy strong { color: var(--ink-900); overflow-wrap: anywhere; }
 .verification-notice { margin: 0 0 1rem; padding: .7rem .85rem; border: 1px solid #f3c7c7; border-radius: 8px; background: #fff6f6; color: var(--danger); font-size: .82rem; }
-.verification-form { gap: .9rem; }
+.verification-form { display: grid; gap: .9rem; }
 .verification-code-fields { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .55rem; }
 .verification-digit { width: 100%; min-width: 0; min-height: 3.35rem; padding: 0; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); color: var(--ink-900); font: 700 1.35rem var(--font-mono); text-align: center; }
 .verification-digit:focus { border-color: var(--accent); box-shadow: 0 0 0 .22rem rgba(180, 83, 9, .13); outline: 0; }
