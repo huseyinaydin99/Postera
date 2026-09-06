@@ -1897,3 +1897,5 @@ button.post-menu-danger:hover:not(:disabled),
 .ped-save-btn { margin-left: auto; display: inline-flex; align-items: center; gap: .3rem; padding: .38rem .9rem; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-weight: 600; font-size: .85rem; cursor: pointer; transition: opacity .12s; min-height: unset !important; }
 .ped-save-btn:disabled { opacity: .55; cursor: not-allowed; }
 .ped-save-btn .material-symbols-outlined { font-size: 16px; }
+
+.reply-form .rte-popover { top: calc(100% + 6px); bottom: auto; }
