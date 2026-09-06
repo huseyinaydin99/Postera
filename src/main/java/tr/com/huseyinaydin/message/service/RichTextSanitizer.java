@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 public class RichTextSanitizer {
 
     private static final String ALLOWED_TAGS = "b|strong|i|em|p|br|ul|ol|li";
-    private static final Pattern LINK_TAG = Pattern.compile("(?i)&lt;a\\s+[^&gt;]*href=&quot;(https?://[^&quot;\\s]+)&quot;[^&gt;]*&gt;");
-    private static final Pattern GIF_TAG = Pattern.compile("(?i)&lt;img\\s+[^&gt;]*src=&quot;(https://media[0-9]*\\.giphy\\.com/media/[A-Za-z0-9]+/giphy\\.gif)&quot;[^&gt;]*&gt;");
+    private static final Pattern LINK_TAG = Pattern.compile("(?i)&lt;a\\s+.*?href=&quot;(https?://.*?)&quot;.*?&gt;");
+    private static final Pattern IMG_TAG = Pattern.compile("(?i)&lt;img\\s+.*?src=&quot;((?:https?://|data:image/).*?)&quot;.*?&gt;");
 
     public String sanitize(String value) {
         if (value == null) return "";
@@ -22,13 +22,13 @@ public class RichTextSanitizer {
         var escaped = escapeHtmlBasic(rawText);
         var formatted = escaped.replaceAll("(?i)&lt;(/?(?:" + ALLOWED_TAGS + "))&gt;", "<$1>");
         formatted = restoreLinks(formatted);
-        return restoreGifs(formatted);
+        return restoreImages(formatted);
     }
 
     public boolean hasText(String value) {
         if (value == null) return false;
         var sanitized = sanitize(value);
-        return sanitized.contains("<img class=\"rich-gif\"")
+        return sanitized.contains("<img ")
                 || sanitized.replaceAll("<[^>]+>", "").replace("&nbsp;", " ").trim().length() > 0;
     }
 
@@ -60,12 +60,12 @@ public class RichTextSanitizer {
         return output.toString().replaceAll("(?i)&lt;/a&gt;", "</a>");
     }
 
-    private String restoreGifs(String value) {
-        var matcher = GIF_TAG.matcher(value);
+    private String restoreImages(String value) {
+        var matcher = IMG_TAG.matcher(value);
         var output = new StringBuffer();
         while (matcher.find()) {
             var src = matcher.group(1).replace("&amp;", "&");
-            matcher.appendReplacement(output, Matcher.quoteReplacement("<img class=\"rich-gif\" src=\"" + src + "\" alt=\"GIF\">"));
+            matcher.appendReplacement(output, Matcher.quoteReplacement("<img class=\"rich-gif\" src=\"" + src + "\" alt=\"Görsel\" style=\"max-width: 100%; border-radius: 6px; margin: 0.6rem 0;\">"));
         }
         matcher.appendTail(output);
         return output.toString();
