@@ -26,18 +26,19 @@
         <p th:if="${param.passwordChanged}" role="status">Şifreniz güncellendi.</p>
         <p><a th:href="@{/profile/password}">Şifremi değiştir</a> · <a th:href="@{/profile/email}">E-posta adresimi değiştir</a> · <a href="#" data-blocked-users-toggle>Engellenenler</a></p>
 
-        <!-- Blocked Users Modal -->
-        <dialog id="blockedUsersModal" class="postera-dialog">
-            <div class="dialog-header">
-                <h2>Engellenen Kişiler</h2>
-                <button type="button" class="btn-close-dialog" data-blocked-users-close aria-label="Kapat">
+        <!-- Blocked Users Modal (matching ped-modal structure) -->
+        <div class="ped-backdrop" id="blockedUsersBackdrop" style="opacity: 0; pointer-events: none; transition: opacity 0.18s ease; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 910;"></div>
+        <div class="ped-modal" id="blockedUsersModal" role="dialog" aria-modal="true" aria-label="Engellenen Kişiler">
+            <div class="ped-header">
+                <span class="ped-title">Engellenen Kişiler</span>
+                <button type="button" class="ped-close" data-blocked-users-close aria-label="Kapat">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div class="dialog-body" id="blockedUsersList">
+            <div class="ped-body" id="blockedUsersList" style="min-height: 100px;">
                 <div class="blocked-users-loading">Yükleniyor…</div>
             </div>
-        </dialog>
+        </div>
 
         <form th:action="@{/profile}" th:object="${profileUpdateRequest}" method="post" enctype="multipart/form-data">
             <div th:if="${#fields.hasGlobalErrors()}" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
