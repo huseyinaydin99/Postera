@@ -11,9 +11,11 @@ import java.nio.file.Path;
 @EnableConfigurationProperties(UploadProperties.class)
 public class WebConfig implements WebMvcConfigurer {
     private final UploadProperties uploadProperties;
+    private final tr.com.huseyinaydin.common.web.UserPresenceInterceptor presenceInterceptor;
 
-    public WebConfig(UploadProperties uploadProperties) {
+    public WebConfig(UploadProperties uploadProperties, tr.com.huseyinaydin.common.web.UserPresenceInterceptor presenceInterceptor) {
         this.uploadProperties = uploadProperties;
+        this.presenceInterceptor = presenceInterceptor;
     }
 
     @Override
@@ -22,5 +24,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/uploads/profile/**").addResourceLocations(location.endsWith("/") ? location : location + "/");
         var messageLocation = Path.of(uploadProperties.messageDirectory()).toAbsolutePath().toUri().toString();
         registry.addResourceHandler("/uploads/messages/**").addResourceLocations(messageLocation.endsWith("/") ? messageLocation : messageLocation + "/");
+    }
+
+    @Override
+    public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {
+        registry.addInterceptor(presenceInterceptor).excludePathPatterns("/css/**", "/js/**", "/images/**", "/uploads/**");
     }
 }

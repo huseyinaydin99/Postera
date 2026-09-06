@@ -103,6 +103,11 @@
                     </div>
                 </div>
             </div>
+            <div class="topbar-friends-sidebar-dropdown">
+                <button type="button" class="topbar-icon-btn" data-friends-sidebar-toggle aria-label="Arkadaşlar" aria-expanded="false" title="Arkadaşlar">
+                    <span class="material-symbols-outlined">contacts</span>
+                </button>
+            </div>
             <details class="profile-menu">
                 <summary aria-label="Kullanıcı menüsünü aç">
                     <img th:src="${navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
@@ -118,6 +123,34 @@
             </details>
         </div>
     </div>
+    
+    <aside id="friendsSidebar" class="friends-sidebar" aria-hidden="true">
+        <div class="friends-sidebar-header">
+            <h2>Arkadaşlar</h2>
+            <button type="button" class="btn-close-sidebar" data-friends-sidebar-close aria-label="Kapat">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <div class="friends-sidebar-status-picker">
+            <label for="presenceStatusSelect">Durumum:</label>
+            <select id="presenceStatusSelect" class="form-control">
+                <option value="AVAILABLE">Müsait</option>
+                <option value="INVISIBLE">Offline Görünür</option>
+                <option value="EATING">Yemekte</option>
+                <option value="SLEEPING">Uyuyor</option>
+                <option value="BUSY">İşi var</option>
+                <option value="RESTROOM">Çişi var</option>
+                <option value="UNAVAILABLE">Müsait değil</option>
+            </select>
+        </div>
+
+        <div class="friends-sidebar-list" id="friendsSidebarList">
+            <!-- JS dynamically populates this -->
+            <div class="friends-sidebar-loading">Yükleniyor…</div>
+        </div>
+    </aside>
+
     <footer class="app-footer">
         <p class="app-footer-github"> © 2026
             <a class="app-footer-github" href="https://github.com/huseyinaydin99" target="_blank" rel="noopener noreferrer">
@@ -134,6 +167,7 @@
     <script th:src="@{/js/friends-dropdown.js}" defer></script>
     <script th:src="@{/js/messages-dropdown.js}" defer></script>
     <script th:src="@{/js/navigation-counters.js}" defer></script>
+    <script th:src="@{/js/friends-sidebar.js}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script th:src="@{/js/message-delete-confirmation.js}" defer></script>
     <script th:src="@{/js/postera-alerts.js}" defer></script>

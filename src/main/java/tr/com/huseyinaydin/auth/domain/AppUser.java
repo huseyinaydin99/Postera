@@ -45,6 +45,13 @@ public class AppUser {
     @Column(name = "profile_image_url", length = 500)
     private String profileImageUrl;
 
+    @Column(name = "last_seen_at")
+    private java.time.OffsetDateTime lastSeenAt;
+
+    @jakarta.persistence.Enumerated(jakarta.persistence.EnumType.STRING)
+    @Column(name = "presence_status", length = 50)
+    private PresenceStatus presenceStatus = PresenceStatus.AVAILABLE;
+
     /*
         // tam olarak mesele bu: app_user_roles bir ara tablo olduğu için hem user_id hem de role_id
         değerini tutuyor; inverseJoinColumns da bu tablodaki karşı entity'nin ID'sini gösteriyor.
@@ -111,5 +118,13 @@ public class AppUser {
 
     public void updateProfileImage(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updatePresenceStatus(PresenceStatus status) {
+        this.presenceStatus = status;
+    }
+
+    public void updateLastSeenAt(java.time.OffsetDateTime lastSeenAt) {
+        this.lastSeenAt = lastSeenAt;
     }
 }

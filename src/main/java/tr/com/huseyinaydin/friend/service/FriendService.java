@@ -235,6 +235,46 @@ public class FriendService {
                 .orElse(false);
     }
 
+    @Transactional(readOnly = true)
+    public java.util.List<tr.com.huseyinaydin.friend.service.SidebarFriendItem> getSidebarFriends(String currentUserEmail) {
+        var currentUser = findUserByEmail(currentUserEmail);
+        var friendships = friendshipRepository.findAllByUserId(currentUser.getId());
+        
+        return friendships.stream()
+                .filter(f -> f.getStatus() == FriendshipStatus.ACCEPTED)
+                .map(f -> f.getSender().getId().equals(currentUser.getId()) ? f.getReceiver() : f.getSender())
+                .map(user -> {
+                    var now = java.time.OffsetDateTime.now();
+                    boolean isOnline = false;
+                    if (user.getLastSeenAt() != null && user.getPresenceStatus() != tr.com.huseyinaydin.auth.domain.PresenceStatus.INVISIBLE) {
+                        isOnline = java.time.temporal.ChronoUnit.MINUTES.between(user.getLastSeenAt(), now) <= 5;
+                    }
+                    return new tr.com.huseyinaydin.friend.service.SidebarFriendItem(
+                            user.getId(),
+                            user.getFirstName() + " " + user.getLastName(),
+                            user.getProfileImageUrl(),
+                            isOnline,
+                            user.getPresenceStatus() != null ? user.getPresenceStatus().label() : "Müsait",
+                            user.getLastSeenAt()
+                    );
+                })
+                .sorted((a, b) -> {
+                    if (a.isOnline() && !b.isOnline()) return -1;
+                    if (!a.isOnline() && b.isOnline()) return 1;
+                    
+                    // Both online or both offline. Sort by name if online, sort by lastSeen if offline
+                    if (a.isOnline()) {
+                        return a.fullName().compareToIgnoreCase(b.fullName());
+                    } else {
+                        if (a.lastSeenAt() == null && b.lastSeenAt() == null) return a.fullName().compareToIgnoreCase(b.fullName());
+                        if (a.lastSeenAt() == null) return 1;
+                        if (b.lastSeenAt() == null) return -1;
+                        return b.lastSeenAt().compareTo(a.lastSeenAt());
+                    }
+                })
+                .toList();
+    }
+
     private String resolveStatus(Long currentUserId, Friendship friendship) {
         if (friendship == null) {
             return "NONE";
