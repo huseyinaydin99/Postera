@@ -12,7 +12,16 @@
     <section aria-labelledby="profile-title">
         <h1 id="profile-title">Profilim</h1>
         <p>E-posta adresiniz: <strong th:text="${email}"></strong></p>
-        <img th:if="${profileImageUrl}" th:src="${profileImageUrl}" alt="Profil görseli" width="96" height="96">
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <div>
+                <strong>Profil Fotoğrafı:</strong><br>
+                <img th:if="${profileImageUrl}" th:src="${profileImageUrl}" alt="Profil görseli" width="96" height="96" style="object-fit: cover; border-radius: 50%;">
+            </div>
+            <div>
+                <strong>Kapak Fotoğrafı:</strong><br>
+                <img th:if="${coverImageUrl}" th:src="${coverImageUrl}" alt="Kapak görseli" width="200" height="96" style="object-fit: cover;">
+            </div>
+        </div>
         <p th:if="${param.updated}" role="status">Profil bilgileriniz güncellendi.</p>
         <p th:if="${param.passwordChanged}" role="status">Şifreniz güncellendi.</p>
         <p><a th:href="@{/profile/password}">Şifremi değiştir</a> · <a th:href="@{/profile/email}">E-posta adresimi değiştir</a></p>
@@ -25,8 +34,13 @@
                 <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></p>
             </div>
             <div>
-                <label for="profileImage">Profil görseli</label>
+                <label for="profileImage">Profil fotoğrafı</label>
                 <input id="profileImage" th:field="*{profileImage}" type="file" accept="image/jpeg,image/png,image/webp">
+                <p>JPG, PNG veya WEBP; en fazla 5 MB.</p>
+            </div>
+            <div>
+                <label for="coverImage">Kapak fotoğrafı</label>
+                <input id="coverImage" th:field="*{coverImage}" type="file" accept="image/jpeg,image/png,image/webp">
                 <p>JPG, PNG veya WEBP; en fazla 5 MB.</p>
             </div>
             <div>

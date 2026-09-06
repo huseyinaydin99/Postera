@@ -16,7 +16,7 @@
         
         <!-- Profil Üst Alanı (Kapak ve Profil Fotoğrafı) -->
         <div class="profile-header">
-            <div class="profile-cover">
+            <div class="profile-cover" th:style="${targetUser.coverImageUrl != null ? 'background-image: url(' + targetUser.coverImageUrl + ');' : ''}">
                 <button type="button" class="btn-block-user" id="blockUserBtn"
                         th:attr="data-user-name=${targetUser.firstName + ' ' + targetUser.lastName}"
                         title="Kullanıcıyı Engelle">

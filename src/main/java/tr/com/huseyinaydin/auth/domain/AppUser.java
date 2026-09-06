@@ -45,6 +45,9 @@ public class AppUser {
     @Column(name = "profile_image_url", length = 500)
     private String profileImageUrl;
 
+    @Column(name = "cover_image_url", length = 500)
+    private String coverImageUrl;
+
     @Column(name = "last_seen_at")
     private java.time.OffsetDateTime lastSeenAt;
 
@@ -118,6 +121,10 @@ public class AppUser {
 
     public void updateProfileImage(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateCoverImage(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
     }
 
     public void updatePresenceStatus(PresenceStatus status) {

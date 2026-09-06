@@ -26,9 +26,10 @@ public class ProfileController {
     @GetMapping
     String profile(Authentication authentication, Model model) {
         var profile = profileService.getProfile(authentication.getName());
-        model.addAttribute("profileUpdateRequest", new ProfileUpdateRequest(profile.firstName(), profile.lastName(), null));
+        model.addAttribute("profileUpdateRequest", new ProfileUpdateRequest(profile.firstName(), profile.lastName(), null, null));
         model.addAttribute("email", profile.email());
         model.addAttribute("profileImageUrl", profile.profileImageUrl());
+        model.addAttribute("coverImageUrl", profile.coverImageUrl());
         return "profile/index";
     }
 
@@ -41,6 +42,7 @@ public class ProfileController {
             var profile = profileService.getProfile(authentication.getName());
             model.addAttribute("email", profile.email());
             model.addAttribute("profileImageUrl", profile.profileImageUrl());
+            model.addAttribute("coverImageUrl", profile.coverImageUrl());
             return "profile/index";
         }
         try {
@@ -51,6 +53,7 @@ public class ProfileController {
             var profile = profileService.getProfile(authentication.getName());
             model.addAttribute("email", profile.email());
             model.addAttribute("profileImageUrl", profile.profileImageUrl());
+            model.addAttribute("coverImageUrl", profile.coverImageUrl());
             return "profile/index";
         }
     }

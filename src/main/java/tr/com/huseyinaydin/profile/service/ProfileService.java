@@ -22,15 +22,19 @@ public class ProfileService {
     @Transactional(readOnly = true)
     public ProfileData getProfile(String email) {
         var user = findUser(email);
-        return new ProfileData(user.getFirstName(), user.getLastName(), user.getEmail(), user.getProfileImageUrl());
+        return new ProfileData(user.getFirstName(), user.getLastName(), user.getEmail(), user.getProfileImageUrl(), user.getCoverImageUrl());
     }
 
     @Transactional
     public void updateProfile(String email, ProfileUpdateRequest request) {
         var user = findUser(email);
         user.updateProfile(request.firstName().trim(), request.lastName().trim());
+        
         var imageUrl = profileImageStorage.store(request.profileImage());
         if (imageUrl != null) user.updateProfileImage(imageUrl);
+        
+        var coverUrl = profileImageStorage.store(request.coverImage());
+        if (coverUrl != null) user.updateCoverImage(coverUrl);
     }
 
     @Transactional

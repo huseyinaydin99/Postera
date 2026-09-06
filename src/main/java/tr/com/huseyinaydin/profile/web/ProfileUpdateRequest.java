@@ -12,6 +12,7 @@ public record ProfileUpdateRequest(
         @NotBlank(message = "Soyad alanı zorunludur.")
         @Size(max = 100, message = "Soyad en fazla 100 karakter olabilir.")
         String lastName,
-        MultipartFile profileImage
+        MultipartFile profileImage,
+        MultipartFile coverImage
 ) {
 }
