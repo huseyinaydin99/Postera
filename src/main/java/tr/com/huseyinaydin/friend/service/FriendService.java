@@ -236,6 +236,30 @@ public class FriendService {
     }
 
     @Transactional(readOnly = true)
+    public java.util.List<tr.com.huseyinaydin.friend.service.BlockedUserItem> getBlockedUsers(String currentUserEmail) {
+        var currentUser = findUserByEmail(currentUserEmail);
+        return friendshipRepository.findBySenderIdAndStatus(currentUser.getId(), FriendshipStatus.BLOCKED)
+                .stream()
+                .map(f -> new tr.com.huseyinaydin.friend.service.BlockedUserItem(
+                        f.getReceiver().getId(),
+                        f.getReceiver().getFirstName() + " " + f.getReceiver().getLastName(),
+                        f.getReceiver().getProfileImageUrl()
+                ))
+                .toList();
+    }
+
+    @Transactional
+    public void unblockUser(String currentUserEmail, Long blockedUserId) {
+        var currentUser = findUserByEmail(currentUserEmail);
+        friendshipRepository.findRelationBetween(currentUser.getId(), blockedUserId)
+                .ifPresent(f -> {
+                    if (f.getStatus() == FriendshipStatus.BLOCKED && f.getSender().getId().equals(currentUser.getId())) {
+                        friendshipRepository.delete(f);
+                    }
+                });
+    }
+
+    @Transactional(readOnly = true)
     public java.util.List<tr.com.huseyinaydin.friend.service.SidebarFriendItem> getSidebarFriends(String currentUserEmail) {
         var currentUser = findUserByEmail(currentUserEmail);
         var friendships = friendshipRepository.findAllByUserId(currentUser.getId());

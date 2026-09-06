@@ -27,4 +27,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
     List<Friendship> findPendingRequestsByReceiverId(@Param("receiverId") Long receiverId,
                                                     @Param("status") FriendshipStatus status,
                                                     Pageable pageable);
+
+    @EntityGraph(attributePaths = {"receiver"})
+    List<Friendship> findBySenderIdAndStatus(Long senderId, FriendshipStatus status);
 }
