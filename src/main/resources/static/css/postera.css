@@ -1899,3 +1899,49 @@ button.post-menu-danger:hover:not(:disabled),
 .ped-save-btn .material-symbols-outlined { font-size: 16px; }
 
 .reply-form .rte-popover { top: calc(100% + 6px); bottom: auto; }
+
+/* Public Profile Styles */
+.profile-header {
+    position: relative;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+.profile-cover {
+    height: 200px;
+    background: linear-gradient(135deg, var(--accent-soft), var(--accent));
+}
+.profile-info-bar {
+    display: flex;
+    align-items: flex-end;
+    padding: 0 1.5rem 1.5rem;
+    margin-top: -3rem;
+    position: relative;
+    z-index: 2;
+}
+.profile-info-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--paper-raised);
+    background: var(--paper-raised);
+    object-fit: cover;
+}
+.profile-info-text {
+    margin-left: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+.profile-info-text h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: var(--ink-700);
+}
+.profile-info-text p {
+    margin: 0;
+    color: var(--ink-500);
+}
+a.discover-user-name:hover {
+    text-decoration: underline !important;
+}

@@ -46,6 +46,17 @@ public class TimelineService {
     }
 
     @Transactional(readOnly = true)
+    public List<TimelinePostItem> getUserProfilePosts(String currentUserEmail, Long targetUserId) {
+        var user = findUser(currentUserEmail);
+        var isAdmin = user.getRoles().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getName()) || "ADMIN".equals(role.getName()));
+        var posts = timelinePostRepository.findAllByUserIdOrderByCreatedAtDesc(targetUserId);
+        var postIds = posts.stream().map(p -> p.getId()).toList();
+        var counts = commentRepository.countGroupedByPostIds(postIds).stream()
+                .collect(java.util.stream.Collectors.toMap(r -> (Long) r[0], r -> (Long) r[1]));
+        return posts.stream().map(post -> toPostItem(post, user, isAdmin, counts.getOrDefault(post.getId(), 0L))).toList();
+    }
+
+    @Transactional(readOnly = true)
     public TimelineFeedResponse getFriendsFeed(String currentUserEmail, int offset, int limit) {
         var user = findUser(currentUserEmail);
         var isAdmin = user.getRoles().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getName()) || "ADMIN".equals(role.getName()));

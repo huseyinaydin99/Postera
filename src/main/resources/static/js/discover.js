@@ -86,7 +86,7 @@
                          src="${user.profileImageUrl ? user.profileImageUrl : '/images/default-avatar.svg'}"
                          alt="${user.fullName} profil fotoğrafı">
                     <div class="discover-user-info">
-                        <strong class="discover-user-name">${escapeHtml(user.fullName)}</strong>
+                        <a class="discover-user-name" href="/u/${user.id}" style="text-decoration: none; color: inherit;">${escapeHtml(user.fullName)}</a>
                         <span class="discover-user-email">${escapeHtml(user.email)}</span>
                     </div>
                 </div>

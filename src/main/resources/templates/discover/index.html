@@ -57,7 +57,7 @@
                          th:src="${user.profileImageUrl != null ? user.profileImageUrl : '/images/default-avatar.svg'}"
                          th:alt="${user.fullName + ' profil fotoğrafı'}">
                     <div class="discover-user-info">
-                        <strong class="discover-user-name" th:text="${user.fullName}"></strong>
+                        <a class="discover-user-name" th:href="@{/u/{id}(id=${user.id})}" th:text="${user.fullName}" style="text-decoration: none; color: inherit;"></a>
                         <span class="discover-user-email" th:text="${user.email}"></span>
                     </div>
                 </div>
