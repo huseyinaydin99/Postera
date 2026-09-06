@@ -33,6 +33,7 @@ public class MessageService {
     private final RichTextSanitizer richTextSanitizer;
     private final MessageImageStorage messageImageStorage;
     private final MessageFileStorage messageFileStorage;
+    private final tr.com.huseyinaydin.friend.service.FriendService friendService;
 
     @Transactional
     public String send(String senderEmail, SendMessageRequest request) {
@@ -40,6 +41,10 @@ public class MessageService {
         var receiverEmail = request.receiverEmail().trim().toLowerCase(Locale.ROOT);
         var receiver = userRepository.findByEmailIgnoreCase(receiverEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı."));
+
+        if (friendService.isBlocked(sender.getId(), receiver.getId())) {
+            throw new IllegalArgumentException("Bu kullanıcı ile mesajlaşamazsınız.");
+        }
 
         var message = MailMessage.send(sender, receiver, request.subject().trim(), request.body().trim());
         if (request.file() != null && !request.file().isEmpty()) {
@@ -202,6 +207,11 @@ public class MessageService {
         }
         message.startConversationIfMissing();
         var receiver = isReceiver(sender, message) ? message.getSender() : message.getReceiver();
+        
+        if (friendService.isBlocked(sender.getId(), receiver.getId())) {
+            throw new IllegalArgumentException("Bu kullanıcı ile mesajlaşamazsınız.");
+        }
+        
         var imageUrls = messageImageStorage.storeAll(images);
         var hasFile = file != null && !file.isEmpty();
         if (!richTextSanitizer.hasText(body) && imageUrls.isEmpty() && !hasFile) {

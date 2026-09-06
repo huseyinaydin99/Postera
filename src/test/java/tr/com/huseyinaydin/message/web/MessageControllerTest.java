@@ -20,7 +20,7 @@ class MessageControllerTest {
         private AttachmentDownload downloadToReturn;
 
         public StubMessageService() {
-            super(null, null, null, null, null, null);
+            super(null, null, null, null, null, null, null);
         }
 
         public void setDownloadToReturn(AttachmentDownload downloadToReturn) {

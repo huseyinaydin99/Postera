@@ -16,7 +16,14 @@
         
         <!-- Profil Üst Alanı (Kapak ve Profil Fotoğrafı) -->
         <div class="profile-header">
-            <div class="profile-cover"></div>
+            <div class="profile-cover">
+                <button type="button" class="btn-block-user" id="blockUserBtn"
+                        th:attr="data-user-name=${targetUser.firstName + ' ' + targetUser.lastName}"
+                        title="Kullanıcıyı Engelle">
+                    <span class="material-symbols-outlined">block</span>
+                    <span>Engelle</span>
+                </button>
+            </div>
             <div class="profile-info-bar">
                 <img class="profile-info-avatar" 
                      th:src="${targetUser.profileImageUrl != null ? targetUser.profileImageUrl : '/images/default-avatar.svg'}" 
@@ -26,6 +33,8 @@
                     <p th:text="${targetUser.email}">eposta@adres.com</p>
                 </div>
             </div>
+            
+            <form id="blockUserForm" th:action="@{/u/{id}/block(id=${targetUser.id})}" method="post" style="display: none;"></form>
         </div>
 
         <!-- Paylaşımlar Akışı (Timeline Feed) -->
@@ -117,6 +126,27 @@ document.addEventListener('click', (e) => {
         }
     });
 });
+
+const blockBtn = document.getElementById('blockUserBtn');
+if (blockBtn) {
+    blockBtn.addEventListener('click', () => {
+        const userName = blockBtn.getAttribute('data-user-name');
+        Swal.fire({
+            title: 'Kullanıcıyı Engelle',
+            text: `${userName} kişisini engellemek istediğinizden emin misiniz?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Evet, engelle',
+            cancelButtonText: 'İptal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('blockUserForm').submit();
+            }
+        });
+    });
+}
 </script>
 </body>
 </html>

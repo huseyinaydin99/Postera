@@ -32,12 +32,13 @@ public class FriendService {
 
         var currentUser = findUserByEmail(currentUserEmail);
         var users = userRepository.searchActiveUsers(query.trim(), currentUser.getId());
+
         if (users.isEmpty()) {
             return List.of();
         }
 
         var userFriendships = friendshipRepository.findAllByUserId(currentUser.getId());
-        Map<Long, Friendship> relationMap = new HashMap<>();
+        var relationMap = new java.util.HashMap<Long, Friendship>();
         for (var f : userFriendships) {
             var otherUserId = f.getSender().getId().equals(currentUser.getId())
                     ? f.getReceiver().getId()
@@ -45,19 +46,24 @@ public class FriendService {
             relationMap.put(otherUserId, f);
         }
 
-        return users.stream().map(user -> {
-            var relation = relationMap.get(user.getId());
-            var status = resolveStatus(currentUser.getId(), relation);
-            return new DiscoverUserItem(
-                    user.getId(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getFirstName() + " " + user.getLastName(),
-                    user.getEmail(),
-                    user.getProfileImageUrl(),
-                    status
-            );
-        }).toList();
+        return users.stream()
+                .filter(user -> {
+                    var relation = relationMap.get(user.getId());
+                    return relation == null || relation.getStatus() != FriendshipStatus.BLOCKED;
+                })
+                .map(user -> {
+                    var relation = relationMap.get(user.getId());
+                    var status = resolveStatus(currentUser.getId(), relation);
+                    return new DiscoverUserItem(
+                            user.getId(),
+                            user.getFirstName(),
+                            user.getLastName(),
+                            user.getFirstName() + " " + user.getLastName(),
+                            user.getEmail(),
+                            user.getProfileImageUrl(),
+                            status
+                    );
+                }).toList();
     }
 
     @Transactional
@@ -199,6 +205,34 @@ public class FriendService {
                     );
                 })
                 .toList();
+    }
+
+    @Transactional
+    public void blockUser(String currentUserEmail, Long targetUserId) {
+        var currentUser = findUserByEmail(currentUserEmail);
+        if (currentUser.getId().equals(targetUserId)) {
+            throw new IllegalArgumentException("Kendinizi engelleyemezsiniz.");
+        }
+        var targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Kullanıcı bulunamadı."));
+
+        var existingRelation = friendshipRepository.findRelationBetween(currentUser.getId(), targetUser.getId());
+        if (existingRelation.isPresent()) {
+            var friendship = existingRelation.get();
+            friendshipRepository.delete(friendship);
+            friendshipRepository.flush();
+        }
+
+        var blockRelation = Friendship.create(currentUser, targetUser);
+        blockRelation.block();
+        friendshipRepository.save(blockRelation);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isBlocked(Long userId1, Long userId2) {
+        return friendshipRepository.findRelationBetween(userId1, userId2)
+                .map(f -> f.getStatus() == FriendshipStatus.BLOCKED)
+                .orElse(false);
     }
 
     private String resolveStatus(Long currentUserId, Friendship friendship) {

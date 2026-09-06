@@ -1945,3 +1945,32 @@ button.post-menu-danger:hover:not(:disabled),
 a.discover-user-name:hover {
     text-decoration: underline !important;
 }
+
+/* Block User Button */
+.btn-block-user {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    z-index: 10;
+}
+.btn-block-user:hover {
+    background-color: rgba(220, 53, 69, 0.9);
+}
+.btn-block-user:active {
+    transform: scale(0.97);
+}
+.btn-block-user .material-symbols-outlined {
+    font-size: 1.25rem;
+}
