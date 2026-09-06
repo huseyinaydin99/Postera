@@ -32,6 +32,7 @@ public class MessageService {
     private final MailCategoryRepository categoryRepository;
     private final RichTextSanitizer richTextSanitizer;
     private final MessageImageStorage messageImageStorage;
+    private final MessageFileStorage messageFileStorage;
 
     @Transactional
     public String send(String senderEmail, SendMessageRequest request) {
@@ -40,7 +41,12 @@ public class MessageService {
         var receiver = userRepository.findByEmailIgnoreCase(receiverEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı."));
 
-        messageRepository.save(MailMessage.send(sender, receiver, request.subject().trim(), request.body().trim()));
+        var message = MailMessage.send(sender, receiver, request.subject().trim(), request.body().trim());
+        if (request.file() != null && !request.file().isEmpty()) {
+            var stored = messageFileStorage.store(request.file(), request.fileAlias());
+            message.attachFile(stored.fileName(), stored.originalName(), stored.alias(), stored.fileSize(), stored.contentType());
+        }
+        messageRepository.save(message);
         return fullName(receiver);
     }
 
@@ -180,7 +186,15 @@ public class MessageService {
     }
 
     @Transactional
-    public void reply(String currentUserEmail, Long messageId, String body, java.util.List<org.springframework.web.multipart.MultipartFile> images) {
+    public void reply(String currentUserEmail, Long messageId, tr.com.huseyinaydin.message.web.ReplyMessageRequest request) {
+        reply(currentUserEmail, messageId, request.body(), request.images(), request.file(), request.fileAlias());
+    }
+
+    @Transactional
+    public void reply(String currentUserEmail, Long messageId, String body,
+                      java.util.List<org.springframework.web.multipart.MultipartFile> images,
+                      org.springframework.web.multipart.MultipartFile file,
+                      String fileAlias) {
         var sender = findUser(currentUserEmail);
         var message = findOwnedMessage(sender, messageId);
         if (message.isDraft() || message.getReceiver() == null) {
@@ -189,9 +203,16 @@ public class MessageService {
         message.startConversationIfMissing();
         var receiver = isReceiver(sender, message) ? message.getSender() : message.getReceiver();
         var imageUrls = messageImageStorage.storeAll(images);
-        if (!richTextSanitizer.hasText(body) && imageUrls.isEmpty()) throw new IllegalArgumentException("Yanıt metni veya görsel zorunludur.");
+        var hasFile = file != null && !file.isEmpty();
+        if (!richTextSanitizer.hasText(body) && imageUrls.isEmpty() && !hasFile) {
+            throw new IllegalArgumentException("Yanıt metni, görsel veya dosya zorunludur.");
+        }
         var reply = MailMessage.reply(sender, receiver, replySubject(message.getSubject()), richTextSanitizer.sanitize(body), message.getConversationId());
         imageUrls.forEach(reply::addImage);
+        if (hasFile) {
+            var stored = messageFileStorage.store(file, fileAlias);
+            reply.attachFile(stored.fileName(), stored.originalName(), stored.alias(), stored.fileSize(), stored.contentType());
+        }
         messageRepository.save(reply);
     }
 
@@ -343,11 +364,42 @@ public class MessageService {
                 message.isRead(), message.isImportant());
     }
 
+    public record AttachmentDownload(
+            org.springframework.core.io.Resource resource,
+            String downloadFileName,
+            String contentType
+    ) {}
+
+    @Transactional(readOnly = true)
+    public AttachmentDownload getAttachmentResource(String currentUserEmail, Long messageId, Long attachmentId) {
+        var user = findUser(currentUserEmail);
+        var message = findOwnedMessage(user, messageId);
+        var attachment = message.getAttachment();
+        if (attachment == null || !attachment.getId().equals(attachmentId)) {
+            throw new IllegalArgumentException("Ekli dosya bulunamadı.");
+        }
+        var resource = messageFileStorage.loadAsResource(attachment.getFileName());
+        return new AttachmentDownload(
+                resource,
+                attachment.getAlias(),
+                attachment.getContentType()
+        );
+    }
+
     private ConversationMessage toConversationMessage(MailMessage message, Long currentUserId) {
+        var attachment = message.getAttachment() != null
+                ? new MessageAttachmentData(
+                        message.getAttachment().getId(),
+                        message.getAttachment().getAlias(),
+                        message.getAttachment().getOriginalName(),
+                        message.getAttachment().getFileSize(),
+                        MessageAttachmentData.formatFileSize(message.getAttachment().getFileSize()))
+                : null;
         return new ConversationMessage(
                 message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSender().getProfileImageUrl(),
                 richTextSanitizer.sanitize(message.getBody()), message.getImages().stream().map(image -> image.getImageUrl()).toList(),
-                message.getSentAt(), message.getSender().getId().equals(currentUserId)
+                message.getSentAt(), message.getSender().getId().equals(currentUserId),
+                attachment
         );
     }
 

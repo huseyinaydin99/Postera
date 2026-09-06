@@ -11,7 +11,7 @@
 <main>
     <section aria-labelledby="compose-title">
         <h1 id="compose-title">Yeni mesaj</h1>
-        <form th:action="@{/messages}" th:object="${sendMessageRequest}" method="post">
+        <form th:action="@{/messages}" th:object="${sendMessageRequest}" method="post" enctype="multipart/form-data" class="compose-form">
             <div th:if="${#fields.hasGlobalErrors()}" role="alert">
                 <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
             </div>
@@ -30,10 +30,33 @@
                 <textarea id="body" th:field="*{body}" rows="10"></textarea>
                 <p th:if="${#fields.hasErrors('body')}" th:errors="*{body}"></p>
             </div>
-            <button type="submit">Gönder</button>
-            <button type="submit" th:formaction="@{/messages/drafts}" formnovalidate>Taslak olarak kaydet</button>
+            <div class="message-attachments-wrapper">
+                <div class="message-upload-actions">
+                    <label class="message-file-upload" for="compose-file"><span class="material-symbols-outlined">attach_file</span> Dosya ekle <small>En fazla 1 dosya, 25 MB</small></label>
+                </div>
+                <div class="file-preview-container" data-file-preview-container hidden>
+                    <div class="file-preview-item">
+                        <span class="material-symbols-outlined file-preview-icon">description</span>
+                        <div class="file-preview-details">
+                            <span class="file-preview-name" data-file-original-name>dosya.pdf</span>
+                            <span class="file-preview-size" data-file-size>2.5 MB</span>
+                        </div>
+                        <div class="file-alias-wrapper">
+                            <input type="text" name="fileAlias" class="file-alias-input" placeholder="Dosya takma adı girin..." data-file-alias-input maxlength="100" title="Dosya takma adı">
+                        </div>
+                        <button type="button" class="file-preview-remove" data-file-remove title="Dosyayı kaldır" aria-label="Dosyayı kaldır">×</button>
+                    </div>
+                </div>
+            </div>
+            <input id="compose-file" type="file" name="file" data-message-file>
+            <p class="file-upload-error" hidden data-file-upload-error></p>
+            <div class="message-action-row">
+                <button type="submit"><span class="material-symbols-outlined">send</span> Gönder</button>
+                <button type="submit" th:formaction="@{/messages/drafts}" formnovalidate><span class="material-symbols-outlined">save</span> Taslak olarak kaydet</button>
+            </div>
         </form>
     </section>
 </main>
+<script th:src="@{/js/message-image-upload.js}" defer></script>
 </body>
 </html>

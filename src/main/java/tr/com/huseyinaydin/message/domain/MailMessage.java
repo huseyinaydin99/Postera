@@ -70,6 +70,9 @@ public class MailMessage {
     @OrderBy("displayOrder ASC")
     private List<MessageImage> images = new ArrayList<>();
 
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MessageFile> files = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
     private AppUser sender;
@@ -113,6 +116,15 @@ public class MailMessage {
 
     public void addImage(String imageUrl) {
         images.add(MessageImage.create(this, imageUrl, images.size()));
+    }
+
+    public MessageFile getAttachment() {
+        return files.isEmpty() ? null : files.get(0);
+    }
+
+    public void attachFile(String fileName, String originalName, String alias, long fileSize, String contentType) {
+        files.clear();
+        files.add(MessageFile.create(this, fileName, originalName, alias, fileSize, contentType));
     }
 
     public void markAsRead() {

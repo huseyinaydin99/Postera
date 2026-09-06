@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ContentDisposition;
+import org.springframework.core.io.Resource;
+import java.nio.charset.StandardCharsets;
 import org.springframework.web.bind.annotation.ResponseBody;
 import tr.com.huseyinaydin.message.service.MessageService;
 import tr.com.huseyinaydin.category.service.CategoryService;
@@ -181,12 +186,31 @@ public class MessageController {
         try {
             model.addAttribute("message", messageService.getDetail(authentication.getName(), messageId));
             model.addAttribute("conversation", messageService.conversation(authentication.getName(), messageId));
-            model.addAttribute("replyMessageRequest", new ReplyMessageRequest(null, null));
+            model.addAttribute("replyMessageRequest", new ReplyMessageRequest(null, null, null, null));
             model.addAttribute("categories", categoryService.list(authentication.getName()));
             model.addAttribute("alreadyReported", reportService.isReportedBy(authentication.getName(), messageId));
             return "messages/detail";
         } catch (IllegalArgumentException exception) {
             return "redirect:/messages/inbox?notFound";
+        }
+    }
+
+    @GetMapping("/{messageId}/attachment/{attachmentId}")
+    public ResponseEntity<Resource> downloadAttachment(
+            @PathVariable Long messageId,
+            @PathVariable Long attachmentId,
+            Authentication authentication) {
+        try {
+            var download = messageService.getAttachmentResource(authentication.getName(), messageId, attachmentId);
+            var disposition = ContentDisposition.attachment()
+                    .filename(download.downloadFileName(), StandardCharsets.UTF_8)
+                    .build();
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                    .contentType(MediaType.parseMediaType(download.contentType() != null ? download.contentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                    .body(download.resource());
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -249,7 +273,7 @@ public class MessageController {
             }
         }
         try {
-            messageService.reply(authentication.getName(), messageId, replyMessageRequest.body(), replyMessageRequest.images());
+            messageService.reply(authentication.getName(), messageId, replyMessageRequest.body(), replyMessageRequest.images(), replyMessageRequest.file(), replyMessageRequest.fileAlias());
             return "redirect:/messages/" + messageId + "?replied";
         } catch (IllegalArgumentException exception) {
             return "redirect:/messages/" + messageId + "?replyError";

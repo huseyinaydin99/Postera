@@ -3,6 +3,7 @@ package tr.com.huseyinaydin.message.web;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 public record SendMessageRequest(
         @NotBlank(message = "Alıcı e-posta adresi zorunludur.")
@@ -15,6 +16,14 @@ public record SendMessageRequest(
 
         @NotBlank(message = "Mesaj içeriği zorunludur.")
         @Size(max = 10000, message = "Mesaj içeriği en fazla 10.000 karakter olabilir.")
-        String body
+        String body,
+
+        MultipartFile file,
+
+        @Size(max = 100, message = "Dosya takma adı en fazla 100 karakter olabilir.")
+        String fileAlias
 ) {
+    public SendMessageRequest(String receiverEmail, String subject, String body) {
+        this(receiverEmail, subject, body, null, null);
+    }
 }

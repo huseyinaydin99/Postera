@@ -34,6 +34,16 @@
                     <div class="message-images" th:if="${!item.imageUrls.empty}">
                         <img th:each="imageUrl : ${item.imageUrls}" th:src="${imageUrl}" alt="Mesaja eklenen görsel">
                     </div>
+                    <div class="message-attachment" th:if="${item.attachment != null}">
+                        <a th:href="@{/messages/{messageId}/attachment/{attachmentId}(messageId=${item.id}, attachmentId=${item.attachment.id})}" class="attachment-link" th:download="${item.attachment.alias}" th:title="${'İndir: ' + item.attachment.alias}">
+                            <span class="material-symbols-outlined attachment-icon">attach_file</span>
+                            <div class="attachment-info">
+                                <span class="attachment-name" th:text="${item.attachment.alias}">Dosya Adı</span>
+                                <small class="attachment-size" th:text="${item.attachment.formattedSize}">1.2 MB</small>
+                            </div>
+                            <span class="material-symbols-outlined attachment-download-icon">download</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -66,12 +76,30 @@
             <div id="reply-editor" class="rte-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Yanıtınız" data-rte-editor
                  data-placeholder="Bu konuşmaya yanıt yazın..." th:text="*{body}"></div>
             <input id="reply-body" type="hidden" th:field="*{body}" data-rte-input>
-            <div class="message-image-upload-wrapper">
-                <label class="message-image-upload" for="reply-images"><span class="material-symbols-outlined">image</span> Görsel ekle <small>En fazla 2 görsel, her biri 5 MB</small></label>
+            <div class="message-attachments-wrapper">
+                <div class="message-upload-actions">
+                    <label class="message-image-upload" for="reply-images"><span class="material-symbols-outlined">image</span> Görsel ekle <small>En fazla 2 görsel, 5 MB</small></label>
+                    <label class="message-file-upload" for="reply-file"><span class="material-symbols-outlined">attach_file</span> Dosya ekle <small>En fazla 1 dosya, 25 MB</small></label>
+                </div>
                 <div class="image-preview-container" data-image-preview-container></div>
+                <div class="file-preview-container" data-file-preview-container hidden>
+                    <div class="file-preview-item">
+                        <span class="material-symbols-outlined file-preview-icon">description</span>
+                        <div class="file-preview-details">
+                            <span class="file-preview-name" data-file-original-name>dosya.pdf</span>
+                            <span class="file-preview-size" data-file-size>2.5 MB</span>
+                        </div>
+                        <div class="file-alias-wrapper">
+                            <input type="text" name="fileAlias" class="file-alias-input" placeholder="Dosya takma adı girin..." data-file-alias-input maxlength="100" title="Dosya takma adı">
+                        </div>
+                        <button type="button" class="file-preview-remove" data-file-remove title="Dosyayı kaldır" aria-label="Dosyayı kaldır">×</button>
+                    </div>
+                </div>
             </div>
             <input id="reply-images" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-message-images>
+            <input id="reply-file" type="file" name="file" data-message-file>
             <p class="image-upload-error" hidden data-image-upload-error></p>
+            <p class="file-upload-error" hidden data-file-upload-error></p>
             <p th:if="${#fields.hasErrors('body')}" th:errors="*{body}"></p>
         </form>
         <p th:if="${param.replied}" role="status">Yanıtınız gönderildi.</p>
