@@ -1,7 +1,7 @@
 (() => {
     // Chat Dock Manager
     const MAX_CHATS = 3;
-    const activeChats = new Map(); // friendId -> { element, pollTimer, friendData, ... }
+    const activeChats = new Map(); // friendId -> { element, pollTimer, ... }
 
     const getCsrfHeaders = () => {
         const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
@@ -60,7 +60,7 @@
     ];
 
     const openChat = (friend) => {
-        const friendId = friend.id;
+        const friendId = Number(friend.id);
         const container = getDockContainer();
 
         // 1. Zaten açıksa odaklan ve küçültülmüşse büyüt
@@ -107,46 +107,48 @@
             </div>
 
             <div class="chat-box-body">
-                <div class="chat-loading-spinner">
+                <div class="chat-loading-spinner" style="display: flex;">
                     <span class="material-symbols-outlined chat-spin">progress_activity</span>
                     <span>Sohbet yükleniyor...</span>
                 </div>
-                <div class="chat-messages-container" hidden></div>
+                <div class="chat-messages-container" style="display: none;"></div>
             </div>
 
             <div class="chat-box-footer">
                 <div class="chat-toolbar" role="toolbar">
                     <button type="button" class="chat-tool-btn" data-chat-cmd="bold" title="Kalın"><strong>B</strong></button>
                     <button type="button" class="chat-tool-btn" data-chat-cmd="italic" title="İtalik"><em>I</em></button>
-                    <button type="button" class="chat-tool-btn" data-chat-cmd="insertUnorderedList" title="Liste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                    <button type="button" class="chat-tool-btn" data-chat-cmd="insertUnorderedList" title="Madde işaretli liste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                    <button type="button" class="chat-tool-btn" data-chat-cmd="insertOrderedList" title="Numaralı liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
                     <button type="button" class="chat-tool-btn" data-chat-popover-toggle="emoji" title="Emoji Ekle">😊</button>
                     <button type="button" class="chat-tool-btn" data-chat-popover-toggle="gif" title="GIF Ekle"><span class="material-symbols-outlined">gif_box</span></button>
                     <button type="button" class="chat-tool-btn" data-chat-popover-toggle="link" title="Bağlantı Ekle"><span class="material-symbols-outlined">link</span></button>
+                    <button type="button" class="chat-tool-btn" data-chat-cmd="removeFormat" title="Biçimlendirmeyi kaldır"><span class="material-symbols-outlined">format_clear</span></button>
                     
                     <label class="chat-tool-btn chat-file-label" title="Görsel Ekle (En fazla 2, 5MB)">
                         <span class="material-symbols-outlined">image</span>
-                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="chat-input-images" hidden>
+                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="chat-input-images" style="display: none !important;">
                     </label>
 
                     <label class="chat-tool-btn chat-file-label" title="Dosya Ekle (En fazla 1, 25MB)">
                         <span class="material-symbols-outlined">attach_file</span>
-                        <input type="file" class="chat-input-file" hidden>
+                        <input type="file" class="chat-input-file" style="display: none !important;">
                     </label>
 
                     <!-- Popovers -->
-                    <div class="chat-popover chat-emoji-popover" hidden>
+                    <div class="chat-popover chat-emoji-popover" style="display: none;">
                         <div class="chat-emoji-grid">
                             ${EMOJIS.map(em => `<button type="button" class="chat-emoji-btn" data-emoji="${em}">${em}</button>`).join('')}
                         </div>
                     </div>
 
-                    <div class="chat-popover chat-gif-popover" hidden>
+                    <div class="chat-popover chat-gif-popover" style="display: none;">
                         <div class="chat-gif-grid">
                             ${GIFS.map(g => `<button type="button" class="chat-gif-btn" data-gif="https://media.giphy.com/media/${g}/giphy.gif"><img src="https://media.giphy.com/media/${g}/giphy.gif" alt="GIF"></button>`).join('')}
                         </div>
                     </div>
 
-                    <div class="chat-popover chat-link-popover" hidden>
+                    <div class="chat-popover chat-link-popover" style="display: none;">
                         <input type="url" class="chat-link-input" placeholder="https://ornek.com">
                         <button type="button" class="chat-link-submit-btn">Ekle</button>
                     </div>
@@ -154,11 +156,11 @@
 
                 <!-- Previews -->
                 <div class="chat-previews">
-                    <div class="chat-image-previews" hidden></div>
-                    <div class="chat-file-preview" hidden>
+                    <div class="chat-image-previews" style="display: none;"></div>
+                    <div class="chat-file-preview" style="display: none;">
                         <span class="material-symbols-outlined chat-file-icon">description</span>
                         <div class="chat-file-info">
-                            <input type="text" class="chat-file-alias-input" placeholder="Dosya adı (isteğe bağlı)">
+                            <input type="text" class="chat-file-alias-input" placeholder="Dosya takma adı (isteğe bağlı)">
                             <small class="chat-file-size"></small>
                         </div>
                         <button type="button" class="chat-remove-file-btn" title="Kaldır"><span class="material-symbols-outlined">close</span></button>
@@ -166,7 +168,7 @@
                 </div>
 
                 <div class="chat-composer-row">
-                    <div class="chat-editor" contenteditable="true" role="textbox" aria-multiline="true" placeholder="${friend.fullName} ile mesajlaşın..."></div>
+                    <div class="chat-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="${friend.fullName} ile mesajlaşın..."></div>
                     <button type="button" class="chat-btn-send" title="Gönder">
                         <span class="material-symbols-outlined">send</span>
                     </button>
@@ -253,7 +255,9 @@
 
         // Popovers
         const closeAllPopovers = () => {
-            chatBox.querySelectorAll('.chat-popover').forEach(p => p.hidden = true);
+            chatBox.querySelectorAll('.chat-popover').forEach(p => {
+                p.style.display = 'none';
+            });
         };
 
         chatBox.querySelectorAll('[data-chat-popover-toggle]').forEach(btn => {
@@ -263,9 +267,14 @@
                 const type = btn.getAttribute('data-chat-popover-toggle');
                 const target = chatBox.querySelector(`.chat-${type}-popover`);
                 if (!target) return;
-                const willOpen = target.hidden;
+                const isCurrentlyOpen = target.style.display === 'flex' || target.style.display === 'block';
                 closeAllPopovers();
-                target.hidden = !willOpen;
+                if (!isCurrentlyOpen) {
+                    target.style.display = (type === 'link' || type === 'emoji') ? 'flex' : 'block';
+                    if (type === 'link') {
+                        setTimeout(() => target.querySelector('.chat-link-input')?.focus(), 50);
+                    }
+                }
             });
         });
 
@@ -357,10 +366,10 @@
         const renderImagePreviews = () => {
             imagePreviews.innerHTML = '';
             if (selectedImages.length === 0) {
-                imagePreviews.hidden = true;
+                imagePreviews.style.display = 'none';
                 return;
             }
-            imagePreviews.hidden = false;
+            imagePreviews.style.display = 'flex';
 
             selectedImages.forEach((imgFile, index) => {
                 const item = document.createElement('div');
@@ -393,7 +402,7 @@
             }
 
             selectedFile = file;
-            filePreview.hidden = false;
+            filePreview.style.display = 'flex';
             fileAliasInput.value = file.name;
             fileSizeText.textContent = formatBytes(file.size);
             fileInput.value = '';
@@ -401,7 +410,7 @@
 
         fileRemoveBtn.addEventListener('click', () => {
             selectedFile = null;
-            filePreview.hidden = true;
+            filePreview.style.display = 'none';
             fileAliasInput.value = '';
             fileSizeText.textContent = '';
         });
@@ -453,8 +462,8 @@
                     `;
                 }).join('');
             }
-            spinner.hidden = true;
-            messagesContainer.hidden = false;
+            spinner.style.display = 'none';
+            messagesContainer.style.display = 'flex';
             scrollToBottom();
         };
 
@@ -463,7 +472,10 @@
             fetch(`/api/chat/history?friendId=${friendId}`, {
                 headers: { 'Accept': 'application/json' }
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('Sunucu yanıt vermedi: ' + res.status);
+                return res.json();
+            })
             .then(data => {
                 if (data && data.messages) {
                     // Sadece mesaj sayısı veya son mesaj değiştiğinde tekrar render et
@@ -477,10 +489,22 @@
                         dot.className = `chat-box-status-dot ${data.isOnline ? 'online' : 'offline'}`;
                         presence.textContent = data.isOnline ? data.presenceStatusLabel : 'Çevrimdışı';
                     }
+                } else {
+                    renderMessages([]);
                 }
             })
             .catch(err => {
-                if (!silent) console.error('Chat history fetch error:', err);
+                if (!silent) {
+                    console.error('Chat history fetch error:', err);
+                    spinner.style.display = 'none';
+                    messagesContainer.style.display = 'flex';
+                    messagesContainer.innerHTML = `
+                        <div class="chat-empty-state">
+                            <span class="material-symbols-outlined">chat_error</span>
+                            <p>Sohbet geçmişi yüklenemedi.<br><small>${err.message || ''}</small></p>
+                        </div>
+                    `;
+                }
             });
         };
 
@@ -520,7 +544,7 @@
                 selectedImages = [];
                 renderImagePreviews();
                 selectedFile = null;
-                filePreview.hidden = true;
+                filePreview.style.display = 'none';
                 fileAliasInput.value = '';
                 fileSizeText.textContent = '';
                 

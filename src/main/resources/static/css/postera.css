@@ -2886,3 +2886,22 @@ a.discover-user-name:hover {
         max-width: 320px;
     }
 }
+
+/* Force hide all [hidden] elements inside chat components */
+.chat-box [hidden],
+.chat-popover[hidden],
+.chat-loading-spinner[hidden],
+.chat-messages-container[hidden],
+.chat-previews [hidden],
+.chat-image-previews[hidden],
+.chat-file-preview[hidden] {
+    display: none !important;
+}
+
+/* Fix placeholder for chat editor with data-placeholder */
+.chat-editor:empty:before {
+    content: attr(data-placeholder);
+    color: var(--ink-500);
+    pointer-events: none;
+    display: block;
+}
