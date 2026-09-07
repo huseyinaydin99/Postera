@@ -276,6 +276,7 @@ public class FriendService {
                     return new tr.com.huseyinaydin.friend.service.SidebarFriendItem(
                             user.getId(),
                             user.getFirstName() + " " + user.getLastName(),
+                            user.getEmail(),
                             user.getProfileImageUrl(),
                             isOnline,
                             user.getPresenceStatus() != null ? user.getPresenceStatus().label() : "Müsait",

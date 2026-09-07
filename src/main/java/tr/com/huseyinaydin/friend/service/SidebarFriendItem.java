@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 public record SidebarFriendItem(
         Long id,
         String fullName,
+        String email,
         String profileImageUrl,
         boolean isOnline,
         String presenceStatusLabel,

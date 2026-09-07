@@ -250,6 +250,85 @@ public class MessageService {
         messageRepository.save(reply);
     }
 
+    @Transactional(readOnly = true)
+    public ChatHistoryResponse getConversationWithFriend(String currentUserEmail, Long friendId) {
+        var user = findUser(currentUserEmail);
+        var friend = userRepository.findById(friendId)
+                .orElseThrow(() -> new IllegalArgumentException("Kullanıcı bulunamadı."));
+
+        var now = java.time.OffsetDateTime.now();
+        boolean isOnline = false;
+        if (friend.getLastSeenAt() != null && friend.getPresenceStatus() != tr.com.huseyinaydin.auth.domain.PresenceStatus.INVISIBLE) {
+            isOnline = java.time.temporal.ChronoUnit.MINUTES.between(friend.getLastSeenAt(), now) <= 5;
+        }
+        String presenceLabel = friend.getPresenceStatus() != null ? friend.getPresenceStatus().label() : "Müsait";
+
+        var existingConversationId = messageRepository
+                .findExistingConversationBetween(user.getId(), friend.getId())
+                .orElse(null);
+
+        java.util.List<ConversationMessage> messages;
+        if (existingConversationId != null) {
+            messages = messageRepository.findByConversationIdOrderBySentAtAsc(existingConversationId).stream()
+                    .filter(item -> isReceiver(user, item) || item.getSender().getId().equals(user.getId()))
+                    .map(item -> toConversationMessage(item, user.getId()))
+                    .toList();
+        } else {
+            messages = java.util.List.of();
+        }
+
+        return new ChatHistoryResponse(
+                friend.getId(),
+                fullName(friend),
+                friend.getEmail(),
+                friend.getProfileImageUrl(),
+                isOnline,
+                presenceLabel,
+                friend.getLastSeenAt(),
+                messages
+        );
+    }
+
+    @Transactional
+    public ConversationMessage sendMessageToFriend(String currentUserEmail, Long friendId, String body,
+                                                   java.util.List<org.springframework.web.multipart.MultipartFile> images,
+                                                   org.springframework.web.multipart.MultipartFile file,
+                                                   String fileAlias) {
+        var sender = findUser(currentUserEmail);
+        var receiver = userRepository.findById(friendId)
+                .orElseThrow(() -> new IllegalArgumentException("Kullanıcı bulunamadı."));
+
+        if (friendService.isBlocked(sender.getId(), receiver.getId())) {
+            throw new IllegalArgumentException("Bu kullanıcı ile mesajlaşamazsınız.");
+        }
+
+        var imageUrls = messageImageStorage.storeAll(images);
+        var hasFile = file != null && !file.isEmpty();
+        if (!richTextSanitizer.hasText(body) && imageUrls.isEmpty() && !hasFile) {
+            throw new IllegalArgumentException("Mesaj metni, görsel veya dosya zorunludur.");
+        }
+
+        var existingConversationId = messageRepository
+                .findExistingConversationBetween(sender.getId(), receiver.getId())
+                .orElse(null);
+
+        MailMessage message;
+        if (existingConversationId != null) {
+            message = MailMessage.reply(sender, receiver, "Sohbet", richTextSanitizer.sanitize(body), existingConversationId);
+        } else {
+            message = MailMessage.send(sender, receiver, "Sohbet", richTextSanitizer.sanitize(body));
+        }
+
+        imageUrls.forEach(message::addImage);
+        if (hasFile) {
+            var stored = messageFileStorage.store(file, fileAlias);
+            message.attachFile(stored.fileName(), stored.originalName(), stored.alias(), stored.fileSize(), stored.contentType());
+        }
+
+        var saved = messageRepository.save(message);
+        return toConversationMessage(saved, sender.getId());
+    }
+
     @Transactional
     public void assignCategory(String currentUserEmail, Long messageId, Long categoryId) {
         var message = findReceivedMessage(currentUserEmail, messageId);

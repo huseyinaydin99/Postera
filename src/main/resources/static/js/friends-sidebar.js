@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listContainer.innerHTML = friends.map(f => {
                 const presenceText = f.isOnline ? f.presenceStatusLabel : formatLastSeen(f.lastSeenAt);
                 return `
-                    <div class="friend-item">
+                    <div class="friend-item" data-friend-id="${f.id}" data-friend-name="${f.fullName}" data-friend-avatar="${f.profileImageUrl || ''}" data-friend-online="${f.isOnline}" data-friend-status="${f.presenceStatusLabel || ''}">
                         <div class="friend-item-avatar-wrapper">
                             <img src="${f.profileImageUrl || '/images/default-avatar.svg'}" class="friend-item-avatar" alt="Avatar">
                             <div class="friend-item-status-dot ${f.isOnline ? 'online' : 'offline'}"></div>
@@ -88,6 +88,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
             }).join('');
+
+            // Add click listeners to friend items to open Chat Dock
+            listContainer.querySelectorAll('.friend-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const friend = {
+                        id: Number(item.getAttribute('data-friend-id')),
+                        fullName: item.getAttribute('data-friend-name'),
+                        profileImageUrl: item.getAttribute('data-friend-avatar') || null,
+                        isOnline: item.getAttribute('data-friend-online') === 'true',
+                        presenceStatusLabel: item.getAttribute('data-friend-status') || 'Müsait'
+                    };
+                    if (window.ChatDock) {
+                        window.ChatDock.openChat(friend);
+                    }
+                });
+            });
         })
         .catch(err => console.error('Friends sidebar fetch error:', err));
     };
