@@ -138,10 +138,6 @@
 
         // File Attachment Handling
         const filePreviewContainer = form.querySelector('[data-file-preview-container]');
-        const fileOriginalName = form.querySelector('[data-file-original-name]');
-        const fileSizeElem = form.querySelector('[data-file-size]');
-        const fileAliasInput = form.querySelector('[data-file-alias-input]');
-        const fileRemoveBtn = form.querySelector('[data-file-remove]');
         const fileError = form.querySelector('[data-file-upload-error]');
         let selectedFile = null;
 
@@ -149,20 +145,70 @@
 
         const renderFilePreview = () => {
             if (!filePreviewContainer || !selectedFile) return;
-            if (fileOriginalName) fileOriginalName.textContent = selectedFile.name;
-            if (fileSizeElem) fileSizeElem.textContent = formatBytes(selectedFile.size);
-            if (fileAliasInput && !fileAliasInput.value.trim()) {
-                const baseName = selectedFile.name.replace(/\.[^/.]+$/, '');
-                fileAliasInput.value = baseName;
-            }
+            filePreviewContainer.innerHTML = '';
+
+            const item = document.createElement('div');
+            item.className = 'file-preview-item';
+
+            const icon = document.createElement('span');
+            icon.className = 'material-symbols-outlined file-preview-icon';
+            icon.textContent = 'description';
+
+            const details = document.createElement('div');
+            details.className = 'file-preview-details';
+
+            const name = document.createElement('span');
+            name.className = 'file-preview-name';
+            name.textContent = selectedFile.name;
+
+            const size = document.createElement('span');
+            size.className = 'file-preview-size';
+            size.textContent = formatBytes(selectedFile.size);
+
+            details.appendChild(name);
+            details.appendChild(size);
+
+            const aliasWrapper = document.createElement('div');
+            aliasWrapper.className = 'file-alias-wrapper';
+
+            const aliasInput = document.createElement('input');
+            aliasInput.type = 'text';
+            aliasInput.name = 'fileAlias';
+            aliasInput.className = 'file-alias-input';
+            aliasInput.placeholder = 'Dosya takma adı girin...';
+            aliasInput.maxLength = 100;
+            aliasInput.title = 'Dosya takma adı';
+            aliasInput.value = selectedFile.name.replace(/\.[^/.]+$/, '');
+            aliasWrapper.appendChild(aliasInput);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'file-preview-remove';
+            removeBtn.title = 'Dosyayı kaldır';
+            removeBtn.setAttribute('aria-label', 'Dosyayı kaldır');
+            removeBtn.textContent = '×';
+            removeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                clearFile();
+            });
+
+            item.appendChild(icon);
+            item.appendChild(details);
+            item.appendChild(aliasWrapper);
+            item.appendChild(removeBtn);
+
+            filePreviewContainer.appendChild(item);
             filePreviewContainer.hidden = false;
         };
 
         const clearFile = () => {
             selectedFile = null;
             if (fileInput) fileInput.value = '';
-            if (fileAliasInput) fileAliasInput.value = '';
-            if (filePreviewContainer) filePreviewContainer.hidden = true;
+            if (filePreviewContainer) {
+                filePreviewContainer.innerHTML = '';
+                filePreviewContainer.hidden = true;
+            }
             if (fileError) {
                 fileError.hidden = true;
                 fileError.textContent = '';
@@ -196,12 +242,6 @@
 
                 selectedFile = file;
                 renderFilePreview();
-            });
-
-            fileRemoveBtn?.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                clearFile();
             });
         }
 
