@@ -117,6 +117,16 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
             """, nativeQuery = true)
     List<Long> findLatestIdPerConversationForSender(@Param("senderId") Long senderId, Pageable pageable);
 
+    @Query(value = """
+            SELECT COUNT(DISTINCT m.conversation_id) FROM mail_messages m
+            WHERE m.sender_id = :senderId
+              AND m.draft = false
+              AND m.sender_trash = false
+              AND m.sender_deleted = false
+              AND m.conversation_id IS NOT NULL
+            """, nativeQuery = true)
+    long countConversationsForSender(@Param("senderId") Long senderId);
+
     @EntityGraph(attributePaths = {"sender", "receiver"})
     @Query("""
             select message from MailMessage message left join message.receiver receiver

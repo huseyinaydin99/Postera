@@ -40,6 +40,7 @@
     <div th:if="${!messages.empty}" hidden>
         <form th:each="message : ${messages.content}" th:id="${'delete-draft-' + message.id}" th:action="@{/messages/{id}/trash(id=${message.id})}" method="post"><input type="hidden" name="returnTo" value="drafts"></form>
     </div>
+    <div th:replace="~{fragments/pagination :: pagination(${messages}, '/messages/drafts')}"></div>
 </main>
 <script th:src="@{/js/trash-selection.js}" defer></script>
 </body>

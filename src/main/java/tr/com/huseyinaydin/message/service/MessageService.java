@@ -25,7 +25,7 @@ import tr.com.huseyinaydin.message.web.InboxFilter;
 @RequiredArgsConstructor
 public class MessageService {
 
-    private static final int PAGE_SIZE = 20;
+    private static final int PAGE_SIZE = 5;
 
     private final MailMessageRepository messageRepository;
     private final AppUserRepository userRepository;
@@ -122,7 +122,7 @@ public class MessageService {
         var messages = messageRepository.findAllById(ids).stream()
                 .sorted(java.util.Comparator.comparing(MailMessage::getSentAt).reversed())
                 .toList();
-        long total = messageRepository.countBySenderIdAndDraftFalseAndSenderTrashFalseAndSenderDeletedFalse(user.getId());
+        long total = messageRepository.countConversationsForSender(user.getId());
         return new org.springframework.data.domain.PageImpl<>(
                 messages.stream().map(m -> toListItem(m, m.getReceiver())).toList(),
                 pageable,
