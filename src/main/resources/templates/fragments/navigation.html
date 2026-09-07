@@ -21,21 +21,21 @@
     </a>
 
     <ul class="sidebar-nav">
-        <li><a class="sidebar-link" th:href="@{/}"><span class="material-symbols-outlined">home</span>Ana Sayfa</a></li>
-        <li><a class="sidebar-link" th:href="@{/messages/inbox}"><span class="material-symbols-outlined">inbox</span>Gelen Kutusu <span class="mailbox-badges"><span class="mailbox-count" th:text="${mailboxCounts.inboxTotal}">0</span><span class="mailbox-count mailbox-unread" th:if="${mailboxCounts.inboxUnread > 0}" th:text="${mailboxCounts.inboxUnread}">0</span></span></a></li>
-        <li><a class="sidebar-link" th:href="@{/timeline}"><span class="material-symbols-outlined">dynamic_feed</span>Zaman Tüneli</a></li>
-        <li><a class="sidebar-link" th:href="@{/discover}"><span class="material-symbols-outlined">person_search</span>İnsanları Keşfet</a></li>
-        <li><a class="sidebar-link" th:href="@{/messages/compose}"><span class="material-symbols-outlined">edit</span>Mesaj Gönder</a></li>
-        <li><a class="sidebar-link" th:href="@{/messages/drafts}"><span class="material-symbols-outlined">drafts</span>Taslaklar <span class="mailbox-count" th:text="${mailboxCounts.drafts}">0</span></a></li>
-        <li><a class="sidebar-link" th:href="@{/messages/sent}"><span class="material-symbols-outlined">send</span>Gönderilenler <span class="mailbox-count" th:text="${mailboxCounts.sent}">0</span></a></li>
-        <li><a class="sidebar-link" th:href="@{/messages/important}"><span class="material-symbols-outlined">label_important</span>Önemli Mesajlar <span class="mailbox-count" th:text="${mailboxCounts.important}">0</span></a></li>
-        <li><a class="sidebar-link" th:href="@{/messages/trash}"><span class="material-symbols-outlined">delete</span>Çöp Kutusu</a></li>
-        <li><a class="sidebar-link" th:href="@{/categories}"><span class="material-symbols-outlined">folder</span>Kategoriler</a></li>
+        <li><a class="sidebar-link" th:href="@{/}"><span class="material-symbols-outlined">home</span><span class="sidebar-link-text">Ana Sayfa</span></a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/inbox}"><span class="material-symbols-outlined">inbox</span><span class="sidebar-link-text">Gelen Kutusu</span> <span class="mailbox-badges"><span class="mailbox-count" th:text="${mailboxCounts.inboxTotal}">0</span><span class="mailbox-count mailbox-unread" th:if="${mailboxCounts.inboxUnread > 0}" th:text="${mailboxCounts.inboxUnread}">0</span></span></a></li>
+        <li><a class="sidebar-link" th:href="@{/timeline}"><span class="material-symbols-outlined">dynamic_feed</span><span class="sidebar-link-text">Zaman Tüneli</span></a></li>
+        <li><a class="sidebar-link" th:href="@{/discover}"><span class="material-symbols-outlined">person_search</span><span class="sidebar-link-text">İnsanları Keşfet</span></a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/compose}"><span class="material-symbols-outlined">edit</span><span class="sidebar-link-text">Mesaj Gönder</span></a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/drafts}"><span class="material-symbols-outlined">drafts</span><span class="sidebar-link-text">Taslaklar</span> <span class="mailbox-count" th:text="${mailboxCounts.drafts}">0</span></a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/sent}"><span class="material-symbols-outlined">send</span><span class="sidebar-link-text">Gönderilenler</span> <span class="mailbox-count" th:text="${mailboxCounts.sent}">0</span></a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/important}"><span class="material-symbols-outlined">label_important</span><span class="sidebar-link-text">Önemli Mesajlar</span> <span class="mailbox-count" th:text="${mailboxCounts.important}">0</span></a></li>
+        <li><a class="sidebar-link" th:href="@{/messages/trash}"><span class="material-symbols-outlined">delete</span><span class="sidebar-link-text">Çöp Kutusu</span></a></li>
+        <li><a class="sidebar-link" th:href="@{/categories}"><span class="material-symbols-outlined">folder</span><span class="sidebar-link-text">Kategoriler</span></a></li>
         <li sec:authorize="hasRole('ADMIN')" class="sidebar-divider">
-            <a class="sidebar-link" th:href="@{/admin}"><span class="material-symbols-outlined">analytics</span>İstatistikler</a>
+            <a class="sidebar-link" th:href="@{/admin}"><span class="material-symbols-outlined">analytics</span><span class="sidebar-link-text">İstatistikler</span></a>
         </li>
-        <li sec:authorize="hasRole('ADMIN')"><a class="sidebar-link" th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span>Kullanıcı Listesi</a></li>
-        <li sec:authorize="hasRole('ADMIN')"><a class="sidebar-link" th:href="@{/admin/reports}"><span class="material-symbols-outlined">report</span>Şikayetler</a></li>
+        <li sec:authorize="hasRole('ADMIN')"><a class="sidebar-link" th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span><span class="sidebar-link-text">Kullanıcı Listesi</span></a></li>
+        <li sec:authorize="hasRole('ADMIN')"><a class="sidebar-link" th:href="@{/admin/reports}"><span class="material-symbols-outlined">report</span><span class="sidebar-link-text">Şikayetler</span></a></li>
     </ul>
 
 </aside>
