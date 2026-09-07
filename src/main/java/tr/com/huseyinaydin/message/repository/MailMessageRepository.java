@@ -19,6 +19,26 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
     @EntityGraph(attributePaths = "sender")
     Page<MailMessage> findByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalseOrderBySentAtDesc(Long receiverId, Pageable pageable);
 
+    /**
+     * Gelen kutusu için: conversationId başına yalnızca en son mesajı döndürür.
+     * Bu sayede aynı kişiyle sürdürülen konuşma tek satır olarak görünür.
+     */
+    @EntityGraph(attributePaths = "sender")
+    @Query("""
+            select m from MailMessage m
+            where m.receiver.id = :receiverId
+              and m.draft = false
+              and m.trash = false
+              and m.receiverDeleted = false
+              and m.sentAt = (
+                  select max(m2.sentAt) from MailMessage m2
+                  where m2.conversationId = m.conversationId
+                    and m2.draft = false
+              )
+            order by m.sentAt desc
+            """)
+    Page<MailMessage> findLatestPerConversationForReceiver(@Param("receiverId") Long receiverId, Pageable pageable);
+
     @EntityGraph(attributePaths = {"sender", "images"})
     @Query("""
             select message from MailMessage message
@@ -60,6 +80,42 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
 
     @EntityGraph(attributePaths = {"sender", "receiver", "images"})
     List<MailMessage> findByConversationIdOrderBySentAtAsc(String conversationId);
+
+    /**
+     * İki kullanıcı arasında var olan en eski sohbet odasının ID'sini döndürür.
+     * Native SQL kullanarak JPQL + Pageable uyumluluk sorununu aşar.
+     */
+    @Query(value = """
+            SELECT conversation_id FROM mail_messages
+            WHERE conversation_id IS NOT NULL
+              AND draft = false
+              AND (
+                (sender_id = :userId1 AND receiver_id = :userId2)
+                OR
+                (sender_id = :userId2 AND receiver_id = :userId1)
+              )
+            ORDER BY sent_at ASC
+            LIMIT 1
+            """, nativeQuery = true)
+    Optional<String> findExistingConversationBetween(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+
+    /**
+     * Gönderilen kutusunda conversationId başına yalnızca en son mesajı döndürür.
+     */
+    @Query(value = """
+            SELECT id FROM mail_messages m
+            WHERE m.sender_id = :senderId
+              AND m.draft = false
+              AND m.sender_trash = false
+              AND m.sender_deleted = false
+              AND m.sent_at = (
+                SELECT MAX(m2.sent_at) FROM mail_messages m2
+                WHERE m2.conversation_id = m.conversation_id
+                  AND m2.draft = false
+              )
+            ORDER BY m.sent_at DESC
+            """, nativeQuery = true)
+    List<Long> findLatestIdPerConversationForSender(@Param("senderId") Long senderId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"sender", "receiver"})
     @Query("""

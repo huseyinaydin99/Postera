@@ -46,7 +46,18 @@ public class MessageService {
             throw new IllegalArgumentException("Bu kullanıcı ile mesajlaşamazsınız.");
         }
 
-        var message = MailMessage.send(sender, receiver, request.subject().trim(), request.body().trim());
+        // İki kullanıcı arasında mevcut sohbet varsa o odayı kullan, yoksa yeni oda oluştur
+        var existingConversationId = messageRepository
+                .findExistingConversationBetween(sender.getId(), receiver.getId())
+                .orElse(null);
+
+        MailMessage message;
+        if (existingConversationId != null) {
+            message = MailMessage.reply(sender, receiver, request.subject().trim(), request.body().trim(), existingConversationId);
+        } else {
+            message = MailMessage.send(sender, receiver, request.subject().trim(), request.body().trim());
+        }
+
         if (request.file() != null && !request.file().isEmpty()) {
             var stored = messageFileStorage.store(request.file(), request.fileAlias());
             message.attachFile(stored.fileName(), stored.originalName(), stored.alias(), stored.fileSize(), stored.contentType());
@@ -58,7 +69,7 @@ public class MessageService {
     @Transactional(readOnly = true)
     public Page<MessageListItem> inbox(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
-        return messageRepository.findByReceiverIdAndDraftFalseAndTrashFalseAndReceiverDeletedFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
+        return messageRepository.findLatestPerConversationForReceiver(user.getId(), pageRequest(page))
                 .map(message -> toListItem(message, message.getSender()));
     }
 
@@ -102,8 +113,21 @@ public class MessageService {
     @Transactional(readOnly = true)
     public Page<MessageListItem> sent(String currentUserEmail, int page) {
         var user = findUser(currentUserEmail);
-        return messageRepository.findBySenderIdAndDraftFalseAndSenderTrashFalseAndSenderDeletedFalseOrderBySentAtDesc(user.getId(), pageRequest(page))
-                .map(message -> toListItem(message, message.getReceiver()));
+        // conversationId başına yalnızca en son mesajın id'lerini getir, sonra o mesajları çek
+        var pageable = pageRequest(page);
+        var ids = messageRepository.findLatestIdPerConversationForSender(user.getId(), pageable);
+        if (ids.isEmpty()) {
+            return org.springframework.data.domain.Page.empty(pageable);
+        }
+        var messages = messageRepository.findAllById(ids).stream()
+                .sorted(java.util.Comparator.comparing(MailMessage::getSentAt).reversed())
+                .toList();
+        long total = messageRepository.countBySenderIdAndDraftFalseAndSenderTrashFalseAndSenderDeletedFalse(user.getId());
+        return new org.springframework.data.domain.PageImpl<>(
+                messages.stream().map(m -> toListItem(m, m.getReceiver())).toList(),
+                pageable,
+                total
+        );
     }
 
     @Transactional(readOnly = true)
