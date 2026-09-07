@@ -71,29 +71,68 @@
         '9Ai5dIk8xvBm0', '3oEduSbSGpGaRX2Vri', '12XDYvMJNcmLgQ', '3ohs4w0OrUm5GIkBKE'
     ];
 
-    const openChat = (friend) => {
+    const STORAGE_KEY = 'postera_chat_dock_state';
+
+    const saveStorageState = () => {
+        try {
+            const list = [];
+            activeChats.forEach((state, friendId) => {
+                list.push({
+                    friend: state.friend,
+                    isMinimized: state.element.classList.contains('is-minimized')
+                });
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        } catch (e) {
+            console.warn('ChatDock save state error:', e);
+        }
+    };
+
+    const restoreFromStorage = () => {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            const list = JSON.parse(raw);
+            if (Array.isArray(list)) {
+                list.slice(0, MAX_CHATS).forEach(item => {
+                    if (item && item.friend && item.friend.id) {
+                        openChat(item.friend, item.isMinimized === true, true);
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('ChatDock restore state error:', e);
+        }
+    };
+
+    const openChat = (friend, startMinimized = false, isRestoring = false) => {
         const friendId = Number(friend.id);
         const container = getDockContainer();
 
-        // 1. Zaten açıksa odaklan ve küçültülmüşse büyüt
+        // 1. Zaten açıksa odaklan ve küçültülmüşse büyüt (kullanıcı tıkladığında)
         if (activeChats.has(friendId)) {
             const chat = activeChats.get(friendId);
-            chat.element.classList.remove('is-minimized');
-            chat.minimizeBtn.setAttribute('title', 'Küçült');
-            chat.minimizeBtn.querySelector('.material-symbols-outlined').textContent = 'remove';
-            chat.editor.focus();
+            if (!isRestoring) {
+                chat.element.classList.remove('is-minimized');
+                chat.minimizeBtn.setAttribute('title', 'Küçült');
+                chat.minimizeBtn.querySelector('.material-symbols-outlined').textContent = 'remove';
+                chat.editor.focus();
+                saveStorageState();
+            }
             return;
         }
 
         // 2. Maksimum 3 pencere kontrolü
         if (activeChats.size >= MAX_CHATS) {
-            showWarningToast('En fazla 3 sohbet penceresi açabilirsiniz.');
+            if (!isRestoring) {
+                showWarningToast('En fazla 3 sohbet penceresi açabilirsiniz.');
+            }
             return;
         }
 
         // 3. Yeni mini chat penceresi oluştur
         const chatBox = document.createElement('div');
-        chatBox.className = 'chat-box';
+        chatBox.className = 'chat-box' + (startMinimized ? ' is-minimized' : '');
         chatBox.setAttribute('data-chat-friend-id', friendId);
 
         chatBox.innerHTML = `
@@ -109,8 +148,8 @@
                     </div>
                 </div>
                 <div class="chat-box-header-actions">
-                    <button type="button" class="chat-btn-icon chat-btn-minimize" title="Küçült" aria-label="Küçült">
-                        <span class="material-symbols-outlined">remove</span>
+                    <button type="button" class="chat-btn-icon chat-btn-minimize" title="${startMinimized ? 'Büyüt' : 'Küçült'}" aria-label="${startMinimized ? 'Büyüt' : 'Küçült'}">
+                        <span class="material-symbols-outlined">${startMinimized ? 'check_box_outline_blank' : 'remove'}</span>
                     </button>
                     <button type="button" class="chat-btn-icon chat-btn-close" title="Kapat" aria-label="Kapat">
                         <span class="material-symbols-outlined">close</span>
@@ -247,6 +286,7 @@
                 scrollToBottom();
                 editor.focus();
             }
+            saveStorageState();
         };
 
         header.addEventListener('click', (e) => {
@@ -262,6 +302,7 @@
             if (chatState.pollTimer) clearInterval(chatState.pollTimer);
             chatBox.remove();
             activeChats.delete(friendId);
+            saveStorageState();
         };
         closeBtn.addEventListener('click', closeChat);
 
@@ -604,14 +645,26 @@
             element: chatBox,
             minimizeBtn,
             editor,
+            friend,
             pollTimer: setInterval(() => fetchHistory(true), 4000)
         };
         activeChats.set(friendId, chatState);
 
         // First fetch
         fetchHistory(false);
-        setTimeout(() => editor.focus(), 150);
+        if (!startMinimized && !isRestoring) {
+            setTimeout(() => editor.focus(), 150);
+        }
+
+        saveStorageState();
     };
+
+    // Restore previously opened chats on page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', restoreFromStorage);
+    } else {
+        restoreFromStorage();
+    }
 
     // Public API on window
     window.ChatDock = {
@@ -619,3 +672,4 @@
         getActiveCount: () => activeChats.size
     };
 })();
+
