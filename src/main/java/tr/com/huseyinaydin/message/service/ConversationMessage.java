@@ -12,6 +12,7 @@ public record ConversationMessage(
         List<String> imageUrls,
         Instant sentAt,
         boolean sentByCurrentUser,
-        MessageAttachmentData attachment
+        MessageAttachmentData attachment,
+        boolean read
 ) {
 }

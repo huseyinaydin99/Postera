@@ -67,4 +67,83 @@ public class ChatApiController {
             return ResponseEntity.internalServerError().body(Map.of("message", "Mesaj gönderilirken bir hata oluştu."));
         }
     }
+
+    @PostMapping("/typing")
+    public ResponseEntity<?> setTyping(
+            @RequestParam("friendId") Long friendId,
+            @RequestParam("isTyping") boolean isTyping,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("message", "Oturum açmanız gerekiyor."));
+        }
+        try {
+            messageService.setTyping(authentication.getName(), friendId, isTyping);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/read")
+    public ResponseEntity<?> markAsRead(
+            @RequestParam("friendId") Long friendId,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("message", "Oturum açmanız gerekiyor."));
+        }
+        try {
+            messageService.markConversationAsRead(authentication.getName(), friendId);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/conversation-live")
+    public ResponseEntity<?> getConversationLive(
+            @RequestParam("messageId") Long messageId,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("message", "Oturum açmanız gerekiyor."));
+        }
+        try {
+            var live = messageService.getConversationLive(authentication.getName(), messageId);
+            return ResponseEntity.ok(live);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", "Canlı konuşma verisi alınamadı."));
+        }
+    }
+
+    @PostMapping("/read-message")
+    public ResponseEntity<?> markMessageAsRead(
+            @RequestParam("messageId") Long messageId,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("message", "Oturum açmanız gerekiyor."));
+        }
+        try {
+            messageService.markConversationAsReadByMessageId(authentication.getName(), messageId);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/message-typing")
+    public ResponseEntity<?> setMessageTyping(
+            @RequestParam("messageId") Long messageId,
+            @RequestParam("isTyping") boolean isTyping,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("message", "Oturum açmanız gerekiyor."));
+        }
+        try {
+            messageService.setTypingForMessageCounterpart(authentication.getName(), messageId, isTyping);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }

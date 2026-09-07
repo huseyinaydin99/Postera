@@ -27,12 +27,18 @@
             </div>
         </div>
         <p class="message-sent-at"><time th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}"></time></p>
-        <section class="conversation" aria-label="Mesaj konuşması">
-            <div th:each="item : ${conversation}" class="conversation-message" th:classappend="${item.sentByCurrentUser} ? ' conversation-message-own' : ''">
+        <section class="conversation" aria-label="Mesaj konuşması" th:attr="data-message-id=${message.id}">
+            <div th:each="item : ${conversation}" class="conversation-message" th:classappend="${item.sentByCurrentUser} ? ' conversation-message-own' : ''" th:attr="data-msg-id=${item.id}">
                 <img th:src="${item.senderProfileImageUrl != null ? item.senderProfileImageUrl : '/images/default-avatar.svg'}"
                      th:alt="${item.senderName + ' profil fotoğrafı'}">
                 <div class="conversation-bubble">
-                    <div><strong th:text="${item.senderName}"></strong><time th:text="${#temporals.format(item.sentAt, 'dd.MM.yyyy HH:mm')}"></time></div>
+                    <div>
+                        <strong th:text="${item.senderName}"></strong>
+                        <time th:text="${#temporals.format(item.sentAt, 'dd.MM.yyyy HH:mm')}"></time>
+                        <span th:if="${item.sentByCurrentUser}" class="conversation-read-status" th:classappend="${item.read} ? 'is-read' : 'is-sent'" th:title="${item.read ? 'Görüldü' : 'İletildi'}">
+                            <span class="material-symbols-outlined" th:text="${item.read ? 'done_all' : 'done'}">done</span>
+                        </span>
+                    </div>
                     <div class="rich-message-body" th:utext="${item.body}"></div>
                     <div class="message-images" th:if="${!item.imageUrls.empty}">
                         <img th:each="imageUrl : ${item.imageUrls}" th:src="${imageUrl}" alt="Mesaja eklenen görsel">
@@ -48,6 +54,14 @@
                         </a>
                     </div>
                 </div>
+            </div>
+            <div class="conversation-typing-indicator" id="conversationTypingIndicator" style="display: none;">
+                <div class="chat-typing-bubble">
+                    <span class="chat-typing-dot"></span>
+                    <span class="chat-typing-dot"></span>
+                    <span class="chat-typing-dot"></span>
+                </div>
+                <span class="conversation-typing-text" id="conversationTypingText">Yazıyor...</span>
             </div>
         </section>
         <form th:if="${!message.draft}" id="reply-form" class="reply-form" th:action="@{/messages/{id}/reply(id=${message.id})}" th:object="${replyMessageRequest}" method="post" enctype="multipart/form-data">
@@ -138,5 +152,6 @@
 </main>
 <script th:src="@{/js/rich-text-editor.js}" defer></script>
 <script th:src="@{/js/message-image-upload.js}" defer></script>
+<script th:src="@{/js/message-detail-live.js}" defer></script>
 </body>
 </html>

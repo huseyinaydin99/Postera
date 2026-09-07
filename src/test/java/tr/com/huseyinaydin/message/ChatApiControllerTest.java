@@ -77,5 +77,45 @@ class ChatApiControllerTest {
         var history = (ChatHistoryResponse) historyResponse.getBody();
         assertThat(history.messages()).hasSize(1);
         assertThat(history.messages().get(0).body()).contains("Merhaba nasılsın?");
+        assertThat(history.messages().get(0).read()).isFalse();
+    }
+
+    @Test
+    void shouldTrackTypingState() {
+        var authUser1 = SecurityContextHolder.getContext().getAuthentication();
+        var authUser2 = new UsernamePasswordAuthenticationToken(user2.getEmail(), null, Collections.emptyList());
+
+        // User2 types to User1
+        chatApiController.setTyping(user1.getId(), true, authUser2);
+
+        // User1 checks chat history with User2 -> peer should be typing
+        var historyResponse = chatApiController.getChatHistory(user2.getId(), authUser1);
+        var history = (ChatHistoryResponse) historyResponse.getBody();
+        assertThat(history.isPeerTyping()).isTrue();
+
+        // User2 stops typing
+        chatApiController.setTyping(user1.getId(), false, authUser2);
+        historyResponse = chatApiController.getChatHistory(user2.getId(), authUser1);
+        history = (ChatHistoryResponse) historyResponse.getBody();
+        assertThat(history.isPeerTyping()).isFalse();
+    }
+
+    @Test
+    void shouldMarkMessagesAsRead() {
+        var authUser1 = SecurityContextHolder.getContext().getAuthentication();
+        var authUser2 = new UsernamePasswordAuthenticationToken(user2.getEmail(), null, Collections.emptyList());
+
+        // User1 sends message to User2
+        var sendResponse = chatApiController.sendMessage(user2.getId(), "Test mesajı", null, null, null, authUser1);
+        var sentMsg = (ConversationMessage) sendResponse.getBody();
+        assertThat(sentMsg.read()).isFalse();
+
+        // User2 marks conversation with User1 as read
+        chatApiController.markAsRead(user1.getId(), authUser2);
+
+        // User1 checks history -> message is now read (Görüldü)
+        var historyResponse = chatApiController.getChatHistory(user2.getId(), authUser1);
+        var history = (ChatHistoryResponse) historyResponse.getBody();
+        assertThat(history.messages().get(0).read()).isTrue();
     }
 }

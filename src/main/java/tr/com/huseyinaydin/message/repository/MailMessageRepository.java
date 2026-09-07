@@ -179,4 +179,24 @@ public interface MailMessageRepository extends JpaRepository<MailMessage, Long>,
             order by count(m) desc
             """)
     List<Object[]> findTopCategories(org.springframework.data.domain.Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            update MailMessage m
+            set m.read = true
+            where m.receiver.id = :receiverId
+              and m.sender.id = :senderId
+              and m.read = false
+            """)
+    int markAllAsReadFromSender(@Param("receiverId") Long receiverId, @Param("senderId") Long senderId);
+
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            update MailMessage m
+            set m.read = true
+            where m.receiver.id = :receiverId
+              and m.conversationId = :conversationId
+              and m.read = false
+            """)
+    int markAllAsReadInConversation(@Param("receiverId") Long receiverId, @Param("conversationId") String conversationId);
 }

@@ -11,5 +11,6 @@ public record ChatHistoryResponse(
         boolean isOnline,
         String presenceStatusLabel,
         OffsetDateTime lastSeenAt,
+        boolean isPeerTyping,
         List<ConversationMessage> messages
 ) {}

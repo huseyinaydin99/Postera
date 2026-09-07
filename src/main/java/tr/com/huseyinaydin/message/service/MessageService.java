@@ -19,6 +19,8 @@ import java.util.Locale;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import tr.com.huseyinaydin.message.web.InboxFilter;
 
 @Service
@@ -27,6 +29,9 @@ public class MessageService {
 
     private static final int PAGE_SIZE = 5;
 
+    // sourceUserId + "_" + targetUserId -> timestamp (epoch milli)
+    private final ConcurrentMap<String, Long> typingState = new ConcurrentHashMap<>();
+
     private final MailMessageRepository messageRepository;
     private final AppUserRepository userRepository;
     private final MailCategoryRepository categoryRepository;
@@ -34,6 +39,31 @@ public class MessageService {
     private final MessageImageStorage messageImageStorage;
     private final MessageFileStorage messageFileStorage;
     private final tr.com.huseyinaydin.friend.service.FriendService friendService;
+
+    public void setTyping(Long senderId, Long targetUserId, boolean typing) {
+        String key = senderId + "_" + targetUserId;
+        if (typing) {
+            typingState.put(key, System.currentTimeMillis());
+        } else {
+            typingState.remove(key);
+        }
+    }
+
+    public void setTyping(String currentUserEmail, Long targetUserId, boolean typing) {
+        var user = findUser(currentUserEmail);
+        setTyping(user.getId(), targetUserId, typing);
+    }
+
+    public boolean isUserTyping(Long senderId, Long targetUserId) {
+        String key = senderId + "_" + targetUserId;
+        Long lastTime = typingState.get(key);
+        if (lastTime == null) return false;
+        if (System.currentTimeMillis() - lastTime > 4000) {
+            typingState.remove(key);
+            return false;
+        }
+        return true;
+    }
 
     @Transactional
     public String send(String senderEmail, SendMessageRequest request) {
@@ -277,6 +307,8 @@ public class MessageService {
             messages = java.util.List.of();
         }
 
+        boolean isPeerTyping = isUserTyping(friend.getId(), user.getId());
+
         return new ChatHistoryResponse(
                 friend.getId(),
                 fullName(friend),
@@ -285,8 +317,58 @@ public class MessageService {
                 isOnline,
                 presenceLabel,
                 friend.getLastSeenAt(),
+                isPeerTyping,
                 messages
         );
+    }
+
+    @Transactional
+    public void markConversationAsRead(String currentUserEmail, Long friendId) {
+        var user = findUser(currentUserEmail);
+        messageRepository.markAllAsReadFromSender(user.getId(), friendId);
+    }
+
+    @Transactional
+    public void markConversationAsReadByMessageId(String currentUserEmail, Long messageId) {
+        var user = findUser(currentUserEmail);
+        var message = findOwnedMessage(user, messageId);
+        if (message.getConversationId() != null) {
+            messageRepository.markAllAsReadInConversation(user.getId(), message.getConversationId());
+        } else if (isReceiver(user, message) && !message.isRead()) {
+            message.markAsRead();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public ConversationLiveResponse getConversationLive(String currentUserEmail, Long messageId) {
+        var user = findUser(currentUserEmail);
+        var message = findOwnedMessage(user, messageId);
+        var counterpart = message.getSender().getId().equals(user.getId()) ? message.getReceiver() : message.getSender();
+        boolean peerTyping = counterpart != null && isUserTyping(counterpart.getId(), user.getId());
+        java.util.List<ConversationMessage> messages;
+        if (message.getConversationId() == null) {
+            messages = java.util.List.of(toConversationMessage(message, user.getId()));
+        } else {
+            messages = messageRepository.findByConversationIdOrderBySentAtAsc(message.getConversationId()).stream()
+                    .filter(item -> isReceiver(user, item) || item.getSender().getId().equals(user.getId()))
+                    .map(item -> toConversationMessage(item, user.getId()))
+                    .toList();
+        }
+        return new ConversationLiveResponse(
+                counterpart != null ? counterpart.getId() : null,
+                counterpart != null ? fullName(counterpart) : "",
+                peerTyping,
+                messages
+        );
+    }
+
+    public void setTypingForMessageCounterpart(String currentUserEmail, Long messageId, boolean typing) {
+        var user = findUser(currentUserEmail);
+        var message = findOwnedMessage(user, messageId);
+        var counterpart = message.getSender().getId().equals(user.getId()) ? message.getReceiver() : message.getSender();
+        if (counterpart != null) {
+            setTyping(user.getId(), counterpart.getId(), typing);
+        }
     }
 
     @Transactional
@@ -512,7 +594,8 @@ public class MessageService {
                 message.getId(), fullName(message.getSender()), message.getSender().getEmail(), message.getSender().getProfileImageUrl(),
                 richTextSanitizer.sanitize(message.getBody()), message.getImages().stream().map(image -> image.getImageUrl()).toList(),
                 message.getSentAt(), message.getSender().getId().equals(currentUserId),
-                attachment
+                attachment,
+                message.isRead()
         );
     }
 

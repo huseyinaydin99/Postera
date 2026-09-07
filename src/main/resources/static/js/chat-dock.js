@@ -163,6 +163,14 @@
                     <span>Sohbet yükleniyor...</span>
                 </div>
                 <div class="chat-messages-container" style="display: none;"></div>
+                <div class="chat-typing-row" style="display: none;">
+                    <div class="chat-typing-bubble">
+                        <span class="chat-typing-dot"></span>
+                        <span class="chat-typing-dot"></span>
+                        <span class="chat-typing-dot"></span>
+                    </div>
+                    <span class="chat-typing-text">${friend.fullName} yazıyor...</span>
+                </div>
             </div>
 
             <div class="chat-box-footer">
@@ -236,6 +244,7 @@
         const bodyElem = chatBox.querySelector('.chat-box-body');
         const spinner = chatBox.querySelector('.chat-loading-spinner');
         const messagesContainer = chatBox.querySelector('.chat-messages-container');
+        const typingRow = chatBox.querySelector('.chat-typing-row');
         const editor = chatBox.querySelector('.chat-editor');
         const sendBtn = chatBox.querySelector('.chat-btn-send');
         const imageInput = chatBox.querySelector('.chat-input-images');
@@ -285,6 +294,7 @@
                 minimizeBtn.setAttribute('title', 'Küçült');
                 scrollToBottom();
                 editor.focus();
+                markAsRead();
             }
             saveStorageState();
         };
@@ -300,6 +310,11 @@
         const closeChat = (e) => {
             if (e) e.stopPropagation();
             if (chatState.pollTimer) clearInterval(chatState.pollTimer);
+            if (stopTypingTimer) clearTimeout(stopTypingTimer);
+            if (isTypingSent) {
+                isTypingSent = false;
+                sendTypingStatus(false);
+            }
             chatBox.remove();
             activeChats.delete(friendId);
             saveStorageState();
@@ -502,6 +517,12 @@
                            </a>`
                         : '';
 
+                    const tickHtml = isOwn
+                        ? `<span class="chat-status-tick ${m.read ? 'is-read' : 'is-sent'}" title="${m.read ? 'Görüldü' : 'İletildi'}">
+                            <span class="material-symbols-outlined">${m.read ? 'done_all' : 'done'}</span>
+                           </span>`
+                        : '';
+
                     return `
                         <div class="chat-message-row ${isOwn ? 'is-own' : 'is-peer'}">
                             ${!isOwn ? avatar : ''}
@@ -509,7 +530,10 @@
                                 ${m.body ? `<div class="chat-bubble-text">${m.body}</div>` : ''}
                                 ${imagesHtml}
                                 ${attachHtml}
-                                <div class="chat-bubble-time">${formatTime(m.sentAt)}</div>
+                                <div class="chat-bubble-footer">
+                                    <span class="chat-bubble-time">${formatTime(m.sentAt)}</span>
+                                    ${tickHtml}
+                                </div>
                             </div>
                         </div>
                     `;
@@ -519,6 +543,58 @@
             messagesContainer.style.display = 'flex';
             scrollToBottom();
         };
+
+        // Mark as Read
+        function markAsRead() {
+            if (chatBox.classList.contains('is-minimized')) return;
+            const { token, header } = getCsrfData();
+            const reqHeaders = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                ...(token && header ? { [header]: token } : {})
+            };
+            const body = new URLSearchParams({ friendId: friendId });
+            if (token) body.append('_csrf', token);
+            fetch('/api/chat/read', {
+                method: 'POST',
+                headers: reqHeaders,
+                body: body.toString()
+            }).catch(e => console.warn('markAsRead error:', e));
+        }
+
+        // Typing Status Tracking
+        let isTypingSent = false;
+        let stopTypingTimer = null;
+
+        function sendTypingStatus(typing) {
+            const { token, header } = getCsrfData();
+            const reqHeaders = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                ...(token && header ? { [header]: token } : {})
+            };
+            const body = new URLSearchParams({ friendId: friendId, isTyping: typing });
+            if (token) body.append('_csrf', token);
+            fetch('/api/chat/typing', {
+                method: 'POST',
+                headers: reqHeaders,
+                body: body.toString()
+            }).catch(() => {});
+        };
+
+        editor.addEventListener('input', () => {
+            if (!isTypingSent) {
+                isTypingSent = true;
+                sendTypingStatus(true);
+            }
+            if (stopTypingTimer) clearTimeout(stopTypingTimer);
+            stopTypingTimer = setTimeout(() => {
+                isTypingSent = false;
+                sendTypingStatus(false);
+            }, 3000);
+        });
+
+        editor.addEventListener('focus', () => {
+            markAsRead();
+        });
 
         // Fetch History
         const fetchHistory = (silent = false) => {
@@ -531,16 +607,35 @@
             })
             .then(data => {
                 if (data && data.messages) {
-                    // Sadece mesaj sayısı veya son mesaj değiştiğinde tekrar render et
-                    if (!silent || data.messages.length !== lastRenderedMessages.length) {
+                    const messagesChanged = !silent
+                        || data.messages.length !== lastRenderedMessages.length
+                        || JSON.stringify(data.messages.map(m => [m.id, m.read])) !== JSON.stringify(lastRenderedMessages.map(m => [m.id, m.read]));
+
+                    if (messagesChanged) {
                         renderMessages(data.messages);
                     }
-                    // Online durumunu güncelle
+
+                    // Typing indicator & Presence update
                     const dot = chatBox.querySelector('.chat-box-status-dot');
                     const presence = chatBox.querySelector('.chat-box-presence');
+                    const isTyping = data.isPeerTyping === true;
+
+                    if (typingRow) {
+                        const wasHidden = typingRow.style.display === 'none';
+                        typingRow.style.display = isTyping ? 'flex' : 'none';
+                        if (isTyping && wasHidden) scrollToBottom();
+                    }
+
                     if (dot && presence) {
                         dot.className = `chat-box-status-dot ${data.isOnline ? 'online' : 'offline'}`;
-                        presence.textContent = data.isOnline ? data.presenceStatusLabel : 'Çevrimdışı';
+                        presence.textContent = isTyping ? 'Yazıyor...' : (data.isOnline ? data.presenceStatusLabel : 'Çevrimdışı');
+                    }
+
+                    if (!chatBox.classList.contains('is-minimized')) {
+                        const hasUnread = data.messages.some(m => !m.sentByCurrentUser && !m.read);
+                        if (hasUnread) {
+                            markAsRead();
+                        }
                     }
                 } else {
                     renderMessages([]);
@@ -570,6 +665,12 @@
 
             if (!textContent && !hasImages && !hasFile && !bodyHtml.includes('<img')) {
                 return;
+            }
+
+            if (stopTypingTimer) clearTimeout(stopTypingTimer);
+            if (isTypingSent) {
+                isTypingSent = false;
+                sendTypingStatus(false);
             }
 
             sendBtn.disabled = true;
