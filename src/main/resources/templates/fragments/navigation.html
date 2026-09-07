@@ -108,11 +108,6 @@
                     </div>
                 </div>
             </div>
-            <div class="topbar-friends-sidebar-dropdown">
-                <button type="button" class="topbar-icon-btn" data-friends-sidebar-toggle aria-label="Arkadaşlar" aria-expanded="false" title="Arkadaşlar">
-                    <span class="material-symbols-outlined">contacts</span>
-                </button>
-            </div>
             <details class="profile-menu">
                 <summary aria-label="Kullanıcı menüsünü aç">
                     <img th:src="${navigationProfile.profileImageUrl != null ? navigationProfile.profileImageUrl : '/images/default-avatar.svg'}"
@@ -126,13 +121,24 @@
                     </form>
                 </div>
             </details>
+            <button type="button" class="sidebar-toggle friends-toggle" data-friends-sidebar-toggle aria-label="Arkadaşlar Menüsü" aria-expanded="false" title="Arkadaşlar Menüsü">
+                <span class="material-symbols-outlined">menu_open</span>
+            </button>
         </div>
     </div>
     
     <aside id="friendsSidebar" class="friends-sidebar" aria-hidden="true">
         <div class="friends-sidebar-header">
-            <h2>Arkadaşlar</h2>
-            <button type="button" class="btn-close-sidebar" data-friends-sidebar-close aria-label="Kapat">
+            <div class="friends-sidebar-title-group">
+                <div class="friends-sidebar-icon-badge">
+                    <span class="material-symbols-outlined">group</span>
+                </div>
+                <div>
+                    <h2>Arkadaşlar</h2>
+                    <p class="friends-sidebar-subtitle">Çevrimiçi & Durum</p>
+                </div>
+            </div>
+            <button type="button" class="btn-close-sidebar" data-friends-sidebar-close aria-label="Kapat" title="Kapat">
                 <span class="material-symbols-outlined">close</span>
             </button>
         </div>

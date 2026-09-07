@@ -29,8 +29,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    toggleBtn.addEventListener('click', toggleSidebar);
-    closeBtn.addEventListener('click', toggleSidebar);
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+    });
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (sidebar.getAttribute('aria-hidden') === 'false') {
+            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                toggleSidebar();
+            }
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.getAttribute('aria-hidden') === 'false') {
+            toggleSidebar();
+        }
+    });
 
     const formatLastSeen = (lastSeenAt) => {
         if (!lastSeenAt) return 'Uzun zaman önce';

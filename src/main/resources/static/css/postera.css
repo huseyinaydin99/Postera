@@ -2010,14 +2010,14 @@ a.discover-user-name:hover {
 .friends-sidebar {
     position: fixed;
     top: 0;
-    right: -320px;
+    right: -330px;
     width: 320px;
     height: 100vh;
-    background: var(--paper-raised);
+    background: linear-gradient(180deg, #ffffff 0%, #faf9f6 100%);
     border-left: 1px solid var(--line);
-    box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+    box-shadow: -4px 0 24px rgba(26, 35, 50, .08);
     z-index: 1000;
-    transition: right 0.3s ease;
+    transition: right .28s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
 }
@@ -2030,104 +2030,208 @@ a.discover-user-name:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
-    border-bottom: 1px solid var(--line);
+    padding: 1.25rem 1.15rem;
+    border-bottom: 1px solid rgba(226, 223, 214, .7);
+    background: var(--paper-raised);
+}
+
+.friends-sidebar-title-group {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    min-width: 0;
+}
+
+.friends-sidebar-icon-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(180, 83, 9, .22);
+    flex-shrink: 0;
+}
+
+.friends-sidebar-icon-badge .material-symbols-outlined {
+    font-size: 1.35rem;
 }
 
 .friends-sidebar-header h2 {
     margin: 0;
-    font-size: 1.2rem;
-    color: var(--ink-700);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink-900);
+    letter-spacing: -.01em;
+}
+
+.friends-sidebar-subtitle {
+    margin: 0;
+    color: var(--ink-500);
+    font: 600 .68rem var(--font-mono);
+    letter-spacing: .05em;
+    text-transform: uppercase;
 }
 
 .btn-close-sidebar {
-    background: none;
-    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 8px;
     cursor: pointer;
     color: var(--ink-500);
-    padding: 0.25rem;
+    padding: 0;
+    transition: all .15s ease;
 }
+
 .btn-close-sidebar:hover {
-    color: var(--ink-700);
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent);
 }
 
 .friends-sidebar-status-picker {
-    padding: 1rem;
+    padding: .9rem 1.15rem;
     border-bottom: 1px solid var(--line);
-    background: var(--canvas);
+    background: rgba(250, 249, 246, .7);
 }
 
 .friends-sidebar-status-picker label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--ink-600);
+    margin-bottom: .4rem;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--ink-700);
+}
+
+.friends-sidebar-status-picker select {
+    min-height: 2.2rem;
+    padding: .35rem .65rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper-raised);
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--ink-800);
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.friends-sidebar-status-picker select:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .friends-sidebar-list {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: .85rem .95rem;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+}
+
+.friends-sidebar-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.friends-sidebar-list::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 4px;
 }
 
 .friends-sidebar-loading {
     text-align: center;
+    padding: 2rem 1rem;
     color: var(--ink-500);
+    font-size: .88rem;
 }
 
 .friend-item {
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
-    position: relative;
+    gap: .75rem;
+    padding: .6rem .75rem;
+    border-radius: 9px;
+    background: transparent;
+    transition: all .16s ease;
+    cursor: pointer;
+}
+
+.friend-item:hover {
+    background: var(--paper-raised);
+    box-shadow: 0 2px 8px rgba(26, 35, 50, .05);
+    transform: translateX(-2px);
 }
 
 .friend-item-avatar-wrapper {
     position: relative;
-    margin-right: 0.75rem;
+    flex-shrink: 0;
 }
 
 .friend-item-avatar {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     object-fit: cover;
+    border: 2px solid var(--line);
+    transition: border-color .15s ease;
+}
+
+.friend-item:hover .friend-item-avatar {
+    border-color: var(--accent);
 }
 
 .friend-item-status-dot {
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
     border: 2px solid var(--paper-raised);
 }
+
 .friend-item-status-dot.online {
-    background-color: #28a745;
+    background-color: #16a34a;
+    box-shadow: 0 0 0 1px rgba(22, 163, 74, .25);
 }
+
 .friend-item-status-dot.offline {
-    background-color: #dc3545;
+    background-color: #dc2626;
+    box-shadow: 0 0 0 1px rgba(220, 38, 38, .25);
 }
 
 .friend-item-info {
     flex: 1;
-    overflow: hidden;
+    min-width: 0;
 }
 
 .friend-item-name {
     display: block;
-    font-weight: 500;
-    color: var(--ink-700);
+    font-weight: 600;
+    font-size: .88rem;
+    color: var(--ink-900);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.3;
 }
 
 .friend-item-presence {
     display: block;
-    font-size: 0.75rem;
+    font-size: .75rem;
     color: var(--ink-500);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: .1rem;
 }
 
 @media (max-width: 768px) {
