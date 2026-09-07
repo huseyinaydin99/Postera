@@ -8,8 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!sidebar || !toggleBtn) return;
 
     const getCsrfHeaders = () => {
-        const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-        const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+        let token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        let header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+        if (!token) {
+            token = document.querySelector('input[name="_csrf"]')?.value;
+        }
+        if (!token) {
+            const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+            if (match) token = decodeURIComponent(match[1]);
+        }
         return token && header ? { [header]: token } : {};
     };
 

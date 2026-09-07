@@ -3,9 +3,21 @@
     const MAX_CHATS = 3;
     const activeChats = new Map(); // friendId -> { element, pollTimer, ... }
 
+    const getCsrfData = () => {
+        let token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        let header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+        if (!token) {
+            token = document.querySelector('input[name="_csrf"]')?.value;
+        }
+        if (!token) {
+            const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+            if (match) token = decodeURIComponent(match[1]);
+        }
+        return { token, header };
+    };
+
     const getCsrfHeaders = () => {
-        const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-        const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+        const { token, header } = getCsrfData();
         return token && header ? { [header]: token } : {};
     };
 
@@ -530,13 +542,30 @@
                 formData.append('fileAlias', fileAliasInput.value.trim() || selectedFile.name);
             }
 
+            const { token, header } = getCsrfData();
+            if (token) {
+                formData.append('_csrf', token);
+            }
+
+            const reqHeaders = token && header ? { [header]: token } : {};
+
             fetch('/api/chat/send', {
                 method: 'POST',
-                headers: getCsrfHeaders(),
+                headers: reqHeaders,
                 body: formData
             })
-            .then(res => {
-                if (!res.ok) return res.json().then(e => Promise.reject(e));
+            .then(async (res) => {
+                if (!res.ok) {
+                    let errMsg = 'Mesaj gönderilemedi.';
+                    try {
+                        const errObj = await res.json();
+                        errMsg = errObj.message || errMsg;
+                    } catch (_) {
+                        if (res.status === 403) errMsg = 'Yetkisiz erişim veya CSRF hatası (403).';
+                        else if (res.status === 401) errMsg = 'Oturum süreniz doldu, lütfen tekrar giriş yapın.';
+                    }
+                    throw new Error(errMsg);
+                }
                 return res.json();
             })
             .then(newMsg => {
